@@ -1258,9 +1258,9 @@ body {
 
 .series-panel::after {
   content: "";
-  position: absolute;
+  position: center;
   top: 0;
-  left: 30px;
+  left: 18px;
   right: 18px;
   height: 3px;
   border-radius: 999px;
@@ -1502,4 +1502,69 @@ body {
 
 body.sub-page .hero {
   display: none !important;
+}
+
+/* Squad picker: no whole-page scroll, only inner panels scroll */
+
+body.squad-page {
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+body.squad-page .page {
+  height: 100vh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+body.squad-page .steps {
+  flex: 0 0 auto !important;
+}
+
+body.squad-page #squadScreen.active {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+body.squad-page .topline {
+  flex: 0 0 auto !important;
+}
+
+body.squad-page #squadScreen > .panel {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+}
+
+body.squad-page .squad-layout {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Left rules/filter panel scrolls inside */
+body.squad-page .side-panel {
+  max-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Right player table scrolls inside */
+body.squad-page .table-card {
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+}
+
+/* Keep table header visible while scrolling */
+body.squad-page .table-card thead {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 5 !important;
 }

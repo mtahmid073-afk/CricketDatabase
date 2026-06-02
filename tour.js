@@ -476,6 +476,8 @@ function showScreen(name) {
 
   document.body.classList.toggle("main-page", name === "setup");
   document.body.classList.toggle("sub-page", name !== "setup");
+  document.body.classList.toggle("squad-page", name === "squad");
+  document.body.classList.toggle("summary-page", name === "summary");
 
   if (name === "summary") renderSummary();
 
