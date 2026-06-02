@@ -294,11 +294,14 @@ const state = {
   computerSquad: []
 };
 
-
-
 let squadSort = {
   key: "overall",
   direction: "desc"
+};
+
+let tourProgress = {
+  completedMatchIndexes: [],
+  activeMatchIndex: null
 };
 
 const TOUR_STORAGE_KEY = "cricketTourSetupSave_v1";
