@@ -399,6 +399,30 @@ function teamStatsHtml(team) {
   `;
 }
 
+function updateTourPreview() {
+  const user = $("userTeamSelect")?.value || "";
+  const computer = $("computerTeamSelect")?.value || "";
+
+  const tests = Number($("tests")?.value || 0);
+  const odis = Number($("odis")?.value || 0);
+  const t20s = Number($("t20s")?.value || 0);
+  const total = tests + odis + t20s;
+
+  const matchup = user && computer
+    ? `${user} vs ${computer}`
+    : "Choose teams";
+
+  const parts = [];
+
+  if (tests > 0) parts.push(`${tests} Test${tests > 1 ? "s" : ""}`);
+  if (odis > 0) parts.push(`${odis} ODI${odis > 1 ? "s" : ""}`);
+  if (t20s > 0) parts.push(`${t20s} T20${t20s > 1 ? "s" : ""}`);
+
+  $("previewMatchup").textContent = matchup;
+  $("previewFormats").textContent = parts.length ? parts.join(" + ") : "No matches selected";
+  $("previewTotal").textContent = `${total} total match${total === 1 ? "" : "es"}`;
+}
+
 function updateTeamCards() {
   const user = $("userTeamSelect").value;
   const computer = $("computerTeamSelect").value;
@@ -419,6 +443,7 @@ function updateTeamCards() {
 
   showLogo("userLogo", "userFallback", user);
   showLogo("computerLogo", "computerFallback", computer);
+  updateTourPreview();
 }
 
 function showScreen(name) {
@@ -923,6 +948,13 @@ function resetAll() {
   fillTeamDropdowns();
   showScreen("setup");
 }
+
+["tests", "odis", "t20s"].forEach((id) => {
+  const el = $(id);
+  if (el) {
+    el.addEventListener("change", updateTourPreview);
+  }
+});
 
 setupSquadSortButtons();
 initData();

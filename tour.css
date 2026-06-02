@@ -1229,3 +1229,69 @@ body {
 .vs-card span {
   box-shadow: 0 0 24px rgba(126, 231, 135, 0.35);
 }
+
+/* Hide debug loaded-from message */
+.data-source {
+  display: none !important;
+}
+
+
+/* Tour preview card */
+
+.tour-preview-card {
+  width: min(960px, 100%);
+  margin: 0 auto 10px;
+  background: linear-gradient(135deg, rgba(23, 33, 43, 0.96), rgba(34, 48, 60, 0.86));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: var(--shadow);
+}
+
+.preview-label {
+  display: inline-block;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.tour-preview-card h3 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.04em;
+}
+
+.preview-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.preview-stats span {
+  background: var(--panel-2);
+  border: 1px solid var(--border-2);
+  color: #cbd5e1;
+  padding: 8px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+/* VS only circle */
+.vs-card {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.vs-card span {
+  box-shadow: 0 0 24px rgba(126, 231, 135, 0.35), 0 12px 28px rgba(0, 0, 0, 0.26) !important;
+}
