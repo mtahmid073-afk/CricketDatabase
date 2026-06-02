@@ -1825,3 +1825,82 @@ body.summary-page #summaryScreen.active {
     justify-content: flex-start;
   }
 }
+
+/* Compact side-by-side schedule cards */
+
+.compact-match-card {
+  display: grid !important;
+  grid-template-columns: minmax(260px, 1.6fr) minmax(210px, 0.9fr) 74px !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 10px 12px !important;
+}
+
+.match-main-info {
+  min-width: 0 !important;
+}
+
+.match-time-info {
+  min-width: 0 !important;
+  text-align: right !important;
+}
+
+.compact-match-card .match-title {
+  font-size: 16px !important;
+  margin-bottom: 3px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.compact-match-card .match-venue {
+  font-size: 12px !important;
+  margin-bottom: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.compact-match-card .match-local-time {
+  font-size: 13px !important;
+  white-space: nowrap !important;
+}
+
+.compact-match-card .match-local-time span {
+  color: #cbd5e1 !important;
+  font-weight: 800 !important;
+}
+
+.compact-match-card .match-gmt-time {
+  font-size: 11px !important;
+  white-space: nowrap !important;
+}
+
+.compact-match-card .match-format-pill {
+  justify-self: end !important;
+  padding: 7px 9px !important;
+  font-size: 11px !important;
+}
+
+/* Mobile fallback */
+@media (max-width: 850px) {
+  .compact-match-card {
+    grid-template-columns: 1fr !important;
+    gap: 7px !important;
+  }
+
+  .match-time-info {
+    text-align: left !important;
+  }
+
+  .compact-match-card .match-title,
+  .compact-match-card .match-venue,
+  .compact-match-card .match-local-time,
+  .compact-match-card .match-gmt-time {
+    white-space: normal !important;
+  }
+
+  .compact-match-card .match-format-pill {
+    justify-self: start !important;
+  }
+}
