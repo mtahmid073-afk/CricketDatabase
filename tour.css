@@ -1497,3 +1497,41 @@ body {
     transform: translateY(0);
   }
 }
+
+/* Reduce Series Creator box slightly */
+
+.series-panel {
+  padding: 9px !important;
+}
+
+.series-panel h2 {
+  font-size: 21px !important;
+  margin-bottom: 6px !important;
+}
+
+.series-panel .series-grid {
+  gap: 6px !important;
+  margin: 6px 0 !important;
+}
+
+.series-panel .format-card {
+  padding: 5px !important;
+  border-radius: 10px !important;
+}
+
+.series-panel .format-card label {
+  font-size: 10px !important;
+  margin-bottom: 4px !important;
+}
+
+.series-panel .format-card select {
+  padding: 5px 7px !important;
+  font-size: 11px !important;
+  border-radius: 8px !important;
+}
+
+.series-panel .actions button {
+  padding: 9px 13px !important;
+  font-size: 12px !important;
+  border-radius: 12px !important;
+}
