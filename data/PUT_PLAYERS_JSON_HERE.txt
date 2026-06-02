@@ -1,0 +1,2 @@
+Put your players.json file in this folder and name it exactly:
+players.json
