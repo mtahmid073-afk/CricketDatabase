@@ -1348,3 +1348,80 @@ body {
   }
 }
 
+/* Cooler VS circle only */
+
+.vs-card {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+}
+
+.vs-card span {
+  position: relative !important;
+  width: 72px !important;
+  height: 72px !important;
+  border-radius: 999px !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.22), transparent 24%),
+    linear-gradient(135deg, #2d6a4f, #40916c, #7ee787) !important;
+  color: #06110b !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 22px !important;
+  font-weight: 1000 !important;
+  letter-spacing: -0.04em !important;
+  border: 2px solid rgba(126, 231, 135, 0.75) !important;
+  box-shadow:
+    0 0 18px rgba(126, 231, 135, 0.42),
+    0 0 40px rgba(126, 231, 135, 0.20),
+    0 16px 32px rgba(0, 0, 0, 0.35),
+    inset 0 2px 5px rgba(255, 255, 255, 0.25),
+    inset 0 -5px 12px rgba(0, 0, 0, 0.22) !important;
+  animation: vsPulse 2.4s ease-in-out infinite;
+}
+
+.vs-card span::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 999px;
+  border: 1px solid rgba(126, 231, 135, 0.28);
+  box-shadow: 0 0 22px rgba(126, 231, 135, 0.18);
+}
+
+.vs-card span::after {
+  content: "";
+  position: absolute;
+  width: 34px;
+  height: 8px;
+  top: 13px;
+  left: 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  transform: rotate(-18deg);
+}
+
+@keyframes vsPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 18px rgba(126, 231, 135, 0.42),
+      0 0 40px rgba(126, 231, 135, 0.20),
+      0 16px 32px rgba(0, 0, 0, 0.35),
+      inset 0 2px 5px rgba(255, 255, 255, 0.25),
+      inset 0 -5px 12px rgba(0, 0, 0, 0.22);
+  }
+
+  50% {
+    transform: scale(1.06);
+    box-shadow:
+      0 0 26px rgba(126, 231, 135, 0.62),
+      0 0 58px rgba(126, 231, 135, 0.28),
+      0 18px 36px rgba(0, 0, 0, 0.42),
+      inset 0 2px 5px rgba(255, 255, 255, 0.28),
+      inset 0 -5px 12px rgba(0, 0, 0, 0.25);
+  }
+}
