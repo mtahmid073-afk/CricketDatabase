@@ -1430,3 +1430,70 @@ body {
 .vs-card span::after {
   display: none !important;
 }
+
+/* Team change premium animation */
+
+.team-card.team-changed {
+  animation: teamCardGlow 0.75s ease;
+}
+
+.logo-frame img.logo-fade-in {
+  animation: logoFadeIn 0.5s ease;
+}
+
+.team-stats.stats-smooth {
+  animation: statsSmoothIn 0.45s ease;
+}
+
+@keyframes teamCardGlow {
+  0% {
+    box-shadow:
+      0 0 0 rgba(126, 231, 135, 0),
+      var(--shadow);
+    border-color: var(--border);
+    transform: scale(1);
+  }
+
+  35% {
+    box-shadow:
+      0 0 0 5px rgba(126, 231, 135, 0.15),
+      0 0 38px rgba(126, 231, 135, 0.32),
+      var(--shadow);
+    border-color: rgba(126, 231, 135, 0.75);
+    transform: scale(1.018);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 rgba(126, 231, 135, 0),
+      var(--shadow);
+    border-color: var(--border);
+    transform: scale(1);
+  }
+}
+
+@keyframes logoFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.84) rotate(-4deg);
+    filter: blur(2px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes statsSmoothIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

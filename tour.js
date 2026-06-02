@@ -289,6 +289,10 @@ let squadSort = {
   direction: "desc"
 };
 
+let lastUserTeam = "";
+let lastComputerTeam = "";
+let teamCardsReady = false;
+
 const $ = id => document.getElementById(id);
 
 const uniqueTeams = () =>
@@ -399,9 +403,37 @@ function teamStatsHtml(team) {
   `;
 }
 
+function animateTeamChange(cardId, logoId, statsId) {
+  const card = $(cardId);
+  const logo = $(logoId);
+  const stats = $(statsId);
+
+  if (!card) return;
+
+  card.classList.remove("team-changed");
+  void card.offsetWidth;
+  card.classList.add("team-changed");
+
+  if (logo) {
+    logo.classList.remove("logo-fade-in");
+    void logo.offsetWidth;
+    logo.classList.add("logo-fade-in");
+  }
+
+  if (stats) {
+    stats.classList.remove("stats-smooth");
+    void stats.offsetWidth;
+    stats.classList.add("stats-smooth");
+  }
+}
+
+
 function updateTeamCards() {
   const user = $("userTeamSelect").value;
   const computer = $("computerTeamSelect").value;
+
+  const userChanged = teamCardsReady && user !== lastUserTeam;
+  const computerChanged = teamCardsReady && computer !== lastComputerTeam;
 
   $("userTeamName").textContent = user || "Load JSON";
   $("computerTeamName").textContent = computer || "Load JSON";
@@ -411,7 +443,7 @@ function updateTeamCards() {
     : "Load a player JSON file to start.";
 
   $("computerTeamDetails").textContent = computer
-    ? `${teamPlayers(computer).length} available players for the tour.`
+    ? `${teamPlayers(computer).length} available computer players.`
     : "Opponent teams appear after JSON loads.";
 
   $("userTeamStats").innerHTML = user ? teamStatsHtml(user) : "";
@@ -419,6 +451,18 @@ function updateTeamCards() {
 
   showLogo("userLogo", "userFallback", user);
   showLogo("computerLogo", "computerFallback", computer);
+
+  if (userChanged) {
+    animateTeamChange("userTeamCard", "userLogo", "userTeamStats");
+  }
+
+  if (computerChanged) {
+    animateTeamChange("computerTeamCard", "computerLogo", "computerTeamStats");
+  }
+
+  lastUserTeam = user;
+  lastComputerTeam = computer;
+  teamCardsReady = true;
 }
 
 function showScreen(name) {
