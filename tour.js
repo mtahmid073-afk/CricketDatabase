@@ -1228,18 +1228,8 @@ function renderSummary() {
   $("tourSquadSummary").textContent = `${state.userSquad.length} user squad • ${state.computerSquad.length} computer squad`;
 
   $("scheduleList").innerHTML = Object.entries(grouped).map(([dateLabel, matches]) => {
-    let lastSeriesName = "";
-
     const matchesHTML = matches.map((match) => {
-      let seriesHTML = "";
-
-      if (match.seriesName !== lastSeriesName) {
-        seriesHTML = `<div class="schedule-series-name">${esc(match.seriesName)}</div>`;
-        lastSeriesName = match.seriesName;
-      }
-
       return `
-        ${seriesHTML}
         ${renderScheduleMatch(match, nextPlayableMatchIndex)}
       `;
     }).join("");
