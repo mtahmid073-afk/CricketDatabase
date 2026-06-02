@@ -171,7 +171,7 @@
         linear-gradient(180deg, rgba(34, 48, 60, 0.96), rgba(23, 33, 43, 0.98));
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 12px;
+      padding: 8px;
       box-shadow: var(--shadow);
       position: relative;
       overflow: hidden;
