@@ -1225,3 +1225,7 @@ body {
 .database-row button {
   white-space: nowrap !important;
 }
+
+.vs-card span {
+  box-shadow: 0 0 24px rgba(126, 231, 135, 0.35);
+}
