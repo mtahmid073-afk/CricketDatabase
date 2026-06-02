@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cricket Tour Setup - JSON Ready</title>
-  <link rel="stylesheet" href="tour.css?v=1015" />
+  <link rel="stylesheet" href="tour.css?v=1016" />
 </head>
 <body class="app-loading main-page">
   <main class="page">
@@ -264,20 +264,20 @@
         </div>
       </div>
 
-      <section class="schedule-shell">
-        <div class="tour-overview-card">
-          <div>
-            <span class="overview-label">Tour</span>
-            <h3 id="tourName">Tour Name</h3>
-          </div>
-
-          <div class="tour-overview-stats">
-            <span id="tourTeamSummary">Teams</span>
-            <span id="tourMatchSummary">Matches</span>
-            <span id="tourSquadSummary">Squads</span>
-          </div>
+      <div class="tour-overview-card schedule-overview-outside">
+        <div>
+          <span class="overview-label">Tour</span>
+          <h3 id="tourName">Tour Name</h3>
         </div>
 
+        <div class="tour-overview-stats">
+          <span id="tourTeamSummary">Teams</span>
+          <span id="tourMatchSummary">Matches</span>
+          <span id="tourSquadSummary">Squads</span>
+        </div>
+      </div>
+
+      <section class="schedule-shell">
         <div id="scheduleList" class="schedule-list"></div>
 
         <details class="json-details">
@@ -290,6 +290,6 @@
     </section>
   </main>
 
-  <script src="tour.js?v=1015"></script>
+  <script src="tour.js?v=1016"></script>
 </body>
 </html>

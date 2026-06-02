@@ -1915,3 +1915,43 @@ body.app-ready .page {
   opacity: 1;
   transition: opacity 0.18s ease;
 }
+
+/* Tour overview outside the scrolling schedule box */
+
+body.summary-page #summaryScreen.active {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  overflow: hidden !important;
+}
+
+.schedule-page-header {
+  flex: 0 0 auto !important;
+}
+
+.schedule-overview-outside {
+  flex: 0 0 auto !important;
+  position: relative !important;
+  top: auto !important;
+  z-index: 2 !important;
+  margin-bottom: 0 !important;
+}
+
+.tour-overview-card {
+  position: relative !important;
+  top: auto !important;
+}
+
+.schedule-shell {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Date headers now stick to the top of the scroll box, not under the tour card */
+.schedule-date {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 4 !important;
+}
