@@ -1347,3 +1347,114 @@ body {
     opacity: 0;
   }
 }
+
+/* Main page new position: teams left/right, series creator in middle */
+
+#setupScreen.active {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+.match-setup-grid {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: 390px minmax(330px, 420px) 390px !important;
+  gap: 22px !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+}
+
+.center-setup-column {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+}
+
+.center-setup-column .vs-card {
+  width: auto !important;
+  min-height: auto !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.center-setup-column .vs-card span {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 999px !important;
+  background: var(--accent-dark) !important;
+  color: white !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 22px !important;
+  font-weight: 1000 !important;
+  border: 1px solid var(--accent-hover) !important;
+  box-shadow: 0 0 28px rgba(126, 231, 135, 0.35), 0 14px 30px rgba(0, 0, 0, 0.28) !important;
+}
+
+.match-setup-grid .team-card {
+  width: 390px !important;
+  max-width: 390px !important;
+  min-height: 350px !important;
+}
+
+.center-setup-column .series-panel {
+  width: 100% !important;
+  max-width: 420px !important;
+  margin: 0 !important;
+  padding: 16px !important;
+}
+
+.center-setup-column .series-panel h2 {
+  text-align: center !important;
+  margin-bottom: 12px !important;
+}
+
+.center-setup-column .series-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  max-width: none !important;
+}
+
+.center-setup-column .format-card {
+  width: 100% !important;
+}
+
+.center-setup-column .format-card label {
+  font-size: 12px !important;
+}
+
+.center-setup-column .format-card select {
+  font-size: 13px !important;
+  padding: 9px 10px !important;
+}
+
+.series-action {
+  margin-top: 4px !important;
+}
+
+.series-action button {
+  width: 100% !important;
+}
+
+/* Keep mobile clean */
+@media (max-width: 1150px) {
+  .match-setup-grid {
+    grid-template-columns: 1fr !important;
+    max-width: 430px !important;
+  }
+
+  .match-setup-grid .team-card,
+  .center-setup-column .series-panel {
+    width: 100% !important;
+    max-width: 430px !important;
+  }
+}

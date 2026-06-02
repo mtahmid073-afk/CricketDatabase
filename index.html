@@ -47,7 +47,8 @@
     </nav>
 
     <section class="screen active" id="setupScreen">
-      <div class="team-grid">
+      <div class="match-setup-grid">
+
         <article class="team-card">
           <div class="team-card-inner">
             <div class="team-label">User Team</div>
@@ -64,7 +65,59 @@
           </div>
         </article>
 
-        <div class="vs-card"><span>VS</span></div>
+        <div class="center-setup-column">
+          <div class="vs-card">
+            <span>VS</span>
+          </div>
+
+          <section class="panel series-panel">
+            <h2>Series Creator</h2>
+
+            <div class="series-grid">
+              <div class="format-card">
+                <label for="tests">Test Matches</label>
+                <select id="tests">
+                  <option value="0">None</option>
+                  <option value="1">1 Test</option>
+                  <option value="2">2 Tests</option>
+                  <option value="3">3 Tests</option>
+                  <option value="4">4 Tests</option>
+                  <option value="5">5 Tests</option>
+                </select>
+              </div>
+
+              <div class="format-card">
+                <label for="odis">ODI Matches</label>
+                <select id="odis">
+                  <option value="0">None</option>
+                  <option value="1">1 ODI</option>
+                  <option value="2">2 ODIs</option>
+                  <option value="3" selected>3 ODIs</option>
+                  <option value="4">4 ODIs</option>
+                  <option value="5">5 ODIs</option>
+                </select>
+              </div>
+
+              <div class="format-card">
+                <label for="t20s">T20 Matches</label>
+                <select id="t20s">
+                  <option value="0">None</option>
+                  <option value="1" selected>1 T20</option>
+                  <option value="2">2 T20s</option>
+                  <option value="3">3 T20s</option>
+                  <option value="4">4 T20s</option>
+                  <option value="5">5 T20s</option>
+                </select>
+              </div>
+
+              <div class="actions series-action">
+                <button onclick="createSeries()">Create Series & Choose Squad</button>
+              </div>
+
+              <div id="setupMsg" class="message error"></div>
+            </div>
+          </section>
+        </div>
 
         <article class="team-card">
           <div class="team-card-inner">
@@ -81,55 +134,8 @@
             <div class="team-stats" id="computerTeamStats"></div>
           </div>
         </article>
+
       </div>
-
-      <section class="panel series-panel">
-        <h2>Series Creator</h2>
-
-        <div class="series-grid">
-          <div class="format-card">
-            <label for="tests">Test Matches</label>
-            <select id="tests">
-              <option value="0">None</option>
-              <option value="1">Only</option>
-              <option value="2">2 Tests</option>
-              <option value="3">3 Tests</option>
-              <option value="4">4 Tests</option>
-              <option value="5">5 Tests</option>
-            </select>
-          </div>
-
-          <div class="format-card">
-            <label for="odis">ODI Matches</label>
-            <select id="odis">
-              <option value="0">None</option>
-              <option value="1">Only</option>
-              <option value="2">2 ODIs</option>
-              <option value="3" selected>3 ODIs</option>
-              <option value="4">4 ODIs</option>
-              <option value="5">5 ODIs</option>
-            </select>
-          </div>
-
-          <div class="format-card">
-            <label for="t20s">T20 Matches</label>
-            <select id="t20s">
-              <option value="0">None</option>
-              <option value="1" selected>Only</option>
-              <option value="2">2 T20s</option>
-              <option value="3">3 T20s</option>
-              <option value="4">4 T20s</option>
-              <option value="5">5 T20s</option>
-            </select>
-          </div>
-
-          <div class="actions">
-            <button onclick="createSeries()">Create Series & Choose Squad</button>
-          </div>
-
-          <div id="setupMsg" class="message error"></div>
-        </div>
-      </section>
     </section>
 
     <section class="screen" id="squadScreen">
