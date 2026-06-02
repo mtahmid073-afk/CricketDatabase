@@ -583,6 +583,11 @@ function createSeries() {
     direction: "desc"
   };
 
+  let tourProgress = {
+    completedMatchIndexes: [],
+    activeMatchIndex: null
+  };
+
   renderPlayerTable();
   showScreen("squad");
 }
@@ -1027,6 +1032,7 @@ function addDays(date, days) {
 
 function buildTourSchedule() {
   const schedule = [];
+  let scheduleMatchIndex = 0;
   const startDate = new Date();
   startDate.setHours(9, 30, 0, 0);
 
@@ -1041,6 +1047,7 @@ function buildTourSchedule() {
         const matchDate = addDays(startDate, dayOffset);
 
         schedule.push({
+          matchIndex: scheduleMatchIndex++,
           date: matchDate,
           seriesName: `${state.computerTeam} tour of ${state.userTeam}, ${matchDate.getFullYear()}`,
           title: `${state.userTeam} vs ${state.computerTeam}, ${getOrdinalNumber(testNumber)} Test, Day ${day}`,
@@ -1062,6 +1069,7 @@ function buildTourSchedule() {
       const matchDate = addDays(startDate, dayOffset);
 
       schedule.push({
+        matchIndex: scheduleMatchIndex++,
         date: matchDate,
         seriesName: `${state.computerTeam} tour of ${state.userTeam}, ${matchDate.getFullYear()}`,
         title: `${state.userTeam} vs ${state.computerTeam}, ${getOrdinalNumber(odiNumber)} ODI`,
@@ -1081,6 +1089,7 @@ function buildTourSchedule() {
       matchDate.setHours(19, 0, 0, 0);
 
       schedule.push({
+        matchIndex: scheduleMatchIndex++,
         date: matchDate,
         seriesName: `${state.computerTeam} tour of ${state.userTeam}, ${matchDate.getFullYear()}`,
         title: `${state.userTeam} vs ${state.computerTeam}, ${getOrdinalNumber(t20Number)} T20I`,
@@ -1115,8 +1124,42 @@ function groupScheduleByDate(schedule) {
   return grouped;
 }
 
-function renderScheduleMatch(match) {
+function getNextPlayableMatchIndex(schedule) {
+  for (const match of schedule) {
+    if (!tourProgress.completedMatchIndexes.includes(match.matchIndex)) {
+      return match.matchIndex;
+    }
+  }
+
+  return null;
+}
+
+function renderScheduleMatch(match, nextPlayableMatchIndex) {
   const formatClass = match.format.toLowerCase();
+  const isCompleted = tourProgress.completedMatchIndexes.includes(match.matchIndex);
+  const isPlayable = match.matchIndex === nextPlayableMatchIndex && !isCompleted;
+
+  let buttonHTML = "";
+
+  if (isCompleted) {
+    buttonHTML = `
+      <button class="match-action-btn completed" disabled>
+        Completed
+      </button>
+    `;
+  } else if (isPlayable) {
+    buttonHTML = `
+      <button class="match-action-btn start" onclick="startTourMatch(${match.matchIndex})">
+        Start Match
+      </button>
+    `;
+  } else {
+    buttonHTML = `
+      <button class="match-action-btn locked" disabled>
+        Yet to Start
+      </button>
+    `;
+  }
 
   return `
     <div class="schedule-match-card compact-match-card">
@@ -1133,13 +1176,43 @@ function renderScheduleMatch(match) {
       <div class="match-format-pill ${esc(formatClass)}">
         ${esc(match.format)}
       </div>
+
+      <div class="match-action-wrap">
+        ${buttonHTML}
+      </div>
     </div>
   `;
+}
+
+function startTourMatch(matchIndex) {
+  const schedule = buildTourSchedule();
+  const match = schedule.find(item => item.matchIndex === matchIndex);
+
+  if (!match) {
+    return;
+  }
+
+  tourProgress.activeMatchIndex = matchIndex;
+
+  const currentMatchData = {
+    matchIndex,
+    match,
+    userTeam: state.userTeam,
+    computerTeam: state.computerTeam,
+    userSquad: state.userSquad,
+    computerSquad: state.computerSquad
+  };
+
+  localStorage.setItem("currentTourMatch", JSON.stringify(currentMatchData));
+  saveTourState("summary");
+
+  window.location.href = "toss.html";
 }
 
 function renderSummary() {
   const schedule = buildTourSchedule();
   const grouped = groupScheduleByDate(schedule);
+  const nextPlayableMatchIndex = getNextPlayableMatchIndex(schedule);
 
   const tests = countFormat("Test");
   const odis = countFormat("ODI");
@@ -1164,7 +1237,7 @@ function renderSummary() {
 
       return `
         ${seriesHTML}
-        ${renderScheduleMatch(match)}
+        ${renderScheduleMatch(match, nextPlayableMatchIndex)}
       `;
     }).join("");
 
@@ -1223,6 +1296,7 @@ function finishAppLoading() {
   document.body.classList.remove("app-loading");
   document.body.classList.add("app-ready");
 }
+
 initData();
 
 function getPlayersByIds(ids) {
@@ -1246,7 +1320,8 @@ function saveTourState(screenName = currentScreenName) {
     series: state.series,
     userSquadIds: state.userSquad.map(player => String(player.id)),
     computerSquadIds: state.computerSquad.map(player => String(player.id)),
-    squadSort
+    squadSort,
+    tourProgress
   };
 
   localStorage.setItem(TOUR_STORAGE_KEY, JSON.stringify(saveData));
@@ -1296,6 +1371,10 @@ function restoreTourStateAfterDataLoad() {
 
     if (saved.squadSort) {
       squadSort = saved.squadSort;
+    }
+
+    if (saved.tourProgress) {
+      tourProgress = saved.tourProgress;
     }
 
     updateTeamCards();
