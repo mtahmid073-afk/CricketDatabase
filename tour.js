@@ -474,6 +474,9 @@ function showScreen(name) {
   $("stepSquad").classList.toggle("active", name === "squad");
   $("stepSummary").classList.toggle("active", name === "summary");
 
+  document.body.classList.toggle("main-page", name === "setup");
+  document.body.classList.toggle("sub-page", name !== "setup");
+
   if (name === "summary") renderSummary();
 
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -967,6 +970,8 @@ function resetAll() {
   fillTeamDropdowns();
   showScreen("setup");
 }
+
+document.body.classList.add("main-page");
 
 setupSquadSortButtons();
 initData();

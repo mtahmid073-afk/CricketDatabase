@@ -1497,3 +1497,9 @@ body {
     transform: translateY(0);
   }
 }
+
+/* Show Cricket Tour Setup header only on main setup page */
+
+body.sub-page .hero {
+  display: none !important;
+}
