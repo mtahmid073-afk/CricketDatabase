@@ -919,25 +919,221 @@ function rosterRow(p, i) {
   );
 }
 
+function getVenueForTeam(team) {
+  const venues = {
+    Bangladesh: "Shere Bangla National Stadium, Dhaka",
+    India: "M. Chinnaswamy Stadium, Bengaluru",
+    Pakistan: "Gaddafi Stadium, Lahore",
+    Australia: "Melbourne Cricket Ground, Melbourne",
+    England: "Lord's, London",
+    "New Zealand": "Eden Park, Auckland",
+    "South Africa": "Newlands, Cape Town",
+    "Sri Lanka": "R. Premadasa Stadium, Colombo",
+    "West Indies": "Sabina Park, Kingston, Jamaica",
+    Afghanistan: "Sharjah Cricket Stadium, Sharjah",
+    Ireland: "Malahide Cricket Club Ground, Dublin",
+    Scotland: "The Grange Club, Edinburgh",
+    Netherlands: "VRA Cricket Ground, Amstelveen",
+    Zimbabwe: "Harare Sports Club, Harare",
+    Nepal: "Tribhuvan University International Cricket Ground, Kirtipur",
+    Oman: "Al Amerat Cricket Ground, Muscat",
+    Canada: "Maple Leaf North-West Ground, King City",
+    Namibia: "Wanderers Cricket Ground, Windhoek",
+    "United Arab Emirates": "Dubai International Cricket Stadium, Dubai",
+    "United States of America": "Central Broward Park, Florida"
+  };
+
+  return venues[team] || "National Cricket Stadium";
+}
+
+function getOrdinalNumber(number) {
+  if (number === 1) return "1st";
+  if (number === 2) return "2nd";
+  if (number === 3) return "3rd";
+  return `${number}th`;
+}
+
+function formatScheduleDate(date) {
+  return date
+    .toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "2-digit",
+      year: "numeric"
+    })
+    .replace(",", "")
+    .toUpperCase();
+}
+
+function formatFullDate(date) {
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric"
+  });
+}
+
+function formatTime(date) {
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit"
+  });
+}
+
+function addDays(date, days) {
+  const copy = new Date(date);
+  copy.setDate(copy.getDate() + days);
+  return copy;
+}
+
+function buildTourSchedule() {
+  const schedule = [];
+  const startDate = new Date();
+  startDate.setHours(9, 30, 0, 0);
+
+  let dayOffset = 0;
+  let odiNumber = 1;
+  let t20Number = 1;
+  let testNumber = 1;
+
+  state.series.forEach((match) => {
+    if (match.format === "Test") {
+      for (let day = 1; day <= 5; day++) {
+        const matchDate = addDays(startDate, dayOffset);
+
+        schedule.push({
+          date: matchDate,
+          seriesName: `${state.computerTeam} tour of ${state.userTeam}, ${matchDate.getFullYear()}`,
+          title: `${state.userTeam} vs ${state.computerTeam}, ${getOrdinalNumber(testNumber)} Test, Day ${day}`,
+          venue: getVenueForTeam(state.userTeam),
+          format: "Test",
+          localTime: formatTime(matchDate),
+          gmtTime: formatTime(addDays(matchDate, 0)),
+          localNote: formatFullDate(matchDate)
+        });
+
+        dayOffset += 1;
+      }
+
+      testNumber += 1;
+      dayOffset += 1;
+    }
+
+    if (match.format === "ODI") {
+      const matchDate = addDays(startDate, dayOffset);
+
+      schedule.push({
+        date: matchDate,
+        seriesName: `${state.computerTeam} tour of ${state.userTeam}, ${matchDate.getFullYear()}`,
+        title: `${state.userTeam} vs ${state.computerTeam}, ${getOrdinalNumber(odiNumber)} ODI`,
+        venue: getVenueForTeam(state.userTeam),
+        format: "ODI",
+        localTime: formatTime(matchDate),
+        gmtTime: formatTime(addDays(matchDate, 0)),
+        localNote: formatFullDate(matchDate)
+      });
+
+      odiNumber += 1;
+      dayOffset += 2;
+    }
+
+    if (match.format === "T20") {
+      const matchDate = addDays(startDate, dayOffset);
+      matchDate.setHours(19, 0, 0, 0);
+
+      schedule.push({
+        date: matchDate,
+        seriesName: `${state.computerTeam} tour of ${state.userTeam}, ${matchDate.getFullYear()}`,
+        title: `${state.userTeam} vs ${state.computerTeam}, ${getOrdinalNumber(t20Number)} T20I`,
+        venue: getVenueForTeam(state.userTeam),
+        format: "T20",
+        localTime: formatTime(matchDate),
+        gmtTime: formatTime(addDays(matchDate, 0)),
+        localNote: formatFullDate(matchDate)
+      });
+
+      t20Number += 1;
+      dayOffset += 1;
+    }
+  });
+
+  return schedule;
+}
+
+function groupScheduleByDate(schedule) {
+  const grouped = {};
+
+  schedule.forEach((item) => {
+    const key = formatScheduleDate(item.date);
+
+    if (!grouped[key]) {
+      grouped[key] = [];
+    }
+
+    grouped[key].push(item);
+  });
+
+  return grouped;
+}
+
+function renderScheduleMatch(match) {
+  const formatClass = match.format.toLowerCase();
+
+  return `
+    <div class="schedule-match-card">
+      <div>
+        <div class="match-title">${esc(match.title)}</div>
+        <div class="match-venue">${esc(match.venue)}</div>
+        <div class="match-local-time">${esc(match.localTime)} (${esc(match.localNote)})</div>
+        <div class="match-gmt-time">${esc(match.gmtTime)} GMT / LOCAL</div>
+      </div>
+
+      <div class="match-format-pill ${esc(formatClass)}">
+        ${esc(match.format)}
+      </div>
+    </div>
+  `;
+}
+
 function renderSummary() {
+  const schedule = buildTourSchedule();
+  const grouped = groupScheduleByDate(schedule);
+
   const tests = countFormat("Test");
   const odis = countFormat("ODI");
   const t20s = countFormat("T20");
 
-  $("teamSummary").innerHTML =
-    summaryRow("User", esc(state.userTeam)) +
-    summaryRow("Computer", esc(state.computerTeam));
+  $("tourName").textContent = `${state.computerTeam} tour of ${state.userTeam}, ${new Date().getFullYear()}`;
+  $("scheduleSubTitle").textContent = `${state.userTeam} vs ${state.computerTeam} official tour schedule`;
+  $("tourTeamSummary").textContent = `${state.userTeam} vs ${state.computerTeam}`;
+  $("tourMatchSummary").textContent = `${tests} Test • ${odis} ODI • ${t20s} T20`;
+  $("tourSquadSummary").textContent = `${state.userSquad.length} user squad • ${state.computerSquad.length} computer squad`;
 
-  $("seriesSummary").innerHTML =
-    summaryRow("Tests", esc(countText(tests, "Test"))) +
-    summaryRow("ODIs", esc(countText(odis, "ODI"))) +
-    summaryRow("T20s", esc(countText(t20s, "T20"))) +
-    state.series.map(m =>
-      summaryRow(m.label, `${esc(state.userTeam)} vs ${esc(state.computerTeam)}`)
-    ).join("");
+  $("scheduleList").innerHTML = Object.entries(grouped).map(([dateLabel, matches]) => {
+    let lastSeriesName = "";
 
-  $("userSquadSummary").innerHTML = state.userSquad.map(rosterRow).join("");
-  $("computerSquadSummary").innerHTML = state.computerSquad.map(rosterRow).join("");
+    const matchesHTML = matches.map((match) => {
+      let seriesHTML = "";
+
+      if (match.seriesName !== lastSeriesName) {
+        seriesHTML = `<div class="schedule-series-name">${esc(match.seriesName)}</div>`;
+        lastSeriesName = match.seriesName;
+      }
+
+      return `
+        ${seriesHTML}
+        ${renderScheduleMatch(match)}
+      `;
+    }).join("");
+
+    return `
+      <section class="schedule-day">
+        <div class="schedule-date">${esc(dateLabel)}</div>
+        ${matchesHTML}
+      </section>
+    `;
+  }).join("");
+
   $("jsonOut").textContent = JSON.stringify(getTourPayload(), null, 2);
 }
 
@@ -952,6 +1148,7 @@ function getTourPayload() {
       t20s: countFormat("T20"),
       matches: state.series
     },
+    schedule: buildTourSchedule(),
     userSquad: state.userSquad,
     computerSquad: state.computerSquad
   };

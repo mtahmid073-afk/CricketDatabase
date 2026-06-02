@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cricket Tour Setup - JSON Ready</title>
-  <link rel="stylesheet" href="tour.css?v=1012" />
+  <link rel="stylesheet" href="tour.css?v=1013" />
 </head>
 <body>
   <main class="page">
@@ -251,51 +251,45 @@
     </section>
 
     <section class="screen" id="summaryScreen">
-      <div class="topline">
+      <div class="schedule-page-header">
         <div>
-          <h2>Tour Summary</h2>
-          <p>This is the object you can later send to your backend/game engine.</p>
+          <h2>Tour Schedule</h2>
+          <p id="scheduleSubTitle">Generated tour fixtures from your selected teams and formats.</p>
         </div>
 
-        <button class="secondary" onclick="showScreen('squad')">Back to Squad</button>
-      </div>
-
-      <section class="panel">
-        <div class="summary-grid">
-          <div class="summary-box">
-            <h3>Teams</h3>
-            <div id="teamSummary"></div>
-          </div>
-
-          <div class="summary-box">
-            <h3>Series</h3>
-            <div id="seriesSummary"></div>
-          </div>
-
-          <div class="summary-box">
-            <h3>User Squad</h3>
-            <div class="squad-list" id="userSquadSummary"></div>
-          </div>
-
-          <div class="summary-box">
-            <h3>Computer Squad</h3>
-            <div class="squad-list" id="computerSquadSummary"></div>
-          </div>
-        </div>
-
-        <h2 style="margin-top:20px;">Saved Tour JSON</h2>
-        <pre id="jsonOut"></pre>
-
-        <div class="actions">
-          <button onclick="copyJson()">Copy JSON</button>
+        <div class="schedule-actions">
+          <button class="secondary" onclick="showScreen('squad')">Back to Squad</button>
+          <button onclick="copyJson()">Copy Tour JSON</button>
           <button class="secondary" onclick="resetAll()">Start Over</button>
         </div>
+      </div>
+
+      <section class="schedule-shell">
+        <div class="tour-overview-card">
+          <div>
+            <span class="overview-label">Tour</span>
+            <h3 id="tourName">Tour Name</h3>
+          </div>
+
+          <div class="tour-overview-stats">
+            <span id="tourTeamSummary">Teams</span>
+            <span id="tourMatchSummary">Matches</span>
+            <span id="tourSquadSummary">Squads</span>
+          </div>
+        </div>
+
+        <div id="scheduleList" class="schedule-list"></div>
+
+        <details class="json-details">
+          <summary>Saved Tour JSON</summary>
+          <pre id="jsonOut"></pre>
+        </details>
 
         <div id="copyMsg" class="message"></div>
       </section>
     </section>
   </main>
 
-  <script src="tour.js?v=1012"></script>
+  <script src="tour.js?v=1013"></script>
 </body>
 </html>
