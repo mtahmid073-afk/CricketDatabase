@@ -407,7 +407,7 @@ function updateTeamCards() {
   $("computerTeamName").textContent = computer || "Load JSON";
 
   $("userTeamDetails").textContent = user
-    ? `${teamPlayers(user).length} available players for the tour.46`
+    ? `${teamPlayers(user).length} available players for the tour.`
     : "Load a player JSON file to start.";
 
   $("computerTeamDetails").textContent = computer
