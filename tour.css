@@ -1497,3 +1497,238 @@ body {
     transform: translateY(0);
   }
 }
+
+/* FIT MAIN PAGE TO SCREEN - NO OUTSIDE SCROLL */
+
+html,
+body {
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+.page {
+  height: 100vh !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 8px 0 !important;
+  gap: 7px !important;
+}
+
+/* Compact header */
+.hero {
+  flex: 0 0 auto !important;
+  padding: 10px 14px !important;
+  min-height: 92px !important;
+}
+
+.hero h1,
+.main-hero-title {
+  font-size: 34px !important;
+}
+
+.hero p {
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+  max-width: 660px !important;
+}
+
+.hero-tools {
+  gap: 6px !important;
+}
+
+.data-source {
+  display: none !important;
+}
+
+/* Compact centered step buttons */
+.steps {
+  flex: 0 0 auto !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.step {
+  font-size: 13px !important;
+  padding: 7px 12px !important;
+}
+
+/* Make setup screen fit remaining height */
+#setupScreen.active {
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+/* Team cards fit screen */
+.team-grid {
+  grid-template-columns: 350px 70px 350px !important;
+  gap: 16px !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  margin: 0 auto !important;
+}
+
+.team-card {
+  width: 350px !important;
+  max-width: 350px !important;
+  min-height: 245px !important;
+  padding: 13px !important;
+  border-radius: 20px !important;
+}
+
+.team-label {
+  font-size: 10px !important;
+  margin-bottom: 5px !important;
+}
+
+.logo-frame {
+  width: 76px !important;
+  height: 76px !important;
+  border-radius: 18px !important;
+  margin-bottom: 7px !important;
+}
+
+.logo-frame img {
+  max-width: 60px !important;
+  max-height: 60px !important;
+}
+
+.logo-fallback {
+  width: 58px !important;
+  height: 58px !important;
+  font-size: 19px !important;
+}
+
+.team-card h2 {
+  font-size: 25px !important;
+}
+
+.team-card p {
+  font-size: 12px !important;
+  margin: 5px 0 7px !important;
+}
+
+.team-card select {
+  padding: 9px 10px !important;
+  font-size: 13px !important;
+}
+
+.team-stats {
+  margin-top: 7px !important;
+  gap: 5px !important;
+}
+
+.mini-stat {
+  font-size: 10.5px !important;
+  padding: 4px 7px !important;
+}
+
+/* VS circle only, compact */
+.vs-card {
+  width: 70px !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.vs-card span {
+  width: 58px !important;
+  height: 58px !important;
+  font-size: 19px !important;
+}
+
+/* Compact Series Creator */
+.series-panel,
+#setupScreen .panel {
+  flex: 0 0 auto !important;
+  padding: 11px 14px !important;
+  border-radius: 18px !important;
+  margin-bottom: 0 !important;
+}
+
+.series-panel h2,
+#setupScreen .panel h2 {
+  font-size: 22px !important;
+  margin-bottom: 6px !important;
+}
+
+.series-grid {
+  grid-template-columns: repeat(3, 120px) auto auto !important;
+  gap: 8px !important;
+  align-items: end !important;
+  margin: 6px 0 0 !important;
+}
+
+.format-card {
+  padding: 6px !important;
+  border-radius: 11px !important;
+}
+
+.format-card label {
+  font-size: 10px !important;
+  margin-bottom: 4px !important;
+}
+
+.format-card select {
+  padding: 6px 7px !important;
+  font-size: 12px !important;
+}
+
+.series-grid .actions {
+  margin-top: 0 !important;
+}
+
+.series-grid .actions button {
+  padding: 10px 13px !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+}
+
+#setupMsg {
+  margin-top: 0 !important;
+  padding: 8px 10px !important;
+  font-size: 12px !important;
+}
+
+/* Keep squad/summary usable with internal scrolling only */
+#squadScreen.active,
+#summaryScreen.active {
+  height: calc(100vh - 120px) !important;
+  overflow: hidden !important;
+}
+
+.table-card,
+#summaryScreen > .panel {
+  overflow: auto !important;
+}
+
+/* Smaller screens */
+@media (max-width: 1000px) {
+  html,
+  body {
+    overflow: auto !important;
+    height: auto !important;
+  }
+
+  .page {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr !important;
+    max-width: 360px !important;
+  }
+
+  .team-card {
+    width: 100% !important;
+    max-width: 360px !important;
+  }
+
+  .series-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
