@@ -1229,3 +1229,121 @@ body {
 .vs-card span {
   box-shadow: 0 0 24px rgba(126, 231, 135, 0.35);
 }
+
+/* Cooler Series Creator box only */
+
+.series-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(126, 231, 135, 0.28) !important;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(126, 231, 135, 0.12), transparent 30%),
+    radial-gradient(circle at 88% 15%, rgba(96, 165, 250, 0.12), transparent 30%),
+    linear-gradient(135deg, rgba(23, 33, 43, 0.98), rgba(16, 24, 32, 0.98)) !important;
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.series-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(126, 231, 135, 0.12), transparent);
+  transform: translateX(-100%);
+  animation: seriesShine 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.series-panel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 18px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--accent), #60a5fa, transparent);
+  opacity: 0.9;
+}
+
+.series-panel h2 {
+  position: relative;
+  z-index: 1;
+  font-size: 26px !important;
+  text-shadow: 0 0 18px rgba(126, 231, 135, 0.22);
+}
+
+.series-panel .series-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.series-panel .format-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(34, 48, 60, 0.96), rgba(16, 24, 32, 0.98)) !important;
+  border: 1px solid rgba(126, 231, 135, 0.22) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 12px 26px rgba(0, 0, 0, 0.22);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.series-panel .format-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(126, 231, 135, 0.55) !important;
+  box-shadow:
+    0 0 0 4px rgba(126, 231, 135, 0.07),
+    0 16px 32px rgba(0, 0, 0, 0.28);
+}
+
+.series-panel .format-card label {
+  color: var(--accent) !important;
+  letter-spacing: 0.08em;
+}
+
+.series-panel .format-card select {
+  background: #0b1117 !important;
+  border-color: rgba(126, 231, 135, 0.22) !important;
+  font-weight: 850;
+}
+
+.series-panel .actions button {
+  background:
+    linear-gradient(135deg, var(--accent-dark), var(--accent-hover)) !important;
+  border-color: rgba(126, 231, 135, 0.75) !important;
+  box-shadow:
+    0 14px 30px rgba(45, 106, 79, 0.35),
+    0 0 0 4px rgba(126, 231, 135, 0.08) !important;
+}
+
+.series-panel .actions button:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 18px 36px rgba(45, 106, 79, 0.42),
+    0 0 0 5px rgba(126, 231, 135, 0.11) !important;
+}
+
+@keyframes seriesShine {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  70% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
