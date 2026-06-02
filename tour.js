@@ -368,11 +368,11 @@ function fillTeamDropdowns() {
   $("userTeamSelect").innerHTML = html;
   $("computerTeamSelect").innerHTML = html;
 
-  $("userTeamSelect").value = teams.includes("Bangladesh") ? "Bangladesh" : teams[0];
+  $("userTeamSelect").value = teams.includes("England") ? "England" : teams[0];
 
   $("computerTeamSelect").value =
-    teams.includes("India") && $("userTeamSelect").value !== "India"
-      ? "India"
+    teams.includes("India") && $("userTeamSelect").value !== "Australia"
+      ? "Australia"
       : teams.find(t => t !== $("userTeamSelect").value) || teams[0];
 
   $("userTeamSelect").onchange = updateTeamCards;
