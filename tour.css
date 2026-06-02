@@ -1955,3 +1955,11 @@ body.summary-page #summaryScreen.active {
   top: 0 !important;
   z-index: 4 !important;
 }
+
+/* Let schedule dates scroll normally */
+
+.schedule-date {
+  position: static !important;
+  top: auto !important;
+  z-index: auto !important;
+}
