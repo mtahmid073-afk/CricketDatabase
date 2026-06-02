@@ -371,7 +371,7 @@ function fillTeamDropdowns() {
   $("userTeamSelect").value = teams.includes("England") ? "England" : teams[0];
 
   $("computerTeamSelect").value =
-    teams.includes("India") && $("userTeamSelect").value !== "Australia"
+    teams.includes("Australia") && $("userTeamSelect").value !== "Australia"
       ? "Australia"
       : teams.find(t => t !== $("userTeamSelect").value) || teams[0];
 
