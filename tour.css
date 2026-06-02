@@ -1904,3 +1904,14 @@ body.summary-page #summaryScreen.active {
     justify-self: start !important;
   }
 }
+
+/* Stop flicker while saved tour is restoring */
+body.app-loading .page {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.app-ready .page {
+  opacity: 1;
+  transition: opacity 0.18s ease;
+}

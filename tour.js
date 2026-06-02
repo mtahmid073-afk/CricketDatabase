@@ -192,9 +192,16 @@ function loadPlayersFromData(rawData, sourceLabel = "JSON file") {
   state.computerSquad = [];
 
   fillTeamDropdowns();
-  restoreTourStateAfterDataLoad();
+
+  const restored = restoreTourStateAfterDataLoad();
+
+  if (!restored) {
+    showScreen("setup", false);
+  }
+
   hideMsg("setupMsg");
   $("dataSource").textContent = `Loaded from ${sourceLabel}`;
+  finishAppLoading();
 }
 
 async function tryFetchDefaultData() {
@@ -226,10 +233,12 @@ async function initData() {
     PLAYER_DATA = [];
     fillTeamDropdowns();
     $("databaseCount").textContent = "No JSON loaded";
+    showScreen("setup", false);
     showMsg(
       "setupMsg",
       "No player JSON loaded yet. Make sure the file is at data/players.json inside this frontend folder, or click Load JSON."
     );
+    finishAppLoading();
   }
 }
 
@@ -294,6 +303,8 @@ let squadSort = {
 
 const TOUR_STORAGE_KEY = "cricketTourSetupSave_v1";
 let currentScreenName = "setup";
+
+let isRestoringTour = false;
 
 let lastUserTeam = "";
 let lastComputerTeam = "";
@@ -478,7 +489,7 @@ function updateTeamCards() {
   teamCardsReady = true;
 }
 
-function showScreen(name) {
+function showScreen(name, shouldSave = true) {
   currentScreenName = name;
 
   $("setupScreen").classList.toggle("active", name === "setup");
@@ -494,9 +505,17 @@ function showScreen(name) {
   document.body.classList.toggle("squad-page", name === "squad");
   document.body.classList.toggle("summary-page", name === "summary");
 
-  if (name === "summary") renderSummary();
+  if (name === "squad" && state.userTeam && PLAYER_DATA.length) {
+    renderPlayerTable();
+  }
 
-  saveTourState(name);
+  if (name === "summary") {
+    renderSummary();
+  }
+
+  if (shouldSave) {
+    saveTourState(name);
+  }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -1200,6 +1219,10 @@ function resetAll() {
 document.body.classList.add("main-page");
 
 setupSquadSortButtons();
+function finishAppLoading() {
+  document.body.classList.remove("app-loading");
+  document.body.classList.add("app-ready");
+}
 initData();
 
 function getPlayersByIds(ids) {
@@ -1211,15 +1234,18 @@ function getPlayersByIds(ids) {
 }
 
 function saveTourState(screenName = currentScreenName) {
-  if (!PLAYER_DATA.length) return;
+  if (!PLAYER_DATA.length || isRestoringTour) return;
+
+  const userTeamValue = state.userTeam || $("userTeamSelect")?.value || "";
+  const computerTeamValue = state.computerTeam || $("computerTeamSelect")?.value || "";
 
   const saveData = {
     currentScreen: screenName,
-    userTeam: state.userTeam || $("userTeamSelect")?.value || "",
-    computerTeam: state.computerTeam || $("computerTeamSelect")?.value || "",
+    userTeam: userTeamValue,
+    computerTeam: computerTeamValue,
     series: state.series,
-    userSquadIds: state.userSquad.map(player => player.id),
-    computerSquadIds: state.computerSquad.map(player => player.id),
+    userSquadIds: state.userSquad.map(player => String(player.id)),
+    computerSquadIds: state.computerSquad.map(player => String(player.id)),
     squadSort
   };
 
@@ -1229,7 +1255,11 @@ function saveTourState(screenName = currentScreenName) {
 function restoreTourStateAfterDataLoad() {
   const raw = localStorage.getItem(TOUR_STORAGE_KEY);
 
-  if (!raw || !PLAYER_DATA.length) return;
+  if (!raw || !PLAYER_DATA.length) {
+    return false;
+  }
+
+  isRestoringTour = true;
 
   try {
     const saved = JSON.parse(raw);
@@ -1249,8 +1279,16 @@ function restoreTourStateAfterDataLoad() {
       state.series = saved.series;
     }
 
-    state.userSquad = getPlayersByIds(saved.userSquadIds);
-    state.computerSquad = getPlayersByIds(saved.computerSquadIds);
+    const savedUserSquadIds =
+      saved.userSquadIds ||
+      (Array.isArray(saved.userSquad) ? saved.userSquad.map(player => player.id) : []);
+
+    const savedComputerSquadIds =
+      saved.computerSquadIds ||
+      (Array.isArray(saved.computerSquad) ? saved.computerSquad.map(player => player.id) : []);
+
+    state.userSquad = getPlayersByIds(savedUserSquadIds);
+    state.computerSquad = getPlayersByIds(savedComputerSquadIds);
 
     if (!state.computerSquad.length && state.computerTeam) {
       state.computerSquad = autoPickComputerSquad(state.computerTeam);
@@ -1265,19 +1303,24 @@ function restoreTourStateAfterDataLoad() {
     const savedScreen = saved.currentScreen || "setup";
 
     if (savedScreen === "summary" && state.series.length && state.userSquad.length >= 12) {
-      showScreen("summary");
-      return;
+      showScreen("summary", false);
+      return true;
     }
 
     if (savedScreen === "squad" && state.series.length) {
-      renderPlayerTable();
-      showScreen("squad");
-      return;
+      showScreen("squad", false);
+      return true;
     }
 
-    showScreen("setup");
+    showScreen("setup", false);
+    return true;
+
   } catch (error) {
     console.error("Could not restore saved tour:", error);
     localStorage.removeItem(TOUR_STORAGE_KEY);
+    return false;
+
+  } finally {
+    isRestoringTour = false;
   }
 }
