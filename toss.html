@@ -450,14 +450,18 @@
             <button id="tailsBtn" onclick="selectCall('Tails')">Tails</button>
           </div>
           <button class="toss-btn" id="flipBtn" onclick="doToss()">Flip Toss</button>
-          <div class="decision-row show" id="decisionRow">
+          <div class="decision-row" id="decisionRow">
             <button onclick="chooseDecision('Bat')">Bat First</button>
             <button onclick="chooseDecision('Bowl')">Bowl First</button>
           </div>
-          <div class="result-box flash-result" id="resultBox" style="margin-top: 10px;">
-            <h3 id="resultTitle">Heads! Bangladesh won the toss</h3>
-            <p id="resultText">Bangladesh called Heads correctly. Choose whether to bat or bowl first.</p>
-          </div>
+          <div class="result-box" id="resultBox" style="margin-top: 10px;">
+                <h3 id="resultTitle">Choose Heads or Tails</h3>
+                <p id="resultText">Pick your toss call, then flip the coin.</p>
+            </div>
+
+            <button class="toss-btn" id="continueBtn" onclick="goToMatchCenter()" style="display: none; margin-top: 9px;">
+                Continue to Match Center
+            </button>
           <button class="toss-btn" id="continueBtn" onclick="goToMatchCenter()" style="display:none; margin-top:9px;">Continue to Match Center</button>
         </div>
       </section>
@@ -775,6 +779,30 @@
       return `${Math.max(5, Math.min(100, Number(value) || 0))}%`;
     }
 
+    function resetTossUI() {
+        userCall = "Heads";
+        tossWinner = "";
+        isFlipping = false;
+
+        document.getElementById("headsBtn").classList.add("active");
+        document.getElementById("tailsBtn").classList.remove("active");
+
+        document.getElementById("headsBtn").disabled = false;
+        document.getElementById("tailsBtn").disabled = false;
+        document.getElementById("flipBtn").disabled = false;
+
+        document.getElementById("decisionRow").classList.remove("show");
+
+        const continueBtn = document.getElementById("continueBtn");
+        if (continueBtn) {
+            continueBtn.style.display = "none";
+        }
+
+        document.getElementById("resultTitle").textContent = "Choose Heads or Tails";
+        document.getElementById("resultText").textContent =
+            `${matchData.teamA.name} will call the toss. Pick Heads or Tails, then flip the coin.`;
+        }
+
     function loadMatchData() {
       document.getElementById("matchType").textContent = matchData.matchType;
       document.getElementById("tickerText").textContent = `${matchData.teamA.name} vs ${matchData.teamB.name} • Toss window open • Captains at the middle • Winner decides bat or bowl`;
@@ -954,6 +982,7 @@
     loadMatchData();
     setupCanvas();
     setFinalFace("Heads");
+    resetTossUI();
   </script>
 
 
