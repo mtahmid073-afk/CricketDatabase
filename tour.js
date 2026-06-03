@@ -1152,8 +1152,8 @@ function renderScheduleMatch(match, nextPlayableMatchIndex) {
     `;
   } else if (isPlayable) {
     buttonHTML = `
-      <button class="match-action-btn start" onclick="startTourMatch(${match.matchIndex})">
-        Start Match
+      <button class="match-action-btn start" onclick="selectXIForMatch(${match.matchIndex})">
+        Select XI
       </button>
     `;
   } else {
@@ -1187,7 +1187,7 @@ function renderScheduleMatch(match, nextPlayableMatchIndex) {
   `;
 }
 
-function startTourMatch(matchIndex) {
+function selectXIForMatch(matchIndex) {
   const schedule = buildTourSchedule();
   const match = schedule.find(item => item.matchIndex === matchIndex);
 
@@ -1211,13 +1211,16 @@ function startTourMatch(matchIndex) {
     userSquad: state.userSquad,
     computerSquad: state.computerSquad,
 
+    selectedUserXI: [],
+    selectedComputerXI: [],
+
     savedAt: new Date().toISOString()
   };
 
   localStorage.setItem("currentTourMatch", JSON.stringify(currentMatchData));
   saveTourState("summary");
 
-  window.location.href = "toss.html";
+  window.location.href = "select-xi.html";
 }
 
 function renderSummary() {

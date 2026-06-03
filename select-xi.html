@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select XI</title>
+
+  <style>
+    :root {
+      --bg: #061018;
+      --panel: #101820;
+      --panel-2: #17212b;
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #eef7f3;
+      --muted: #8ca4ad;
+      --green: #22c55e;
+      --blue: #38bdf8;
+      --gold: #f6c453;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(34, 197, 94, 0.16), transparent 28%),
+        radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.12), transparent 30%),
+        linear-gradient(135deg, #030a0f, #061823 52%, #03100b);
+    }
+
+    .page {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 18px;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 14px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(90deg, rgba(34, 197, 94, 0.10), transparent 38%, rgba(246, 196, 83, 0.09)),
+        rgba(13, 27, 37, 0.86);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--green), #0ea5e9);
+      color: #00140a;
+      font-weight: 950;
+      font-size: 22px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    .title h1 {
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      letter-spacing: -0.04em;
+    }
+
+    .title p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 3px;
+      font-weight: 700;
+    }
+
+    .back-btn {
+      border: 1px solid rgba(126, 231, 135, 0.45);
+      background: rgba(34, 197, 94, 0.12);
+      color: var(--green);
+      border-radius: 14px;
+      padding: 11px 13px;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      background: rgba(34, 197, 94, 0.22);
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      gap: 14px;
+      min-height: 0;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.065), transparent),
+        rgba(9, 22, 33, 0.86);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .team-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .team-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .team-name h2 {
+      font-size: 1.55rem;
+      line-height: 1;
+    }
+
+    .team-name p {
+      color: var(--muted);
+      font-size: 0.83rem;
+      margin-top: 5px;
+      font-weight: 800;
+    }
+
+    .badge {
+      width: 58px;
+      height: 58px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--green), #d9f99d);
+      color: #041017;
+      font-weight: 950;
+      font-size: 1.2rem;
+    }
+
+    .badge.away {
+      background: linear-gradient(135deg, var(--gold), #ef4444);
+    }
+
+    .mini-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .mini-stat {
+      padding: 10px 8px;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .mini-stat b {
+      display: block;
+      font-size: 1.1rem;
+    }
+
+    .mini-stat span {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .captain-box {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(34, 197, 94, 0.10);
+      border: 1px solid rgba(34, 197, 94, 0.18);
+    }
+
+    .captain-box small {
+      color: var(--muted);
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 800;
+    }
+
+    .captain-box strong {
+      color: var(--green);
+    }
+
+    .center-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      text-align: center;
+    }
+
+    .match-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: center;
+      padding: 9px 13px;
+      border: 1px solid rgba(246, 196, 83, 0.32);
+      border-radius: 999px;
+      background: rgba(246, 196, 83, 0.12);
+      color: var(--gold);
+      font-weight: 950;
+      font-size: 0.85rem;
+    }
+
+    .dummy-box {
+      border: 1px dashed rgba(255, 255, 255, 0.20);
+      border-radius: 18px;
+      padding: 22px;
+      background: rgba(255, 255, 255, 0.045);
+      display: grid;
+      gap: 10px;
+    }
+
+    .dummy-box h2 {
+      color: var(--green);
+      font-size: 1.6rem;
+      letter-spacing: -0.04em;
+    }
+
+    .dummy-box p {
+      color: var(--muted);
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .xi-placeholder {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .slot {
+      height: 34px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid var(--line);
+      color: #cbd5e1;
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .start-btn {
+      width: 100%;
+      height: 48px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--green), #16a34a);
+      color: #02120a;
+      font-size: 1rem;
+      font-weight: 1000;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(34, 197, 94, 0.22);
+    }
+
+    .start-btn:hover {
+      transform: translateY(-1px);
+      background: #7ee787;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 750;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 920px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🏏</div>
+        <div class="title">
+          <h1>Select Playing XI</h1>
+          <p>Dummy page before toss. Later this will become full XI selection.</p>
+        </div>
+      </div>
+
+      <button class="back-btn" onclick="goBackToSummary()">← Tour Summary</button>
+    </header>
+
+    <main class="main-grid">
+      <section class="card team-card">
+        <div class="team-head">
+          <div class="team-name">
+            <h2 id="teamAName">Team A</h2>
+            <p>User Team</p>
+          </div>
+          <div class="badge" id="teamABadge">A</div>
+        </div>
+
+        <div class="mini-stat-grid">
+          <div class="mini-stat">
+            <b id="teamABat">0</b>
+            <span>Bat</span>
+          </div>
+          <div class="mini-stat">
+            <b id="teamABowl">0</b>
+            <span>Bowl</span>
+          </div>
+          <div class="mini-stat">
+            <b id="teamAField">0</b>
+            <span>Field</span>
+          </div>
+        </div>
+
+        <div class="captain-box">
+          <small>Captain</small>
+          <strong id="teamACaptain">Captain</strong>
+        </div>
+      </section>
+
+      <section class="card center-card">
+        <div>
+          <div class="match-pill" id="matchType">Match</div>
+        </div>
+
+        <div class="dummy-box">
+          <h2>Select XI Placeholder</h2>
+          <p>
+            For now this page is a dummy stop before the toss. Later you can add checkboxes,
+            batting order, wicketkeeper selection, captain selection, and bowling options here.
+          </p>
+
+          <div class="xi-placeholder">
+            <div class="slot">1. Opener</div>
+            <div class="slot">2. Opener</div>
+            <div class="slot">3. Top Order</div>
+            <div class="slot">4. Top Order</div>
+            <div class="slot">5. Middle Order</div>
+            <div class="slot">6. All-rounder</div>
+            <div class="slot">7. Wicketkeeper</div>
+            <div class="slot">8. Bowler</div>
+            <div class="slot">9. Bowler</div>
+            <div class="slot">10. Bowler</div>
+            <div class="slot">11. Bowler</div>
+          </div>
+        </div>
+
+        <button class="start-btn" onclick="startMatchFromXI()">
+          Start Match
+        </button>
+
+        <p class="note">
+          Clicking Start Match saves a dummy XI and sends this match to the toss page.
+        </p>
+      </section>
+
+      <section class="card team-card">
+        <div class="team-head">
+          <div class="team-name">
+            <h2 id="teamBName">Team B</h2>
+            <p>Computer Team</p>
+          </div>
+          <div class="badge away" id="teamBBadge">B</div>
+        </div>
+
+        <div class="mini-stat-grid">
+          <div class="mini-stat">
+            <b id="teamBBat">0</b>
+            <span>Bat</span>
+          </div>
+          <div class="mini-stat">
+            <b id="teamBBowl">0</b>
+            <span>Bowl</span>
+          </div>
+          <div class="mini-stat">
+            <b id="teamBField">0</b>
+            <span>Field</span>
+          </div>
+        </div>
+
+        <div class="captain-box">
+          <small>Captain</small>
+          <strong id="teamBCaptain">Captain</strong>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function getStoredTourMatch() {
+      const raw = localStorage.getItem("currentTourMatch");
+
+      if (!raw) return null;
+
+      try {
+        return JSON.parse(raw);
+      } catch (error) {
+        console.error("Could not read currentTourMatch:", error);
+        return null;
+      }
+    }
+
+    function getTeamShortName(teamName) {
+      const special = {
+        Bangladesh: "BAN",
+        India: "IND",
+        Pakistan: "PAK",
+        Australia: "AUS",
+        England: "ENG",
+        "New Zealand": "NZ",
+        "South Africa": "SA",
+        "Sri Lanka": "SL",
+        "West Indies": "WI",
+        Afghanistan: "AFG",
+        Zimbabwe: "ZIM"
+      };
+
+      if (special[teamName]) return special[teamName];
+
+      return String(teamName || "TEAM")
+        .split(/\s+/)
+        .map(word => word[0])
+        .join("")
+        .slice(0, 3)
+        .toUpperCase();
+    }
+
+    function average(numbers) {
+      const valid = numbers.filter(number => Number.isFinite(number));
+      if (!valid.length) return 0;
+      return valid.reduce((sum, number) => sum + number, 0) / valid.length;
+    }
+
+    function getTeamRatings(squad) {
+      const players = Array.isArray(squad) ? squad : [];
+
+      if (!players.length) {
+        return { bat: 0, bowl: 0, field: 0 };
+      }
+
+      const bat = average(players.map(player => Number(player?.attributes?.overall?.batting_overall) || 0));
+      const bowl = average(players.map(player => Number(player?.attributes?.overall?.bowling_overall) || 0));
+
+      const field = average(players.map(player => {
+        const f = player?.attributes?.fielding || {};
+        return average([
+          Number(f.catching) || 0,
+          Number(f.reflexes) || 0,
+          Number(f.groundFielding) || 0,
+          Number(f.throwPower) || 0,
+          Number(f.throwAccuracy) || 0
+        ]);
+      }));
+
+      return {
+        bat: Math.round(bat * 5),
+        bowl: Math.round(bowl * 5),
+        field: Math.round(field * 5)
+      };
+    }
+
+    function getPlayerOverall(player) {
+      const batting = Number(player?.attributes?.overall?.batting_overall) || 0;
+      const bowling = Number(player?.attributes?.overall?.bowling_overall) || 0;
+      return Math.max(batting, bowling);
+    }
+
+    function getCaptain(squad) {
+      if (!Array.isArray(squad) || !squad.length) return "Captain";
+
+      const sorted = [...squad].sort((a, b) => {
+        const leadershipA = Number(a?.attributes?.mental?.leadership) || 0;
+        const leadershipB = Number(b?.attributes?.mental?.leadership) || 0;
+
+        if (leadershipB !== leadershipA) return leadershipB - leadershipA;
+
+        return getPlayerOverall(b) - getPlayerOverall(a);
+      });
+
+      return sorted[0]?.name || sorted[0]?.fullName || "Captain";
+    }
+
+    function fillPage() {
+      const data = getStoredTourMatch();
+
+      if (!data) {
+        document.getElementById("matchType").textContent = "No match loaded";
+        return;
+      }
+
+      const teamA = data.userTeam || data.teamA || "Team A";
+      const teamB = data.computerTeam || data.teamB || "Team B";
+
+      const teamARatings = getTeamRatings(data.userSquad);
+      const teamBRatings = getTeamRatings(data.computerSquad);
+
+      document.getElementById("matchType").textContent =
+        `${data.match?.format || "Match"} • ${data.match?.title || `${teamA} vs ${teamB}`}`;
+
+      document.getElementById("teamAName").textContent = teamA;
+      document.getElementById("teamABadge").textContent = getTeamShortName(teamA);
+      document.getElementById("teamACaptain").textContent = getCaptain(data.userSquad);
+      document.getElementById("teamABat").textContent = teamARatings.bat;
+      document.getElementById("teamABowl").textContent = teamARatings.bowl;
+      document.getElementById("teamAField").textContent = teamARatings.field;
+
+      document.getElementById("teamBName").textContent = teamB;
+      document.getElementById("teamBBadge").textContent = getTeamShortName(teamB);
+      document.getElementById("teamBCaptain").textContent = getCaptain(data.computerSquad);
+      document.getElementById("teamBBat").textContent = teamBRatings.bat;
+      document.getElementById("teamBBowl").textContent = teamBRatings.bowl;
+      document.getElementById("teamBField").textContent = teamBRatings.field;
+    }
+
+    function startMatchFromXI() {
+      const data = getStoredTourMatch();
+
+      if (!data) {
+        alert("No match loaded. Go back to Tour Summary and select a match.");
+        return;
+      }
+
+      data.selectedUserXI = Array.isArray(data.userSquad) ? data.userSquad.slice(0, 11) : [];
+      data.selectedComputerXI = Array.isArray(data.computerSquad) ? data.computerSquad.slice(0, 11) : [];
+      data.xiConfirmed = true;
+      data.xiConfirmedAt = new Date().toISOString();
+
+      localStorage.setItem("currentTourMatch", JSON.stringify(data));
+
+      window.location.href = "toss.html";
+    }
+
+    function goBackToSummary() {
+      window.location.href = "index.html";
+    }
+
+    fillPage();
+  </script>
+</body>
+</html>
