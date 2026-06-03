@@ -309,6 +309,180 @@
         flex-direction: column;
       }
     }
+
+    /* =========================================================
+   SELECT XI DRAG DROP PAGE
+    ========================================================= */
+
+    .xi-page-layout {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+    }
+
+    .xi-control-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    }
+
+    .xi-control-card h2 {
+    margin: 8px 0 4px;
+    font-size: 1.45rem;
+    color: var(--text);
+    }
+
+    .xi-control-card p {
+    color: var(--muted);
+    font-size: 0.86rem;
+    font-weight: 700;
+    }
+
+    .xi-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    }
+
+    .xi-box {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    }
+
+    .xi-box-head {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    }
+
+    .xi-box-head h2 {
+    margin: 0;
+    font-size: 1.35rem;
+    }
+
+    .xi-box-head p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    }
+
+    .xi-count {
+    min-width: 74px;
+    text-align: center;
+    padding: 8px 11px;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.28);
+    color: var(--green);
+    font-weight: 950;
+    }
+
+    .xi-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: grid;
+    gap: 8px;
+    padding-right: 4px;
+    }
+
+    .selected-xi-list {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    align-content: start;
+    }
+
+    .bench-xi-list {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    align-content: start;
+    }
+
+    .xi-player-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid var(--line);
+    cursor: grab;
+    }
+
+    .xi-player-card:active {
+    cursor: grabbing;
+    }
+
+    .xi-player-card.dragging {
+    opacity: 0.45;
+    }
+
+    .xi-rank {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--green);
+    font-weight: 950;
+    }
+
+    .xi-player-main strong {
+    display: block;
+    font-size: 0.92rem;
+    }
+
+    .xi-player-main span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.76rem;
+    margin-top: 3px;
+    font-weight: 750;
+    }
+
+    .xi-player-rating {
+    text-align: right;
+    display: grid;
+    gap: 3px;
+    font-size: 0.72rem;
+    color: #cbd5e1;
+    font-weight: 850;
+    }
+
+    .xi-warning {
+    color: #f6c453;
+    }
+
+    .start-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    }
+
+    @media (max-width: 900px) {
+    .xi-control-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .xi-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .xi-actions button {
+        width: 100%;
+    }
+    }
   </style>
 </head>
 
@@ -326,266 +500,463 @@
       <button class="back-btn" onclick="goBackToSummary()">← Tour Summary</button>
     </header>
 
-    <main class="main-grid">
-      <section class="card team-card">
-        <div class="team-head">
-          <div class="team-name">
-            <h2 id="teamAName">Team A</h2>
-            <p>User Team</p>
-          </div>
-          <div class="badge" id="teamABadge">A</div>
-        </div>
-
-        <div class="mini-stat-grid">
-          <div class="mini-stat">
-            <b id="teamABat">0</b>
-            <span>Bat</span>
-          </div>
-          <div class="mini-stat">
-            <b id="teamABowl">0</b>
-            <span>Bowl</span>
-          </div>
-          <div class="mini-stat">
-            <b id="teamAField">0</b>
-            <span>Field</span>
-          </div>
-        </div>
-
-        <div class="captain-box">
-          <small>Captain</small>
-          <strong id="teamACaptain">Captain</strong>
-        </div>
-      </section>
-
-      <section class="card center-card">
+    <main class="xi-page-layout">
+    <section class="card xi-control-card">
         <div>
-          <div class="match-pill" id="matchType">Match</div>
+        <div class="match-pill" id="matchType">Match</div>
+        <h2>Select Playing XI</h2>
+        <p>Top box is your selected XI. Drag players to change batting order or swap with bench players.</p>
         </div>
 
-        <div class="dummy-box">
-          <h2>Select XI Placeholder</h2>
-          <p>
-            For now this page is a dummy stop before the toss. Later you can add checkboxes,
-            batting order, wicketkeeper selection, captain selection, and bowling options here.
-          </p>
+        <div class="xi-actions">
+        <button class="back-btn" onclick="goBackToSummary()">← Tour Summary</button>
+        <button class="back-btn" onclick="autoPickBestXI()">Auto Pick XI</button>
+        <button class="start-btn" id="startMatchBtn" onclick="startMatchFromXI()">Start Match</button>
+        </div>
+    </section>
 
-          <div class="xi-placeholder">
-            <div class="slot">1. Opener</div>
-            <div class="slot">2. Opener</div>
-            <div class="slot">3. Top Order</div>
-            <div class="slot">4. Top Order</div>
-            <div class="slot">5. Middle Order</div>
-            <div class="slot">6. All-rounder</div>
-            <div class="slot">7. Wicketkeeper</div>
-            <div class="slot">8. Bowler</div>
-            <div class="slot">9. Bowler</div>
-            <div class="slot">10. Bowler</div>
-            <div class="slot">11. Bowler</div>
-          </div>
+    <section class="card xi-box selected-xi-box">
+        <div class="xi-box-head">
+        <div>
+            <h2>Selected XI</h2>
+            <p>Drag inside this box to set batting order.</p>
+        </div>
+        <div class="xi-count" id="selectedCount">0 / 11</div>
         </div>
 
-        <button class="start-btn" onclick="startMatchFromXI()">
-          Start Match
-        </button>
+        <div
+        class="xi-list selected-xi-list"
+        id="selectedXiList"
+        ondragover="allowDrop(event)"
+        ondrop="handleListDrop(event, 'selected')"
+        ></div>
+    </section>
 
-        <p class="note">
-          Clicking Start Match saves a dummy XI and sends this match to the toss page.
-        </p>
-      </section>
-
-      <section class="card team-card">
-        <div class="team-head">
-          <div class="team-name">
-            <h2 id="teamBName">Team B</h2>
-            <p>Computer Team</p>
-          </div>
-          <div class="badge away" id="teamBBadge">B</div>
+    <section class="card xi-box bench-xi-box">
+        <div class="xi-box-head">
+        <div>
+            <h2>Bench / Not Selected</h2>
+            <p>Drag a player onto the XI to replace someone.</p>
+        </div>
+        <div class="xi-count" id="benchCount">0</div>
         </div>
 
-        <div class="mini-stat-grid">
-          <div class="mini-stat">
-            <b id="teamBBat">0</b>
-            <span>Bat</span>
-          </div>
-          <div class="mini-stat">
-            <b id="teamBBowl">0</b>
-            <span>Bowl</span>
-          </div>
-          <div class="mini-stat">
-            <b id="teamBField">0</b>
-            <span>Field</span>
-          </div>
-        </div>
-
-        <div class="captain-box">
-          <small>Captain</small>
-          <strong id="teamBCaptain">Captain</strong>
-        </div>
-      </section>
+        <div
+        class="xi-list bench-xi-list"
+        id="benchList"
+        ondragover="allowDrop(event)"
+        ondrop="handleListDrop(event, 'bench')"
+        ></div>
+    </section>
     </main>
   </div>
 
-  <script>
+    <script>
+    let currentMatch = null;
+    let selectedXI = [];
+    let benchPlayers = [];
+    let draggedInfo = null;
+
     function getStoredTourMatch() {
-      const raw = localStorage.getItem("currentTourMatch");
+        const raw = localStorage.getItem("currentTourMatch");
 
-      if (!raw) return null;
+        if (!raw) return null;
 
-      try {
+        try {
         return JSON.parse(raw);
-      } catch (error) {
+        } catch (error) {
         console.error("Could not read currentTourMatch:", error);
         return null;
-      }
+        }
     }
 
-    function getTeamShortName(teamName) {
-      const special = {
-        Bangladesh: "BAN",
-        India: "IND",
-        Pakistan: "PAK",
-        Australia: "AUS",
-        England: "ENG",
-        "New Zealand": "NZ",
-        "South Africa": "SA",
-        "Sri Lanka": "SL",
-        "West Indies": "WI",
-        Afghanistan: "AFG",
-        Zimbabwe: "ZIM"
-      };
-
-      if (special[teamName]) return special[teamName];
-
-      return String(teamName || "TEAM")
-        .split(/\s+/)
-        .map(word => word[0])
-        .join("")
-        .slice(0, 3)
-        .toUpperCase();
+    function getPlayerKey(player) {
+        return String(player?.id || player?.playerId || player?.name || player?.fullName);
     }
 
-    function average(numbers) {
-      const valid = numbers.filter(number => Number.isFinite(number));
-      if (!valid.length) return 0;
-      return valid.reduce((sum, number) => sum + number, 0) / valid.length;
+    function getPlayerName(player) {
+        return player?.name || player?.fullName || "Unknown Player";
     }
 
-    function getTeamRatings(squad) {
-      const players = Array.isArray(squad) ? squad : [];
+    function getRoleGroup(player) {
+        const role = String(player?.role || "").toLowerCase();
+        const keeping = Number(player?.attributes?.fielding?.keeping) || 0;
 
-      if (!players.length) {
-        return { bat: 0, bowl: 0, field: 0 };
-      }
+        if (role.includes("wicket") || role.includes("keeper") || role.includes("wk") || keeping >= 14) {
+        return "wicketkeeper";
+        }
 
-      const bat = average(players.map(player => Number(player?.attributes?.overall?.batting_overall) || 0));
-      const bowl = average(players.map(player => Number(player?.attributes?.overall?.bowling_overall) || 0));
+        if (role.includes("all-rounder") || role.includes("all rounder") || role.includes("allrounder")) {
+        return "all-rounder";
+        }
 
-      const field = average(players.map(player => {
+        if (role.includes("bowler")) {
+        return "bowler";
+        }
+
+        return "batsman";
+    }
+
+    function getBat(player) {
+        return Number(player?.attributes?.overall?.batting_overall) || 0;
+    }
+
+    function getBowl(player) {
+        return Number(player?.attributes?.overall?.bowling_overall) || 0;
+    }
+
+    function getField(player) {
         const f = player?.attributes?.fielding || {};
-        return average([
-          Number(f.catching) || 0,
-          Number(f.reflexes) || 0,
-          Number(f.groundFielding) || 0,
-          Number(f.throwPower) || 0,
-          Number(f.throwAccuracy) || 0
-        ]);
-      }));
 
-      return {
-        bat: Math.round(bat * 5),
-        bowl: Math.round(bowl * 5),
-        field: Math.round(field * 5)
-      };
+        const values = [
+        Number(f.catching) || 0,
+        Number(f.reflexes) || 0,
+        Number(f.groundFielding) || 0,
+        Number(f.throwPower) || 0,
+        Number(f.throwAccuracy) || 0
+        ];
+
+        return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
     }
 
-    function getPlayerOverall(player) {
-      const batting = Number(player?.attributes?.overall?.batting_overall) || 0;
-      const bowling = Number(player?.attributes?.overall?.bowling_overall) || 0;
-      return Math.max(batting, bowling);
+    function getKeeping(player) {
+        return Number(player?.attributes?.fielding?.keeping) || 0;
     }
 
-    function getCaptain(squad) {
-      if (!Array.isArray(squad) || !squad.length) return "Captain";
+    function getPlayerScore(player) {
+        const group = getRoleGroup(player);
+        const bat = getBat(player);
+        const bowl = getBowl(player);
+        const field = getField(player);
+        const keeping = getKeeping(player);
 
-      const sorted = [...squad].sort((a, b) => {
-        const leadershipA = Number(a?.attributes?.mental?.leadership) || 0;
-        const leadershipB = Number(b?.attributes?.mental?.leadership) || 0;
+        if (group === "wicketkeeper") {
+        return bat * 5 + keeping * 3 + field;
+        }
 
-        if (leadershipB !== leadershipA) return leadershipB - leadershipA;
+        if (group === "all-rounder") {
+        return Math.max(bat, bowl) * 4 + Math.min(bat, bowl) * 3 + field;
+        }
 
-        return getPlayerOverall(b) - getPlayerOverall(a);
-      });
+        if (group === "bowler") {
+        return bowl * 5 + field;
+        }
 
-      return sorted[0]?.name || sorted[0]?.fullName || "Captain";
+        return bat * 5 + field;
     }
 
-    function fillPage() {
-      const data = getStoredTourMatch();
+    function addBest(result, used, pool, amount, scoreFunction) {
+        const ranked = pool
+        .filter(player => !used.has(getPlayerKey(player)))
+        .sort((a, b) => scoreFunction(b) - scoreFunction(a));
 
-      if (!data) {
+        for (const player of ranked) {
+        if (amount <= 0) break;
+
+        result.push(player);
+        used.add(getPlayerKey(player));
+        amount--;
+        }
+    }
+
+    function sortBattingOrder(players) {
+        return [...players].sort((a, b) => {
+        const posA = Number(a.primaryBattingPosition);
+        const posB = Number(b.primaryBattingPosition);
+
+        const estimatedA = Number.isFinite(posA) && posA > 0 ? posA : estimateBattingPosition(a);
+        const estimatedB = Number.isFinite(posB) && posB > 0 ? posB : estimateBattingPosition(b);
+
+        if (estimatedA !== estimatedB) {
+            return estimatedA - estimatedB;
+        }
+
+        return getBat(b) - getBat(a);
+        });
+    }
+
+    function estimateBattingPosition(player) {
+        const group = getRoleGroup(player);
+
+        if (group === "batsman") return 3;
+        if (group === "wicketkeeper") return 6;
+        if (group === "all-rounder") return 7;
+        return 10;
+    }
+
+    function pickDefaultXI(squad) {
+        const players = Array.isArray(squad) ? squad : [];
+
+        const result = [];
+        const used = new Set();
+
+        const wicketkeepers = players.filter(player => getRoleGroup(player) === "wicketkeeper");
+        const batsmen = players.filter(player => getRoleGroup(player) === "batsman");
+        const allrounders = players.filter(player => getRoleGroup(player) === "all-rounder");
+        const bowlers = players.filter(player => getRoleGroup(player) === "bowler");
+
+        addBest(result, used, wicketkeepers, 1, player => getBat(player) * 5 + getKeeping(player) * 3);
+        addBest(result, used, batsmen, 5, player => getBat(player) * 5 + getField(player));
+        addBest(result, used, allrounders, 2, player => getPlayerScore(player));
+        addBest(result, used, bowlers, 3, player => getBowl(player) * 5 + getField(player));
+
+        const remaining = players
+        .filter(player => !used.has(getPlayerKey(player)))
+        .sort((a, b) => getPlayerScore(b) - getPlayerScore(a));
+
+        for (const player of remaining) {
+        if (result.length >= 11) break;
+        result.push(player);
+        used.add(getPlayerKey(player));
+        }
+
+        return sortBattingOrder(result.slice(0, 11));
+    }
+
+    function loadPage() {
+        currentMatch = getStoredTourMatch();
+
+        if (!currentMatch) {
         document.getElementById("matchType").textContent = "No match loaded";
         return;
-      }
+        }
 
-      const teamA = data.userTeam || data.teamA || "Team A";
-      const teamB = data.computerTeam || data.teamB || "Team B";
+        document.getElementById("matchType").textContent =
+        `${currentMatch.match?.format || "Match"} • ${currentMatch.match?.title || "Tour Match"}`;
 
-      const teamARatings = getTeamRatings(data.userSquad);
-      const teamBRatings = getTeamRatings(data.computerSquad);
+        const squad = Array.isArray(currentMatch.userSquad) ? currentMatch.userSquad : [];
 
-      document.getElementById("matchType").textContent =
-        `${data.match?.format || "Match"} • ${data.match?.title || `${teamA} vs ${teamB}`}`;
+        if (Array.isArray(currentMatch.selectedUserXI) && currentMatch.selectedUserXI.length) {
+        selectedXI = currentMatch.selectedUserXI.slice(0, 11);
+        } else {
+        selectedXI = pickDefaultXI(squad);
+        }
 
-      document.getElementById("teamAName").textContent = teamA;
-      document.getElementById("teamABadge").textContent = getTeamShortName(teamA);
-      document.getElementById("teamACaptain").textContent = getCaptain(data.userSquad);
-      document.getElementById("teamABat").textContent = teamARatings.bat;
-      document.getElementById("teamABowl").textContent = teamARatings.bowl;
-      document.getElementById("teamAField").textContent = teamARatings.field;
+        const selectedKeys = new Set(selectedXI.map(getPlayerKey));
 
-      document.getElementById("teamBName").textContent = teamB;
-      document.getElementById("teamBBadge").textContent = getTeamShortName(teamB);
-      document.getElementById("teamBCaptain").textContent = getCaptain(data.computerSquad);
-      document.getElementById("teamBBat").textContent = teamBRatings.bat;
-      document.getElementById("teamBBowl").textContent = teamBRatings.bowl;
-      document.getElementById("teamBField").textContent = teamBRatings.field;
+        benchPlayers = squad.filter(player => !selectedKeys.has(getPlayerKey(player)));
+
+        saveDraftXI();
+        renderXIPage();
+    }
+
+    function renderXIPage() {
+        const selectedList = document.getElementById("selectedXiList");
+        const benchList = document.getElementById("benchList");
+
+        selectedList.innerHTML = selectedXI.map((player, index) => {
+        return renderPlayerCard(player, "selected", index);
+        }).join("");
+
+        benchList.innerHTML = benchPlayers.map((player, index) => {
+        return renderPlayerCard(player, "bench", index);
+        }).join("");
+
+        document.getElementById("selectedCount").textContent = `${selectedXI.length} / 11`;
+        document.getElementById("benchCount").textContent = `${benchPlayers.length}`;
+
+        const startBtn = document.getElementById("startMatchBtn");
+
+        if (startBtn) {
+        startBtn.disabled = selectedXI.length !== 11;
+        }
+    }
+
+    function renderPlayerCard(player, listName, index) {
+        const rankHtml = listName === "selected"
+        ? `<div class="xi-rank">${index + 1}</div>`
+        : `<div class="xi-rank">+</div>`;
+
+        const role = getRoleGroup(player);
+
+        return `
+        <div
+            class="xi-player-card"
+            draggable="true"
+            data-list="${listName}"
+            data-index="${index}"
+            ondragstart="handleDragStart(event, '${listName}', ${index})"
+            ondragend="handleDragEnd(event)"
+            ondragover="allowDrop(event)"
+            ondrop="handleCardDrop(event, '${listName}', ${index})"
+        >
+            ${rankHtml}
+
+            <div class="xi-player-main">
+            <strong>${getPlayerName(player)}</strong>
+            <span>${role} • ${player.battingHand || "-"} hand bat • ${player.bowlingStyle || "Does Not Bowl"}</span>
+            </div>
+
+            <div class="xi-player-rating">
+            <div>Bat ${getBat(player)}</div>
+            <div>Bowl ${getBowl(player)}</div>
+            <div>Fld ${getField(player)}</div>
+            </div>
+        </div>
+        `;
+    }
+
+    function handleDragStart(event, listName, index) {
+        draggedInfo = {
+        listName,
+        index
+        };
+
+        event.currentTarget.classList.add("dragging");
+        event.dataTransfer.effectAllowed = "move";
+    }
+
+    function handleDragEnd(event) {
+        event.currentTarget.classList.remove("dragging");
+    }
+
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function handleCardDrop(event, targetListName, targetIndex) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!draggedInfo) return;
+
+        const fromListName = draggedInfo.listName;
+        const fromIndex = draggedInfo.index;
+
+        if (fromListName === targetListName) {
+        reorderWithinSameList(targetListName, fromIndex, targetIndex);
+        } else {
+        swapBetweenLists(fromListName, fromIndex, targetListName, targetIndex);
+        }
+
+        draggedInfo = null;
+        saveDraftXI();
+        renderXIPage();
+    }
+
+    function handleListDrop(event, targetListName) {
+        event.preventDefault();
+
+        if (event.target.closest(".xi-player-card")) {
+        return;
+        }
+
+        if (!draggedInfo) return;
+
+        const fromListName = draggedInfo.listName;
+        const fromIndex = draggedInfo.index;
+
+        if (fromListName === targetListName) {
+        moveToEnd(targetListName, fromIndex);
+        } else {
+        moveBetweenLists(fromListName, fromIndex, targetListName);
+        }
+
+        draggedInfo = null;
+        saveDraftXI();
+        renderXIPage();
+    }
+
+    function getList(listName) {
+        return listName === "selected" ? selectedXI : benchPlayers;
+    }
+
+    function reorderWithinSameList(listName, fromIndex, targetIndex) {
+        const list = getList(listName);
+        const [movedPlayer] = list.splice(fromIndex, 1);
+        list.splice(targetIndex, 0, movedPlayer);
+    }
+
+    function moveToEnd(listName, fromIndex) {
+        const list = getList(listName);
+        const [movedPlayer] = list.splice(fromIndex, 1);
+        list.push(movedPlayer);
+    }
+
+    function swapBetweenLists(fromListName, fromIndex, targetListName, targetIndex) {
+        const fromList = getList(fromListName);
+        const targetList = getList(targetListName);
+
+        const fromPlayer = fromList[fromIndex];
+        const targetPlayer = targetList[targetIndex];
+
+        fromList[fromIndex] = targetPlayer;
+        targetList[targetIndex] = fromPlayer;
+    }
+
+    function moveBetweenLists(fromListName, fromIndex, targetListName) {
+        const fromList = getList(fromListName);
+        const targetList = getList(targetListName);
+
+        if (targetListName === "selected" && selectedXI.length >= 11) {
+        alert("Selected XI already has 11 players. Drop onto a selected player to swap.");
+        return;
+        }
+
+        const [movedPlayer] = fromList.splice(fromIndex, 1);
+        targetList.push(movedPlayer);
+    }
+
+    function autoPickBestXI() {
+        if (!currentMatch || !Array.isArray(currentMatch.userSquad)) {
+        alert("No user squad loaded.");
+        return;
+        }
+
+        selectedXI = pickDefaultXI(currentMatch.userSquad);
+
+        const selectedKeys = new Set(selectedXI.map(getPlayerKey));
+        benchPlayers = currentMatch.userSquad.filter(player => !selectedKeys.has(getPlayerKey(player)));
+
+        saveDraftXI();
+        renderXIPage();
+    }
+
+    function saveDraftXI() {
+        if (!currentMatch) return;
+
+        currentMatch.selectedUserXI = selectedXI;
+        currentMatch.userBench = benchPlayers;
+        currentMatch.battingOrder = selectedXI.map((player, index) => ({
+        position: index + 1,
+        playerId: getPlayerKey(player),
+        name: getPlayerName(player)
+        }));
+
+        localStorage.setItem("currentTourMatch", JSON.stringify(currentMatch));
     }
 
     function startMatchFromXI() {
-      const data = getStoredTourMatch();
-
-      if (!data) {
-        alert("No match loaded. Go back to Tour Summary and select a match.");
+        if (!currentMatch) {
+        alert("No match loaded.");
         return;
-      }
+        }
 
-      data.selectedUserXI = Array.isArray(data.userSquad) ? data.userSquad.slice(0, 11) : [];
-      data.selectedComputerXI = Array.isArray(data.computerSquad)
-        ? data.computerSquad
-            .slice()
-            .sort((a, b) => {
-                const aBat = Number(a?.attributes?.overall?.batting_overall) || 0;
-                const aBowl = Number(a?.attributes?.overall?.bowling_overall) || 0;
-                const bBat = Number(b?.attributes?.overall?.batting_overall) || 0;
-                const bBowl = Number(b?.attributes?.overall?.bowling_overall) || 0;
+        if (selectedXI.length !== 11) {
+        alert("You need exactly 11 players in the Selected XI.");
+        return;
+        }
 
-                return Math.max(bBat, bBowl) - Math.max(aBat, aBowl);
-            })
-            .slice(0, 11)
+        currentMatch.selectedUserXI = selectedXI;
+        currentMatch.userBench = benchPlayers;
+
+        currentMatch.selectedComputerXI = Array.isArray(currentMatch.computerSquad)
+        ? pickDefaultXI(currentMatch.computerSquad)
         : [];
-      data.xiConfirmed = true;
-      data.xiConfirmedAt = new Date().toISOString();
 
-      localStorage.setItem("currentTourMatch", JSON.stringify(data));
+        currentMatch.xiConfirmed = true;
+        currentMatch.xiConfirmedAt = new Date().toISOString();
 
-      window.location.href = "toss.html";
+        localStorage.setItem("currentTourMatch", JSON.stringify(currentMatch));
+
+        window.location.href = "toss.html";
     }
 
     function goBackToSummary() {
-      window.location.href = "index.html";
+        window.location.href = "index.html";
     }
 
-    fillPage();
-  </script>
+    loadPage();
+    </script>
 </body>
 </html>
