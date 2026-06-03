@@ -78,8 +78,10 @@ async function loadPlayers() {
       id: String(player.id ?? player.playerId ?? player.player_id ?? `player_${index}`)
     }));
 
+    recalculateAllPlayerPlaystyles();
     snapshotOriginalPlayers();
     applySavedPlayerEdits();
+    recalculateAllPlayerPlaystyles();
 
     filteredPlayers = [...allPlayers];
 
@@ -220,6 +222,560 @@ function getTopThreePlaystyles(player, category) {
   }
 
   return playstyles;
+}
+
+/* =========================================================
+   PLAYSTYLE RECALCULATION FORMULAS
+========================================================= */
+
+function ratingNumber(value) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : 0;
+}
+
+function roundPlaystyleRating(value) {
+  return Math.round((Number(value) || 0) * 100) / 100;
+}
+
+function getPositionBonuses(player) {
+  const position = Number(player.primaryBattingPosition);
+
+  return {
+    openerBonus: position === 1 || position === 2 ? 20 : 0,
+    topOrderBonus: position === 3 || position === 4 ? 20 : 0,
+    middleOrderBonus: position === 5 || position === 6 ? 20 : 0,
+    lowerOrderBonus: position === 7 || position === 8 ? 20 : 0,
+    runnerBonus: position === 9 ? 20 : 0,
+    pinchHitterBonus: position === 9 ? 20 : 0,
+    wallBonus: position === 9 ? 20 : 0
+  };
+}
+
+function calculateBattingPlaystyleRatings(player) {
+  const batting = player.attributes?.batting || {};
+  const physical = player.attributes?.physical || {};
+  const mental = player.attributes?.mental || {};
+  const overall = player.attributes?.overall || {};
+  const bonuses = getPositionBonuses(player);
+
+  const batting_overall = ratingNumber(overall.batting_overall);
+
+  const technique = ratingNumber(batting.technique);
+  const timing = ratingNumber(batting.timing);
+  const footwork = ratingNumber(batting.footwork);
+  const placement = ratingNumber(batting.placement);
+  const range360 = ratingNumber(batting.range360);
+  const defensiveShots = ratingNumber(batting.defensiveShots);
+  const neutralShots = ratingNumber(batting.neutralShots);
+  const attackingShots = ratingNumber(batting.attackingShots);
+  const vsPace = ratingNumber(batting.vsPace);
+  const vsSpin = ratingNumber(batting.vsSpin);
+  const creativity = ratingNumber(batting.creativity);
+
+  const strength = ratingNumber(physical.strength);
+  const speed = ratingNumber(physical.speed);
+  const agility = ratingNumber(physical.agility);
+
+  const concentration = ratingNumber(mental.concentration);
+  const aggression = ratingNumber(mental.aggression);
+  const judgement = ratingNumber(mental.judgement);
+
+  return {
+    "Opener - Slogger": roundPlaystyleRating(
+      bonuses.openerBonus +
+      batting_overall +
+      technique * 0.5 +
+      timing * 0.5 +
+      vsPace * 0.5 +
+      aggression * 0.5 +
+      placement * 0.25 +
+      creativity * 0.25 +
+      attackingShots * 0.25 +
+      strength * 0.25
+    ),
+
+    "Opener - Balanced": roundPlaystyleRating(
+      bonuses.openerBonus +
+      batting_overall +
+      technique * 0.5 +
+      timing * 0.5 +
+      footwork * 0.25 +
+      placement * 0.25 +
+      neutralShots * 0.25 +
+      vsPace * 0.25 +
+      speed * 0.125 +
+      agility * 0.125 +
+      concentration * 0.25 +
+      aggression * 0.25 +
+      judgement * 0.25
+    ),
+
+    "Opener - Anchor": roundPlaystyleRating(
+      bonuses.openerBonus +
+      batting_overall +
+      technique * 0.5 +
+      timing * 0.5 +
+      footwork * 0.5 +
+      defensiveShots * 0.25 +
+      vsPace * 0.25 +
+      vsSpin * 0.25 +
+      concentration * 0.25 +
+      judgement * 0.5
+    ),
+
+    "Top Order - Slogger": roundPlaystyleRating(
+      bonuses.topOrderBonus +
+      batting_overall +
+      technique * 0.5 +
+      timing * 0.25 +
+      range360 * 0.25 +
+      attackingShots * 0.5 +
+      vsPace * 0.25 +
+      vsSpin * 0.25 +
+      creativity * 0.25 +
+      strength * 0.25 +
+      aggression * 0.5
+    ),
+
+    "Top Order - Balanced": roundPlaystyleRating(
+      bonuses.topOrderBonus +
+      batting_overall +
+      technique * 0.5 +
+      timing * 0.25 +
+      footwork * 0.25 +
+      range360 * 0.25 +
+      neutralShots * 0.5 +
+      vsPace * 0.25 +
+      vsSpin * 0.25 +
+      concentration * 0.25 +
+      aggression * 0.25 +
+      judgement * 0.25
+    ),
+
+    "Top Order - Anchor": roundPlaystyleRating(
+      bonuses.topOrderBonus +
+      batting_overall +
+      technique * 0.5 +
+      timing * 0.25 +
+      footwork * 0.5 +
+      defensiveShots * 0.5 +
+      vsSpin * 0.25 +
+      speed * 0.125 +
+      agility * 0.125 +
+      concentration * 0.25 +
+      judgement * 0.5
+    ),
+
+    "Middle Order - Slogger": roundPlaystyleRating(
+      bonuses.middleOrderBonus +
+      batting_overall +
+      technique * 0.25 +
+      timing * 0.25 +
+      placement * 0.25 +
+      range360 * 0.25 +
+      neutralShots * 0.25 +
+      attackingShots * 0.5 +
+      vsSpin * 0.5 +
+      creativity * 0.25 +
+      strength * 0.25 +
+      aggression * 0.25
+    ),
+
+    "Middle Order - Balanced": roundPlaystyleRating(
+      bonuses.middleOrderBonus +
+      batting_overall +
+      technique * 0.25 +
+      timing * 0.25 +
+      footwork * 0.25 +
+      placement * 0.25 +
+      defensiveShots * 0.25 +
+      neutralShots * 0.25 +
+      attackingShots * 0.25 +
+      vsSpin * 0.25 +
+      creativity * 0.25 +
+      strength * 0.25 +
+      speed * 0.125 +
+      agility * 0.125 +
+      judgement * 0.25
+    ),
+
+    "Middle Order - Anchor": roundPlaystyleRating(
+      bonuses.middleOrderBonus +
+      batting_overall +
+      technique * 0.25 +
+      timing * 0.25 +
+      footwork * 0.5 +
+      defensiveShots * 0.5 +
+      neutralShots * 0.25 +
+      vsSpin * 0.25 +
+      creativity * 0.25 +
+      speed * 0.125 +
+      agility * 0.125 +
+      judgement * 0.5
+    ),
+
+    "Lower Order - Slogger": roundPlaystyleRating(
+      bonuses.lowerOrderBonus +
+      batting_overall +
+      timing * 0.25 +
+      placement * 0.25 +
+      range360 * 0.5 +
+      neutralShots * 0.25 +
+      attackingShots * 0.5 +
+      vsPace * 0.25 +
+      vsSpin * 0.25 +
+      creativity * 0.25 +
+      strength * 0.25 +
+      aggression * 0.25
+    ),
+
+    "Lower Order - Balanced": roundPlaystyleRating(
+      bonuses.lowerOrderBonus +
+      batting_overall +
+      timing * 0.25 +
+      footwork * 0.25 +
+      placement * 0.5 +
+      range360 * 0.25 +
+      neutralShots * 0.5 +
+      attackingShots * 0.25 +
+      vsPace * 0.25 +
+      vsSpin * 0.25 +
+      concentration * 0.25 +
+      judgement * 0.25
+    ),
+
+    "Lower Order - Anchor": roundPlaystyleRating(
+      bonuses.lowerOrderBonus +
+      batting_overall +
+      timing * 0.25 +
+      footwork * 0.5 +
+      placement * 0.25 +
+      range360 * 0.25 +
+      defensiveShots * 0.5 +
+      neutralShots * 0.25 +
+      speed * 0.125 +
+      agility * 0.125 +
+      concentration * 0.25 +
+      judgement * 0.5
+    ),
+
+    "Finisher": roundPlaystyleRating(
+      batting_overall +
+      placement * 0.25 +
+      range360 * 0.5 +
+      attackingShots * 0.25 +
+      vsPace * 0.5 +
+      creativity * 0.5 +
+      concentration * 0.5 +
+      aggression * 0.25 +
+      judgement * 0.25
+    ),
+
+    "Runner": roundPlaystyleRating(
+      bonuses.runnerBonus +
+      batting_overall +
+      range360 * 0.25 +
+      defensiveShots * 0.25 +
+      neutralShots * 0.5 +
+      vsPace * 0.25 +
+      vsSpin * 0.25 +
+      strength * 0.5 +
+      speed * 0.25 +
+      agility * 0.25 +
+      concentration * 0.5
+    ),
+
+    "Pinch-Hitter": roundPlaystyleRating(
+      bonuses.pinchHitterBonus +
+      batting_overall +
+      placement * 0.25 +
+      range360 * 0.25 +
+      attackingShots * 0.5 +
+      vsPace * 0.5 +
+      vsSpin * 0.5 +
+      strength * 0.5 +
+      aggression * 0.5
+    ),
+
+    "Wall": roundPlaystyleRating(
+      bonuses.wallBonus +
+      batting_overall +
+      defensiveShots * 0.5 +
+      neutralShots * 0.25 +
+      vsPace * 0.5 +
+      vsSpin * 0.5 +
+      speed * 0.125 +
+      agility * 0.125 +
+      concentration * 0.5 +
+      judgement * 0.5
+    )
+  };
+}
+
+function getBowlingGroup(player) {
+  const bowlingType = String(player.bowlingType ?? "").toLowerCase();
+  const bowlingStyle = String(player.bowlingStyle ?? "").toLowerCase();
+
+  if (
+    bowlingType === "none" ||
+    bowlingType === "null" ||
+    bowlingType === "" ||
+    bowlingStyle === "does not bowl"
+  ) {
+    return "none";
+  }
+
+  if (bowlingType.includes("pace")) return "pace";
+  if (bowlingType.includes("spin")) return "spin";
+
+  if (
+    bowlingStyle.includes("fast") ||
+    bowlingStyle.includes("medium") ||
+    bowlingStyle.includes("seam") ||
+    bowlingStyle.includes("swing")
+  ) {
+    return "pace";
+  }
+
+  if (
+    bowlingStyle.includes("spin") ||
+    bowlingStyle.includes("break") ||
+    bowlingStyle.includes("orthodox") ||
+    bowlingStyle.includes("leg") ||
+    bowlingStyle.includes("off") ||
+    bowlingStyle.includes("slow")
+  ) {
+    return "spin";
+  }
+
+  return "none";
+}
+
+function calculateBowlingPlaystyleRatings(player) {
+  const bowlingGroup = getBowlingGroup(player);
+
+  if (bowlingGroup === "none") {
+    return {
+      "Swing Bowler": null,
+      "Hit-the-Deck Seamer": null,
+      "Short-Ball Specialist": null,
+      "Death Specialist": null,
+      "Classical Spinner": null,
+      "Flat Spinner": null,
+      "Mystery Spinner": null,
+      "Containment Spinner": null,
+      "Does Not Bowl": null
+    };
+  }
+
+  const bowling = player.attributes?.bowling || {};
+  const physical = player.attributes?.physical || {};
+  const mental = player.attributes?.mental || {};
+  const overall = player.attributes?.overall || {};
+
+  const bowling_overall = ratingNumber(overall.bowling_overall);
+
+  const accuracy = ratingNumber(bowling.accuracy);
+  const bowlingSpeed = ratingNumber(bowling.bowlingSpeed);
+  const swing = ratingNumber(bowling.swing);
+  const turn = ratingNumber(bowling.turn);
+  const flight = ratingNumber(bowling.flight);
+  const variations = ratingNumber(bowling.variations);
+  const intelligence = ratingNumber(bowling.intelligence);
+  const defensiveBowling = ratingNumber(bowling.defensiveBowling);
+  const neutralBowling = ratingNumber(bowling.neutralBowling);
+  const attackingBowling = ratingNumber(bowling.attackingBowling);
+
+  const stamina = ratingNumber(physical.stamina);
+  const temperament = ratingNumber(mental.temperament);
+
+  if (bowlingGroup === "pace") {
+    return {
+      "Swing Bowler": roundPlaystyleRating(
+        bowling_overall +
+        bowlingSpeed * 0.8 +
+        swing * 0.8 +
+        variations * 0.4 +
+        intelligence * 0.4 +
+        neutralBowling * 0.4 +
+        attackingBowling * 0.4 +
+        stamina * 0.4 +
+        temperament * 0.4
+      ),
+
+      "Hit-the-Deck Seamer": roundPlaystyleRating(
+        bowling_overall +
+        accuracy * 0.4 +
+        bowlingSpeed * 0.8 +
+        swing * 0.4 +
+        variations * 0.4 +
+        neutralBowling * 0.8 +
+        attackingBowling * 0.4 +
+        stamina * 0.8
+      ),
+
+      "Short-Ball Specialist": roundPlaystyleRating(
+        bowling_overall +
+        accuracy * 0.4 +
+        bowlingSpeed * 0.8 +
+        defensiveBowling * 0.8 +
+        attackingBowling * 0.8 +
+        stamina * 0.8 +
+        temperament * 0.4
+      ),
+
+      "Death Specialist": roundPlaystyleRating(
+        bowling_overall +
+        accuracy * 0.8 +
+        variations * 0.8 +
+        intelligence * 0.8 +
+        defensiveBowling * 0.4 +
+        attackingBowling * 0.4 +
+        temperament * 0.8
+      ),
+
+      "Classical Spinner": null,
+      "Flat Spinner": null,
+      "Mystery Spinner": null,
+      "Containment Spinner": null,
+      "Does Not Bowl": null
+    };
+  }
+
+  return {
+    "Swing Bowler": null,
+    "Hit-the-Deck Seamer": null,
+    "Short-Ball Specialist": null,
+    "Death Specialist": null,
+
+    "Classical Spinner": roundPlaystyleRating(
+      bowling_overall +
+      accuracy * 0.4 +
+      turn * 0.4 +
+      flight * 0.4 +
+      variations * 0.4 +
+      intelligence * 0.4 +
+      defensiveBowling * 0.4 +
+      neutralBowling * 0.8 +
+      attackingBowling * 0.4 +
+      temperament * 0.4
+    ),
+
+    "Flat Spinner": roundPlaystyleRating(
+      bowling_overall +
+      accuracy * 0.4 +
+      flight * 0.8 +
+      variations * 0.4 +
+      defensiveBowling * 0.8 +
+      neutralBowling * 0.4 +
+      stamina * 0.8 +
+      temperament * 0.4
+    ),
+
+    "Mystery Spinner": roundPlaystyleRating(
+      bowling_overall +
+      turn * 0.4 +
+      flight * 0.4 +
+      variations * 0.8 +
+      intelligence * 0.8 +
+      neutralBowling * 0.4 +
+      attackingBowling * 0.8 +
+      temperament * 0.4
+    ),
+
+    "Containment Spinner": roundPlaystyleRating(
+      bowling_overall +
+      accuracy * 0.8 +
+      flight * 0.4 +
+      intelligence * 0.8 +
+      defensiveBowling * 0.8 +
+      neutralBowling * 0.4 +
+      stamina * 0.4 +
+      temperament * 0.4
+    ),
+
+    "Does Not Bowl": null
+  };
+}
+
+function calculateFieldingPlaystyleRatings(player) {
+  const fielding = player.attributes?.fielding || {};
+
+  const reflexes = ratingNumber(fielding.reflexes);
+  const keeping = ratingNumber(fielding.keeping);
+  const collecting = ratingNumber(fielding.collecting);
+  const stumping = ratingNumber(fielding.stumping);
+
+  return {
+    Wicketkeeper: roundPlaystyleRating(
+      reflexes * 0.75 +
+      keeping * 2 +
+      collecting * 1.25 +
+      stumping * 1
+    )
+  };
+}
+
+function getPrimaryStyleFromRatings(styleRatings) {
+  let bestName = null;
+  let bestRating = -Infinity;
+
+  for (const [name, rating] of Object.entries(styleRatings || {})) {
+    if (typeof rating === "number" && Number.isFinite(rating) && rating > bestRating) {
+      bestName = name;
+      bestRating = rating;
+    }
+  }
+
+  return {
+    name: bestName,
+    rating: bestRating
+  };
+}
+
+function getTopThreeFromRatings(styleRatings) {
+  return Object.entries(styleRatings || {})
+    .filter(([, rating]) => typeof rating === "number" && Number.isFinite(rating))
+    .map(([name, rating]) => ({ name, rating }))
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 3);
+}
+
+function recalculatePlayerPlaystyles(player) {
+  if (!player.playstyleRatings) player.playstyleRatings = {};
+  if (!player.topPlaystyles) player.topPlaystyles = {};
+  if (!player.primaryPlaystyle) player.primaryPlaystyle = {};
+
+  const battingRatings = calculateBattingPlaystyleRatings(player);
+  const bowlingRatings = calculateBowlingPlaystyleRatings(player);
+  const fieldingRatings = calculateFieldingPlaystyleRatings(player);
+
+  player.playstyleRatings.batting = battingRatings;
+  player.playstyleRatings.bowling = bowlingRatings;
+  player.playstyleRatings.fielding = fieldingRatings;
+
+  player.topPlaystyles.batting = getTopThreeFromRatings(battingRatings);
+  player.topPlaystyles.bowling = getTopThreeFromRatings(bowlingRatings);
+  player.topPlaystyles.fielding = getTopThreeFromRatings(fieldingRatings);
+
+  const primaryBatting = getPrimaryStyleFromRatings(battingRatings);
+  const primaryBowling = getPrimaryStyleFromRatings(bowlingRatings);
+  const primaryFielding = getPrimaryStyleFromRatings(fieldingRatings);
+
+  player.primaryPlaystyle.batting = primaryBatting.name;
+  player.primaryPlaystyle.bowling = primaryBowling.name;
+  player.primaryPlaystyle.fielding = primaryFielding.name;
+
+  if (getBowlingGroup(player) === "none") {
+    player.primaryPlaystyle.bowling = null;
+    player.topPlaystyles.bowling = [];
+  }
+
+  return player;
+}
+
+function recalculateAllPlayerPlaystyles() {
+  allPlayers.forEach((player) => recalculatePlayerPlaystyles(player));
 }
 
 function getBatStyle(player) {
@@ -705,28 +1261,34 @@ function renderEditorPreviewRows(player, category) {
   `).join("");
 }
 
+function renderEditorPlaystylePreviewInner(player) {
+  return `
+    <h3>Playstyle Preview</h3>
+    <p>Playstyles are calculated from attributes and shown here as read-only.</p>
+
+    <div class="editor-preview-grid">
+      <div>
+        <h4>Top Batting</h4>
+        ${renderEditorPreviewRows(player, "batting")}
+      </div>
+
+      <div>
+        <h4>Top Bowling</h4>
+        ${renderEditorPreviewRows(player, "bowling")}
+      </div>
+
+      <div>
+        <h4>Top Fielding</h4>
+        ${renderEditorPreviewRows(player, "fielding")}
+      </div>
+    </div>
+  `;
+}
+
 function renderEditorPlaystylePreview(player) {
   return `
-    <section class="editor-section editor-playstyle-preview">
-      <h3>Playstyle Preview</h3>
-      <p>Playstyles are calculated from attributes and shown here as read-only.</p>
-
-      <div class="editor-preview-grid">
-        <div>
-          <h4>Top Batting</h4>
-          ${renderEditorPreviewRows(player, "batting")}
-        </div>
-
-        <div>
-          <h4>Top Bowling</h4>
-          ${renderEditorPreviewRows(player, "bowling")}
-        </div>
-
-        <div>
-          <h4>Top Fielding</h4>
-          ${renderEditorPreviewRows(player, "fielding")}
-        </div>
-      </div>
+    <section class="editor-section editor-playstyle-preview" id="editorPlaystylePreview">
+      ${renderEditorPlaystylePreviewInner(player)}
     </section>
   `;
 }
@@ -931,6 +1493,47 @@ function renderPlayerEditorForm(player) {
   `;
 }
 
+function getEditorDraftPlayer() {
+  const originalPlayer = findEditorPlayerById(editingPlayerId);
+
+  if (!originalPlayer) return null;
+
+  const draftPlayer = deepClone(originalPlayer);
+
+  document.querySelectorAll("#playerEditorOverlay [data-edit-path]").forEach((input) => {
+    const path = input.dataset.editPath;
+    const type = input.dataset.editType;
+    const value = normalizeEditorValue(input.value, type);
+
+    setNestedValue(draftPlayer, path, value);
+  });
+
+  normalizeNoBowlerFields(draftPlayer);
+  recalculatePlayerPlaystyles(draftPlayer);
+
+  return draftPlayer;
+}
+
+function refreshEditorPlaystylePreview() {
+  const preview = document.getElementById("editorPlaystylePreview");
+  const draftPlayer = getEditorDraftPlayer();
+
+  if (!preview || !draftPlayer) return;
+
+  preview.innerHTML = renderEditorPlaystylePreviewInner(draftPlayer);
+}
+
+function attachPlayerEditorLivePreview() {
+  const overlay = document.getElementById("playerEditorOverlay");
+
+  if (!overlay) return;
+
+  overlay.querySelectorAll("[data-edit-path]").forEach((input) => {
+    input.addEventListener("input", refreshEditorPlaystylePreview);
+    input.addEventListener("change", refreshEditorPlaystylePreview);
+  });
+}
+
 function ensurePlayerEditorRoot() {
   let root = document.getElementById("playerEditorOverlay");
 
@@ -958,6 +1561,7 @@ function openPlayerEditor(playerId) {
 
   const root = ensurePlayerEditorRoot();
   root.innerHTML = renderPlayerEditorForm(player);
+  attachPlayerEditorLivePreview();
   root.classList.add("show");
   document.body.classList.add("editor-open");
 }
@@ -1016,6 +1620,7 @@ function savePlayerEditorChanges() {
   });
 
   normalizeNoBowlerFields(player);
+  recalculatePlayerPlaystyles(player);
 
   const edits = getSavedPlayerEdits();
   edits[String(player.id)] = deepClone(player);
