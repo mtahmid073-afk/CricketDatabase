@@ -794,3 +794,51 @@ body.editor-open {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================
+   PERFORMANCE FIX FOR PLAYER EDITOR SCROLL
+========================================================= */
+
+/* Remove expensive blur while editor is open */
+.player-editor-overlay {
+  backdrop-filter: none !important;
+  background: rgba(5, 8, 12, 0.92) !important;
+}
+
+/* Reduce heavy repaint cost */
+.player-editor-modal {
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45) !important;
+  background: #101820 !important;
+  transform: translateZ(0);
+}
+
+/* Make the scrolling area smoother */
+.player-editor-body {
+  will-change: scroll-position;
+  transform: translateZ(0);
+  contain: content;
+}
+
+/* Simplify section backgrounds during scroll */
+.editor-section {
+  background: #17212b !important;
+  contain: layout paint;
+}
+
+/* Browser can skip rendering off-screen editor sections */
+.editor-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 220px;
+}
+
+/* Keep inputs lighter */
+.editor-field input,
+.editor-field select {
+  box-shadow: none !important;
+}
+
+/* Remove focus glow repaint cost */
+.editor-field input:focus,
+.editor-field select:focus {
+  box-shadow: none !important;
+}
