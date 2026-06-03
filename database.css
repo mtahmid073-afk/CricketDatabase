@@ -969,3 +969,52 @@ body.editor-open {
 .download-json-btn {
   margin-left: auto !important;
 }
+
+/* Top full-screen action row */
+
+.database-top-actions {
+  width: 100%;
+  padding: 18px 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-main-btn,
+.download-json-btn {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  border: none;
+}
+
+.back-main-btn {
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
+}
+
+.download-json-btn {
+  margin-left: auto;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+}
+
+.back-main-btn:hover,
+.download-json-btn:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 650px) {
+  .database-top-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .back-main-btn,
+  .download-json-btn {
+    width: 100%;
+  }
+}
