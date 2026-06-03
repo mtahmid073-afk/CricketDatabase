@@ -1437,6 +1437,128 @@ function renderScheduleMatch(match, nextPlayableMatchIndex) {
   `;
 }
 
+
+
+
+
+function testComputerSquadPick() {
+  const computerTeam =
+    state.computerTeam ||
+    document.getElementById("computerTeamSelect")?.value ||
+    "";
+
+  if (!computerTeam) {
+    alert("No computer team selected yet.");
+    return;
+  }
+
+  const pickedSquad = autoPickComputerSquad(computerTeam);
+
+  const selectedFormats =
+    typeof getSelectedNationalFormats === "function"
+      ? getSelectedNationalFormats()
+      : [];
+
+  const counts = {
+    batsman: 0,
+    wicketkeeper: 0,
+    allrounder: 0,
+    bowler: 0
+  };
+
+  const rows = pickedSquad.map((player, index) => {
+    const roleGroup =
+      typeof getPlayerRoleGroup === "function"
+        ? getPlayerRoleGroup(player)
+        : String(player.role || "unknown").toLowerCase();
+
+    if (counts[roleGroup] !== undefined) {
+      counts[roleGroup]++;
+    }
+
+    const batting = Number(player.attributes?.overall?.batting_overall) || 0;
+    const bowling = Number(player.attributes?.overall?.bowling_overall) || 0;
+    const keeping = Number(player.attributes?.fielding?.keeping) || 0;
+    const leadership = Number(player.attributes?.mental?.leadership) || 0;
+    const fitness = Number(player.condition?.fitness) || 0;
+
+    const eligible =
+      typeof isPlayerEligibleForSelectedFormats === "function"
+        ? isPlayerEligibleForSelectedFormats(player, selectedFormats)
+        : true;
+
+    const score =
+      typeof getComputerSquadScore === "function"
+        ? Math.round(getComputerSquadScore(player, selectedFormats) * 100) / 100
+        : "-";
+
+    return {
+      pick: index + 1,
+      name: player.name || player.fullName || "Unknown",
+      role: player.role || "-",
+      group: roleGroup,
+      bat: batting,
+      bowl: bowling,
+      keeping,
+      leadership,
+      fitness,
+      eligible,
+      score
+    };
+  });
+
+  console.clear();
+  console.log("COMPUTER SQUAD TEST");
+  console.log("Team:", computerTeam);
+  console.log("Formats:", selectedFormats);
+  console.log("Counts:", counts);
+  console.table(rows);
+
+  const outputLines = [
+    `COMPUTER SQUAD TEST`,
+    `Team: ${computerTeam}`,
+    `Formats: ${selectedFormats.length ? selectedFormats.join(", ").toUpperCase() : "No format filter"}`,
+    ``,
+    `Total picked: ${pickedSquad.length}`,
+    `Batsmen: ${counts.batsman}`,
+    `Wicketkeepers: ${counts.wicketkeeper}`,
+    `All-rounders: ${counts.allrounder}`,
+    `Bowlers: ${counts.bowler}`,
+    ``,
+    `Picked Players:`,
+    ...rows.map(row => {
+      return `${row.pick}. ${row.name} | ${row.group} | Bat ${row.bat} | Bowl ${row.bowl} | WK ${row.keeping} | Score ${row.score} | Eligible: ${row.eligible}`;
+    })
+  ];
+
+  let out = document.getElementById("computerSquadTestOut");
+
+  if (!out) {
+    out = document.createElement("pre");
+    out.id = "computerSquadTestOut";
+    document.body.appendChild(out);
+  }
+
+  out.textContent = outputLines.join("\n");
+
+  alert(
+    `Computer squad picked:\n\n` +
+    `Total: ${pickedSquad.length}\n` +
+    `Batsmen: ${counts.batsman}\n` +
+    `Wicketkeepers: ${counts.wicketkeeper}\n` +
+    `All-rounders: ${counts.allrounder}\n` +
+    `Bowlers: ${counts.bowler}\n\n` +
+    `Full list printed on page and in console.`
+  );
+}
+
+
+
+
+
+
+
+
 function selectXIForMatch(matchIndex) {
   const schedule = buildTourSchedule();
   const match = schedule.find(item => item.matchIndex === matchIndex);
