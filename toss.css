@@ -502,3 +502,88 @@
   cursor: not-allowed !important;
   pointer-events: none !important;
 }
+
+/* =========================================================
+   TOSS PAGE PERFORMANCE MODE
+   Keeps style, removes laggy always-running effects
+========================================================= */
+
+/* Stop full-page moving background layers */
+body::after {
+  display: none !important;
+  animation: none !important;
+}
+
+.stadium-lights,
+.beam {
+  display: none !important;
+  animation: none !important;
+}
+
+.field-glow {
+  opacity: 0.45 !important;
+  filter: none !important;
+}
+
+/* Remove expensive blur repainting */
+.topbar,
+.card,
+.toss-center,
+.team-card,
+.info-card {
+  backdrop-filter: none !important;
+}
+
+/* Stop constant shine animations */
+.topbar::after,
+.team-badge::after,
+.card::after {
+  display: none !important;
+  animation: none !important;
+}
+
+/* Stop idle pulsing animations */
+.logo,
+.vs-badge,
+.power-fill,
+.coin-stage {
+  animation: none !important;
+}
+
+/* Lighter shadows */
+.card,
+.topbar,
+.toss-center,
+.team-card,
+.info-card {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32) !important;
+}
+
+/* Coin area lighter */
+#coinCanvas {
+  filter: drop-shadow(0 14px 16px rgba(0, 0, 0, 0.32)) !important;
+}
+
+.coin-stage {
+  opacity: 0.28 !important;
+}
+
+/* Remove ring blast and spark effects if still laggy */
+.energy-ring {
+  display: none !important;
+}
+
+.spark {
+  display: none !important;
+}
+
+/* Keep hover effects simple */
+.team-card:hover,
+.info-card:hover {
+  transform: none !important;
+}
+
+/* Prevent animation overload */
+* {
+  scroll-behavior: auto !important;
+}

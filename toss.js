@@ -453,9 +453,9 @@ function drawRidges(cx, cy, r, scaleX) {
   ctx.translate(cx, cy);
   ctx.scale(scaleX, 1);
 
-  for (let i = 0; i < 72; i++) {
-    const angle = (Math.PI * 2 * i) / 72;
-    const next = angle + Math.PI * 2 / 110;
+  for (let i = 0; i < 28; i++) {
+    const angle = (Math.PI * 2 * i) / 28;
+    const next = angle + Math.PI * 2 / 44;
 
     ctx.beginPath();
     ctx.arc(0, 0, r + 4, angle, next);
@@ -703,34 +703,7 @@ function flashResult() {
 }
 
 function createSparkBurst() {
-  const coinArea = document.getElementById("coinArea");
-
-  if (!coinArea) {
-    return;
-  }
-
-  const colors = ["gold", "blue", "green"];
-
-  for (let i = 0; i < 14; i++) {
-    const spark = document.createElement("span");
-    spark.className = "spark";
-
-    const color = colors[i % colors.length];
-
-    if (color !== "gold") {
-      spark.classList.add(color);
-    }
-
-    const angle = (Math.PI * 2 * i) / 14;
-    const distance = 60 + Math.random() * 46;
-
-    spark.style.setProperty("--x", `${Math.cos(angle) * distance}px`);
-    spark.style.setProperty("--y", `${Math.sin(angle) * distance}px`);
-
-    coinArea.appendChild(spark);
-
-    setTimeout(() => spark.remove(), 820);
-  }
+  // Disabled for smoother performance.
 }
 
 function animateCoinTo(outcome, done) {
@@ -745,7 +718,7 @@ function animateCoinTo(outcome, done) {
   }
 
   const startTime = performance.now();
-  const duration = 1850;
+  const duration = 1050;
 
   function frame(now) {
     const t = Math.min(1, (now - startTime) / duration);
@@ -954,7 +927,15 @@ function resetTossUI() {
   );
 }
 
-window.addEventListener("resize", setupCanvas);
+let resizeTimer = null;
+
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+
+  resizeTimer = setTimeout(() => {
+    setupCanvas();
+  }, 150);
+});
 
 loadMatchData();
 setupCanvas();
