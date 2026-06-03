@@ -587,3 +587,24 @@ body::after {
 * {
   scroll-behavior: auto !important;
 }
+
+/* Center toss call title and remove VS space */
+
+.toss-title-centered {
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.toss-title-centered > div {
+  width: 100%;
+}
+
+.toss-subtitle {
+  font-weight: 950;
+  margin-top: 4px;
+  font-size: 1rem;
+}
+
+.vs-badge {
+  display: none !important;
+}
