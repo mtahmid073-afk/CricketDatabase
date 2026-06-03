@@ -480,3 +480,25 @@
     padding: 11px;
   }
 }
+
+/* Remove laggy live ticker */
+.ticker {
+  display: none !important;
+}
+
+.ticker-text {
+  animation: none !important;
+}
+
+/* Adjust page since ticker is gone */
+.page {
+  grid-template-rows: auto 1fr !important;
+}
+
+/* Prevent double clicking flip */
+.toss-btn.locked,
+#flipBtn:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}

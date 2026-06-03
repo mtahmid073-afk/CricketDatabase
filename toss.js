@@ -109,6 +109,7 @@ function getStoredTourMatch() {
     let userCall = "Heads";
     let tossWinner = "";
     let isFlipping = false;
+    let tossCompleted = false;
 
     const canvas = document.getElementById("coinCanvas");
     const ctx = canvas.getContext("2d");
@@ -363,50 +364,73 @@ function getStoredTourMatch() {
     }
 
     function doToss() {
-      if (isFlipping) return;
-      if (!userCall) {
+    if (isFlipping || tossCompleted) return;
+
+    if (!userCall) {
         document.getElementById("resultTitle").textContent = "Choose Heads or Tails first";
         document.getElementById("resultText").textContent = "Click one toss call before flipping the coin.";
         flashResult();
         return;
-      }
-      isFlipping = true;
-      const coinArea = document.getElementById("coinArea");
-      const flipBtn = document.getElementById("flipBtn");
-      const headsBtn = document.getElementById("headsBtn");
-      const tailsBtn = document.getElementById("tailsBtn");
-      const decisionRow = document.getElementById("decisionRow");
-      decisionRow.classList.remove("show");
-      document.getElementById("continueBtn").style.display = "none";
-      const outcome = Math.random() < 0.5 ? "Heads" : "Tails";
-      coinArea.classList.add("flipping");
-      flipBtn.disabled = true;
-      headsBtn.disabled = true;
-      tailsBtn.disabled = true;
-      document.getElementById("resultTitle").textContent = "Coin flipping...";
-      document.getElementById("resultText").textContent = "The coin is rotating, turning edge-on, and slowing into the final result.";
-      setTimeout(createSparkBurst, 1260);
-      animateCoinTo(outcome, () => {
+    }
+
+    isFlipping = true;
+    tossCompleted = true;
+
+    const coinArea = document.getElementById("coinArea");
+    const flipBtn = document.getElementById("flipBtn");
+    const headsBtn = document.getElementById("headsBtn");
+    const tailsBtn = document.getElementById("tailsBtn");
+    const decisionRow = document.getElementById("decisionRow");
+
+    decisionRow.classList.remove("show");
+
+    const outcome = Math.random() < 0.5 ? "Heads" : "Tails";
+
+    coinArea.classList.add("flipping");
+
+    flipBtn.disabled = true;
+    flipBtn.classList.add("locked");
+    flipBtn.textContent = "Toss Completed";
+
+    headsBtn.disabled = true;
+    tailsBtn.disabled = true;
+
+    document.getElementById("resultTitle").textContent = "Coin flipping...";
+    document.getElementById("resultText").textContent =
+        "The coin is rotating, turning edge-on, and slowing into the final result.";
+
+    setTimeout(createSparkBurst, 1260);
+
+    animateCoinTo(outcome, () => {
         coinArea.classList.remove("flipping");
         setFinalFace(outcome);
         flashResult();
+
         const userWon = outcome === userCall;
         tossWinner = userWon ? matchData.teamA.name : matchData.teamB.name;
+
         document.getElementById("resultTitle").textContent = `${outcome}! ${tossWinner} won the toss`;
+
         if (userWon) {
-          document.getElementById("resultText").textContent = `${matchData.teamA.name} called ${userCall} correctly. Choose whether to bat or bowl first.`;
-          decisionRow.classList.add("show");
+        document.getElementById("resultText").textContent =
+            `${matchData.teamA.name} called ${userCall} correctly. Choose whether to bat or bowl first.`;
+
+        decisionRow.classList.add("show");
         } else {
-          const computerDecision = getComputerDecision();
-          saveTossData(computerDecision, matchData.teamB.name);
-          document.getElementById("resultText").textContent = `${matchData.teamA.name} called ${userCall}, but it landed ${outcome}. ${matchData.teamB.name} chooses to ${computerDecision.toLowerCase()} first.`;
-          document.getElementById("continueBtn").style.display = "block";
+        const computerDecision = getComputerDecision();
+
+        saveTossData(computerDecision, matchData.teamB.name);
+
+        document.getElementById("resultText").textContent =
+            `${matchData.teamA.name} called ${userCall}, but it landed ${outcome}. ${matchData.teamB.name} chooses to ${computerDecision.toLowerCase()} first.`;
+
+        const continueBtn = document.getElementById("continueBtn");
+        if (continueBtn) continueBtn.style.display = "block";
         }
-        flipBtn.disabled = false;
-        headsBtn.disabled = false;
-        tailsBtn.disabled = false;
+
         isFlipping = false;
-      });
+        tossCompleted = false;
+    });
     }
 
     function getComputerDecision() {
@@ -437,6 +461,9 @@ function getStoredTourMatch() {
       document.getElementById("resultTitle").textContent = `${tossWinner} chooses to ${decision}`;
       document.getElementById("resultText").textContent = `${decision === "Bat" ? "Batting first selected." : "Bowling first selected."} Continue to Match Center.`;
       document.getElementById("continueBtn").style.display = "block";
+      document.querySelectorAll("#decisionRow button").forEach((button) => {
+        button.disabled = true;
+        });
       flashResult();
     }
 
