@@ -2,7 +2,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Match Toss</title>
-  <link rel="stylesheet" href="toss.css?v=1">
+  <link rel="stylesheet" href="toss.css?v=2">
 </head>
 <body>
   <div class="stadium-lights">
@@ -51,7 +51,20 @@
           <div class="stat"><b id="teamAField">0</b><span>Field</span></div>
         </div>
         <div class="captain-box"><small>Captain</small><strong id="teamACaptain">Captain</strong></div>
-        <div class="mini-tags"><span class="tag green">User Squad</span><span class="tag">Tour Ready</span><span class="tag gold" id="teamATag">Home</span></div>
+        <div class="team-info-box weather-inside-team">
+            <div class="team-info-head">
+                <span>Weather</span>
+                <b>⛅</b>
+            </div>
+
+            <h3 id="weatherTitle">Partly Cloudy • 28°C</h3>
+            <p id="weatherText">Good match conditions.</p>
+
+            <div class="mini-tags compact-tags">
+                <span class="tag blue" id="weatherWind">Wind 12 km/h</span>
+                <span class="tag" id="weatherHumidity">Humidity 54%</span>
+            </div>
+        </div>
       </section>
 
       <section class="card toss-center">
@@ -103,32 +116,33 @@
           <div class="stat"><b id="teamBField">0</b><span>Field</span></div>
         </div>
         <div class="captain-box"><small>Captain</small><strong id="teamBCaptain">Captain</strong></div>
-        <div class="mini-tags"><span class="tag gold">Computer Squad</span><span class="tag">AI Team</span><span class="tag blue" id="teamBTag">Away</span></div>
+        <div class="team-info-box venue-inside-team">
+            <div class="team-info-head">
+                <span>Pitch & Stadium</span>
+                <b>🏟️</b>
+            </div>
+
+            <h3 id="pitchTitle">Dry Batting Surface</h3>
+            <p id="pitchText">Good for batting first. Spin may become stronger later.</p>
+
+            <div class="venue-divider"></div>
+
+            <h3 id="stadiumName">Melbourne Cricket Ground, Melbourne</h3>
+            <p id="stadiumText">Home venue. Chasing may depend on dew and pitch pace.</p>
+
+            <div class="mini-tags compact-tags">
+                <span class="tag gold" id="pitchBounce">Bounce: Medium</span>
+                <span class="tag green" id="pitchAssist">Assist: Spin Late</span>
+                <span class="tag" id="stadiumCapacity">Capacity 25,000+</span>
+                <span class="tag green" id="stadiumCrowd">Crowd: Loud</span>
+            </div>
+        </div>
       </section>
     </main>
 
-    <section class="info-grid">
-      <section class="card info-card">
-        <div class="info-top"><div class="section-label">Weather</div><div class="icon">⛅</div></div>
-        <h2 id="weatherTitle">Partly Cloudy • 28°C</h2>
-        <p id="weatherText">Humidity is medium and wind is light. Ball should come nicely onto the bat early.</p>
-        <div class="mini-tags"><span class="tag blue" id="weatherWind">Wind 12 km/h</span><span class="tag" id="weatherHumidity">Humidity 54%</span></div>
-      </section>
-      <section class="card info-card">
-        <div class="info-top"><div class="section-label">Pitch Condition</div><div class="icon">🟫</div></div>
-        <h2 id="pitchTitle">Dry Surface</h2>
-        <p id="pitchText">Good for batting first. Spin may become stronger as the match goes deeper.</p>
-        <div class="mini-tags"><span class="tag gold" id="pitchBounce">Bounce: Medium</span><span class="tag green" id="pitchAssist">Assist: Spin Late</span></div>
-      </section>
-      <section class="card info-card">
-        <div class="info-top"><div class="section-label">Stadium</div><div class="icon">🏟️</div></div>
-        <h2 id="stadiumName">National Cricket Stadium</h2>
-        <p id="stadiumText">Tour venue. Match conditions loaded from your schedule.</p>
-        <div class="mini-tags"><span class="tag" id="stadiumCapacity">Capacity 25,000+</span><span class="tag green" id="stadiumCrowd">Crowd: Loud</span></div>
-      </section>
-    </section>
+
   </div>
-  <script src="toss.js?v=1"></script>
+  <script src="toss.js?v=2"></script>
 
 
 </body></html>

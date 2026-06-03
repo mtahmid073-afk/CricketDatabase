@@ -386,3 +386,97 @@
   display: none;
   margin-top: 9px;
 }
+
+/* =========================================================
+   COMPACT TEAM CARD INFO BOXES
+========================================================= */
+
+.team-info-box {
+  position: relative;
+  z-index: 1;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid var(--line);
+}
+
+.weather-inside-team {
+  background:
+    linear-gradient(135deg, rgba(56, 189, 248, 0.10), rgba(255, 255, 255, 0.045));
+  border-color: rgba(56, 189, 248, 0.18);
+}
+
+.venue-inside-team {
+  background:
+    linear-gradient(135deg, rgba(246, 196, 83, 0.10), rgba(255, 255, 255, 0.045));
+  border-color: rgba(246, 196, 83, 0.18);
+}
+
+.team-info-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.team-info-head span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 950;
+}
+
+.team-info-head b {
+  font-size: 1.25rem;
+}
+
+.team-info-box h3 {
+  margin: 0 0 5px;
+  font-size: 0.98rem;
+  color: var(--text);
+}
+
+.team-info-box p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.compact-tags {
+  margin-top: 9px;
+  gap: 6px;
+}
+
+.compact-tags .tag {
+  font-size: 0.68rem;
+  padding: 5px 7px;
+}
+
+.venue-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.10);
+  margin: 10px 0;
+}
+
+/* Bottom info row removed */
+.info-grid {
+  display: none !important;
+}
+
+/* Keep team cards from becoming too tall */
+.team-card {
+  gap: 10px;
+}
+
+.captain-box {
+  padding: 10px 12px;
+}
+
+@media (max-width: 930px) {
+  .team-info-box {
+    padding: 11px;
+  }
+}
