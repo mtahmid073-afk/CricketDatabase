@@ -842,3 +842,48 @@ body.editor-open {
 .editor-field select:focus {
   box-shadow: none !important;
 }
+
+/* Move Edit Player button beside the player name instead of under the X */
+
+.player-profile-title-row {
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.player-profile-title-row h2 {
+  margin: 0 !important;
+}
+
+.db-edit-player-btn {
+  height: 34px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  border-radius: 999px !important;
+}
+
+/* Back to Main Menu button */
+
+.back-main-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(126, 231, 135, 0.55);
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
+  color: white;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(45, 106, 79, 0.25);
+}
+
+.back-main-btn:hover {
+  background: #52b788;
+  color: #06110b;
+  transform: translateY(-1px);
+}
