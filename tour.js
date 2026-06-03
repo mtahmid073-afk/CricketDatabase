@@ -595,11 +595,261 @@ function createSeries() {
   showScreen("squad");
 }
 
+/* =========================================================
+   COMPUTER BEST SQUAD PICKER
+   Uses national format eligibility + role balance
+========================================================= */
+
+const COMPUTER_SQUAD_SIZE = 18;
+
+const COMPUTER_SQUAD_TARGETS = {
+  batsman: 7,
+  wicketkeeper: 2,
+  allrounder: 4,
+  bowler: 5
+};
+
+function getSelectedNationalFormats() {
+  const formats = new Set();
+
+  state.series.forEach((match) => {
+    const format = String(match.format || "").toLowerCase();
+
+    if (format.includes("test")) formats.add("test");
+    if (format.includes("odi")) formats.add("odi");
+    if (format.includes("t20")) formats.add("t20");
+  });
+
+  return [...formats];
+}
+
+function isPlayerEligibleForSelectedFormats(player, selectedFormats) {
+  if (!selectedFormats.length) return true;
+
+  const nationalFormats = player.nationalFormats || player.formats || null;
+
+  // If old JSON does not have nationalFormats, do not block the player.
+  if (!nationalFormats) return true;
+
+  return selectedFormats.some((format) => {
+    if (format === "test") {
+      return nationalFormats.test === true || nationalFormats.Test === true || nationalFormats.TEST === true;
+    }
+
+    if (format === "odi") {
+      return nationalFormats.odi === true || nationalFormats.ODI === true;
+    }
+
+    if (format === "t20") {
+      return (
+        nationalFormats.t20 === true ||
+        nationalFormats.T20 === true ||
+        nationalFormats.t20i === true ||
+        nationalFormats.T20I === true
+      );
+    }
+
+    return false;
+  });
+}
+
+function getPlayerRoleGroup(player) {
+  const role = String(player.role || player.playerRole || "").toLowerCase();
+  const keeping = Number(player.attributes?.fielding?.keeping) || 0;
+
+  if (
+    role.includes("wicket") ||
+    role.includes("keeper") ||
+    role.includes("wk") ||
+    keeping >= 14
+  ) {
+    return "wicketkeeper";
+  }
+
+  if (
+    role.includes("all-rounder") ||
+    role.includes("all rounder") ||
+    role.includes("allrounder")
+  ) {
+    return "allrounder";
+  }
+
+  if (role.includes("bowler") || role === "bowl") {
+    return "bowler";
+  }
+
+  return "batsman";
+}
+
+function getPlayerFormatBonus(player, selectedFormats) {
+  const nationalFormats = player.nationalFormats || player.formats || null;
+
+  if (!nationalFormats || !selectedFormats.length) return 0;
+
+  let bonus = 0;
+
+  selectedFormats.forEach((format) => {
+    if (format === "test" && (nationalFormats.test || nationalFormats.Test || nationalFormats.TEST)) bonus += 4;
+    if (format === "odi" && (nationalFormats.odi || nationalFormats.ODI)) bonus += 4;
+    if (format === "t20" && (nationalFormats.t20 || nationalFormats.T20 || nationalFormats.t20i || nationalFormats.T20I)) bonus += 4;
+  });
+
+  return bonus;
+}
+
+function getFieldingAverage(player) {
+  const fielding = player.attributes?.fielding || {};
+
+  const values = [
+    Number(fielding.catching) || 0,
+    Number(fielding.reflexes) || 0,
+    Number(fielding.groundFielding) || 0,
+    Number(fielding.throwPower) || 0,
+    Number(fielding.throwAccuracy) || 0
+  ];
+
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function getComputerSquadScore(player, selectedFormats) {
+  const roleGroup = getPlayerRoleGroup(player);
+
+  const batting = Number(player.attributes?.overall?.batting_overall) || 0;
+  const bowling = Number(player.attributes?.overall?.bowling_overall) || 0;
+  const fielding = getFieldingAverage(player);
+
+  const leadership = Number(player.attributes?.mental?.leadership) || 0;
+  const fitness = Number(player.condition?.fitness) || 0;
+  const keeping = Number(player.attributes?.fielding?.keeping) || 0;
+
+  const formatBonus = getPlayerFormatBonus(player, selectedFormats);
+
+  let roleScore = 0;
+
+  if (roleGroup === "batsman") {
+    roleScore =
+      batting * 5 +
+      fielding * 0.8 +
+      leadership * 0.25;
+  }
+
+  if (roleGroup === "wicketkeeper") {
+    roleScore =
+      batting * 4 +
+      keeping * 3 +
+      fielding * 1 +
+      leadership * 0.25;
+  }
+
+  if (roleGroup === "allrounder") {
+    const higher = Math.max(batting, bowling);
+    const lower = Math.min(batting, bowling);
+
+    roleScore =
+      higher * 4 +
+      lower * 3 +
+      fielding * 0.8 +
+      leadership * 0.25;
+  }
+
+  if (roleGroup === "bowler") {
+    roleScore =
+      bowling * 5 +
+      fielding * 0.8 +
+      leadership * 0.25;
+  }
+
+  return roleScore + formatBonus + fitness * 0.03;
+}
+
+function getPlayerUniqueKey(player) {
+  return String(
+    player.id ||
+    player.playerId ||
+    player.name ||
+    player.fullName ||
+    Math.random()
+  );
+}
+
+function addBestPlayersFromPool(squad, usedKeys, pool, needed) {
+  for (const player of pool) {
+    if (squad.length >= COMPUTER_SQUAD_SIZE) break;
+    if (needed <= 0) break;
+
+    const key = getPlayerUniqueKey(player);
+
+    if (usedKeys.has(key)) continue;
+
+    squad.push(player);
+    usedKeys.add(key);
+    needed--;
+  }
+}
+
 function autoPickComputerSquad(team) {
-  return teamPlayers(team)
-    .slice()
-    .sort((a, b) => overallScore(b) - overallScore(a))
-    .slice(0, 18);
+  const selectedFormats = getSelectedNationalFormats();
+
+  const allTeamPlayers = teamPlayers(team);
+
+  const eligiblePlayers = allTeamPlayers.filter((player) => {
+    return isPlayerEligibleForSelectedFormats(player, selectedFormats);
+  });
+
+  // If strict format filtering gives too few players, use all available team players as fallback.
+  const sourcePlayers = eligiblePlayers.length >= 11 ? eligiblePlayers : allTeamPlayers;
+
+  const rankedPlayers = [...sourcePlayers].sort((a, b) => {
+    return getComputerSquadScore(b, selectedFormats) - getComputerSquadScore(a, selectedFormats);
+  });
+
+  const roleBuckets = {
+    batsman: rankedPlayers.filter((player) => getPlayerRoleGroup(player) === "batsman"),
+    wicketkeeper: rankedPlayers.filter((player) => getPlayerRoleGroup(player) === "wicketkeeper"),
+    allrounder: rankedPlayers.filter((player) => getPlayerRoleGroup(player) === "allrounder"),
+    bowler: rankedPlayers.filter((player) => getPlayerRoleGroup(player) === "bowler")
+  };
+
+  const squad = [];
+  const usedKeys = new Set();
+
+  addBestPlayersFromPool(
+    squad,
+    usedKeys,
+    roleBuckets.batsman,
+    COMPUTER_SQUAD_TARGETS.batsman
+  );
+
+  addBestPlayersFromPool(
+    squad,
+    usedKeys,
+    roleBuckets.wicketkeeper,
+    COMPUTER_SQUAD_TARGETS.wicketkeeper
+  );
+
+  addBestPlayersFromPool(
+    squad,
+    usedKeys,
+    roleBuckets.allrounder,
+    COMPUTER_SQUAD_TARGETS.allrounder
+  );
+
+  addBestPlayersFromPool(
+    squad,
+    usedKeys,
+    roleBuckets.bowler,
+    COMPUTER_SQUAD_TARGETS.bowler
+  );
+
+  // Fill shortages with best remaining players, regardless of role.
+  addBestPlayersFromPool(
+    squad,
+    usedKeys,
+    rankedPlayers,
+    COMPUTER_SQUAD_SIZE - squad.length
+  );
+
+  return squad.slice(0, COMPUTER_SQUAD_SIZE);
 }
 
 function selectedSet() {

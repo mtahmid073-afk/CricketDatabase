@@ -560,7 +560,19 @@
       }
 
       data.selectedUserXI = Array.isArray(data.userSquad) ? data.userSquad.slice(0, 11) : [];
-      data.selectedComputerXI = Array.isArray(data.computerSquad) ? data.computerSquad.slice(0, 11) : [];
+      data.selectedComputerXI = Array.isArray(data.computerSquad)
+        ? data.computerSquad
+            .slice()
+            .sort((a, b) => {
+                const aBat = Number(a?.attributes?.overall?.batting_overall) || 0;
+                const aBowl = Number(a?.attributes?.overall?.bowling_overall) || 0;
+                const bBat = Number(b?.attributes?.overall?.batting_overall) || 0;
+                const bBowl = Number(b?.attributes?.overall?.bowling_overall) || 0;
+
+                return Math.max(bBat, bBowl) - Math.max(aBat, aBowl);
+            })
+            .slice(0, 11)
+        : [];
       data.xiConfirmed = true;
       data.xiConfirmedAt = new Date().toISOString();
 
