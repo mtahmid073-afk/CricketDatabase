@@ -887,3 +887,21 @@ body.editor-open {
   color: #06110b;
   transform: translateY(-1px);
 }
+
+/* Force Download Updated JSON to far right side of screen */
+
+.database-top-actions {
+  width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  padding: 0 24px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+.download-json-btn {
+  margin-left: auto !important;
+}
