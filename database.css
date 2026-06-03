@@ -862,40 +862,28 @@ body.editor-open {
   border-radius: 999px !important;
 }
 
-/* Back to Main Menu button */
-
-.back-main-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  height: 42px;
-  padding: 0 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(126, 231, 135, 0.55);
-  background: linear-gradient(135deg, #2d6a4f, #40916c);
-  color: white;
-  font-size: 14px;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 10px 24px rgba(45, 106, 79, 0.25);
-}
-
-.back-main-btn:hover {
-  background: #52b788;
-  color: #06110b;
-  transform: translateY(-1px);
-}
-
-/* Top database action buttons */
+//* =========================================================
+   TOP DATABASE ACTION BUTTONS
+   Back to Main Menu left, Download Updated JSON far right
+========================================================= */
 
 .database-top-actions {
+  position: fixed;
+  top: 18px;
+  left: 24px;
+  right: 24px;
+  z-index: 5000;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
+
+  pointer-events: none;
+}
+
+.database-top-actions button {
+  pointer-events: auto;
 }
 
 .back-main-btn,
@@ -903,24 +891,28 @@ body.editor-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   height: 42px;
   padding: 0 16px;
   border-radius: 12px;
+  border: none;
+
   color: white;
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
   text-decoration: none;
+
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .back-main-btn {
-  border: 1px solid rgba(126, 231, 135, 0.55);
   background: linear-gradient(135deg, #2d6a4f, #40916c);
   box-shadow: 0 10px 24px rgba(45, 106, 79, 0.25);
 }
 
 .download-json-btn {
-  border: 1px solid rgba(96, 165, 250, 0.55);
+  margin-left: auto;
   background: linear-gradient(135deg, #1d4ed8, #2563eb);
   box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
 }
@@ -940,81 +932,26 @@ body.editor-open {
   color: #06110b;
 }
 
+/* Push page down so fixed buttons do not cover the title */
+.page {
+  padding-top: 78px;
+}
+
 @media (max-width: 650px) {
   .database-top-actions {
+    position: static;
+    padding: 18px 24px 0;
     flex-direction: column;
     align-items: stretch;
+    pointer-events: auto;
   }
 
   .back-main-btn,
   .download-json-btn {
     width: 100%;
   }
-}
 
-/* Force Download Updated JSON to far right side of screen */
-
-.database-top-actions {
-  width: 100vw !important;
-  margin-left: calc(50% - 50vw) !important;
-  margin-right: calc(50% - 50vw) !important;
-  padding: 0 24px !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  gap: 12px !important;
-  margin-bottom: 12px !important;
-}
-
-.download-json-btn {
-  margin-left: auto !important;
-}
-
-/* Top full-screen action row */
-
-.database-top-actions {
-  width: 100%;
-  padding: 18px 24px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.back-main-btn,
-.download-json-btn {
-  height: 42px;
-  padding: 0 16px;
-  border-radius: 12px;
-  color: white;
-  font-size: 14px;
-  font-weight: 900;
-  cursor: pointer;
-  border: none;
-}
-
-.back-main-btn {
-  background: linear-gradient(135deg, #2d6a4f, #40916c);
-}
-
-.download-json-btn {
-  margin-left: auto;
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
-}
-
-.back-main-btn:hover,
-.download-json-btn:hover {
-  transform: translateY(-1px);
-}
-
-@media (max-width: 650px) {
-  .database-top-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .back-main-btn,
-  .download-json-btn {
-    width: 100%;
+  .page {
+    padding-top: 24px;
   }
 }
