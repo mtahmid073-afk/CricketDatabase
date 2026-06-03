@@ -1,0 +1,960 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Toss</title>
+  <style>
+    :root {
+      --bg: #030a0f;
+      --panel: rgba(9, 22, 33, 0.86);
+      --panel-2: rgba(15, 31, 44, 0.92);
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #eef7f3;
+      --muted: #8ca4ad;
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.14);
+      --gold: #f6c453;
+      --gold-soft: rgba(246, 196, 83, 0.14);
+      --blue: #38bdf8;
+      --blue-soft: rgba(56, 189, 248, 0.13);
+      --red: #fb7185;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+      background: var(--bg);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -5;
+      background:
+        radial-gradient(circle at 50% 12%, rgba(56, 189, 248, 0.16), transparent 30%),
+        radial-gradient(circle at 20% 5%, rgba(34, 197, 94, 0.22), transparent 26%),
+        radial-gradient(circle at 82% 7%, rgba(246, 196, 83, 0.18), transparent 26%),
+        linear-gradient(135deg, #030a0f, #061823 52%, #03100b);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -4;
+      opacity: 0.35;
+      background:
+        linear-gradient(110deg, transparent 0 23%, rgba(255,255,255,0.055) 24%, transparent 25% 54%, rgba(255,255,255,0.04) 55%, transparent 56%),
+        repeating-linear-gradient(90deg, transparent 0 70px, rgba(255,255,255,0.025) 70px 72px),
+        repeating-linear-gradient(0deg, transparent 0 58px, rgba(255,255,255,0.018) 58px 60px);
+      animation: backgroundDrift 10s linear infinite;
+      pointer-events: none;
+    }
+
+    .stadium-lights {
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .beam {
+      position: absolute;
+      top: -18%;
+      width: 280px;
+      height: 130vh;
+      background: linear-gradient(180deg, rgba(255,255,255,0.20), transparent 60%);
+      filter: blur(18px);
+      opacity: 0.18;
+      transform-origin: top center;
+      animation: beamSweep 9s ease-in-out infinite alternate;
+    }
+
+    .beam.left { left: 4%; transform: rotate(23deg); }
+    .beam.right { right: 4%; transform: rotate(-23deg); animation-delay: 1.5s; }
+    .beam.center { left: 50%; transform: translateX(-50%) rotate(2deg); opacity: 0.11; animation-delay: 0.7s; }
+
+    .field-glow {
+      position: fixed;
+      left: 50%;
+      bottom: -290px;
+      width: min(1100px, 115vw);
+      height: 480px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      z-index: -2;
+      background:
+        radial-gradient(ellipse at center, rgba(34,197,94,0.24), transparent 62%),
+        radial-gradient(ellipse at center, rgba(246,196,83,0.10), transparent 74%);
+      border: 2px solid rgba(34,197,94,0.10);
+      box-shadow: 0 -35px 90px rgba(34,197,94,0.12);
+    }
+
+    .page {
+      width: min(1220px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 12px;
+    }
+
+    .topbar, .ticker, .card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(90deg, rgba(34,197,94,0.10), transparent 35%, rgba(246,196,83,0.10)),
+        rgba(13,27,37,0.76);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .topbar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-110%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      animation: shineMove 4.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; position: relative; z-index: 2; }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--green), #0ea5e9);
+      color: #00140a;
+      font-weight: 900;
+      box-shadow: 0 0 28px rgba(34,197,94,0.35), inset 0 0 0 1px rgba(255,255,255,0.35);
+      animation: logoPulse 2.5s ease-in-out infinite;
+    }
+
+    .title h1 { font-size: clamp(1.2rem, 3vw, 1.85rem); letter-spacing: 0.5px; }
+    .title p { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+
+    .match-pill {
+      padding: 10px 13px;
+      border: 1px solid rgba(246,196,83,0.30);
+      border-radius: 999px;
+      background: var(--gold-soft);
+      color: var(--gold);
+      font-size: 0.84rem;
+      font-weight: 900;
+      white-space: nowrap;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 0 22px rgba(246,196,83,0.10);
+    }
+
+    .back-btn {
+      text-decoration: none;
+      color: var(--text);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 9px 11px;
+      font-size: 0.82rem;
+      font-weight: 900;
+      position: relative;
+      z-index: 3;
+    }
+
+    .back-btn:hover { background: var(--green-soft); border-color: rgba(34,197,94,0.4); }
+
+    .ticker {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .ticker-label { color: var(--blue); font-weight: 950; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; }
+    .ticker-track { overflow: hidden; white-space: nowrap; color: var(--muted); font-size: 0.83rem; }
+    .ticker-text { display: inline-block; padding-left: 100%; animation: tickerSlide 22s linear infinite; }
+    .ticker-status { color: var(--green); font-size: 0.78rem; font-weight: 900; padding: 6px 9px; border-radius: 999px; background: var(--green-soft); border: 1px solid rgba(34,197,94,0.20); }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr 1.05fr;
+      gap: 12px;
+      align-items: stretch;
+      min-height: 0;
+    }
+
+    .card {
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,0.070), transparent), var(--panel);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at top right, rgba(34,197,94,0.13), transparent 36%);
+    }
+
+    .team-card { padding: 16px; display: flex; flex-direction: column; gap: 12px; transition: 0.2s ease; }
+    .team-card:hover { transform: translateY(-2px); border-color: rgba(34,197,94,0.28); box-shadow: var(--shadow), 0 0 35px rgba(34,197,94,0.08); }
+    .team-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; z-index: 1; }
+
+    .team-badge {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      font-size: 1.45rem;
+      font-weight: 950;
+      color: #041017;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35), 0 14px 28px rgba(0,0,0,0.24);
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--green), #d9f99d);
+    }
+
+    .team-badge.away { background: linear-gradient(135deg, var(--gold), var(--red)); }
+
+    .team-name { position: relative; z-index: 1; min-width: 0; }
+    .team-name h2 { font-size: clamp(1.2rem, 3vw, 1.95rem); line-height: 1; }
+    .team-name p { color: var(--muted); font-size: 0.86rem; margin-top: 6px; }
+
+    .power-meter { height: 9px; border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08); overflow: hidden; position: relative; z-index: 1; }
+    .power-fill { height: 100%; width: 78%; border-radius: inherit; background: linear-gradient(90deg, var(--green), var(--blue), var(--gold)); box-shadow: 0 0 18px rgba(34,197,94,0.26); animation: meterPulse 2.2s ease-in-out infinite; }
+    .power-fill.away-fill { width: 72%; background: linear-gradient(90deg, #facc15, #fb7185, var(--blue)); }
+
+    .team-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; position: relative; z-index: 1; }
+    .stat { padding: 10px 8px; border-radius: 16px; background: rgba(255,255,255,0.055); border: 1px solid var(--line); text-align: center; transition: 0.18s ease; }
+    .stat b { display: block; font-size: 1.08rem; color: var(--text); }
+    .stat span { display: block; color: var(--muted); font-size: 0.72rem; margin-top: 4px; }
+
+    .captain-box { padding: 12px; border-radius: 18px; background: rgba(34,197,94,0.10); border: 1px solid rgba(34,197,94,0.18); position: relative; z-index: 1; }
+    .captain-box small { color: var(--muted); display: block; margin-bottom: 4px; }
+    .captain-box strong { color: var(--green); }
+
+    .toss-center {
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+      min-height: 0;
+      border-color: rgba(246,196,83,0.19);
+      box-shadow: var(--shadow), 0 0 46px rgba(246,196,83,0.07);
+    }
+
+    .toss-center::before { background: radial-gradient(circle at 50% 22%, rgba(246,196,83,0.24), transparent 30%), radial-gradient(circle at 50% 48%, rgba(56,189,248,0.12), transparent 46%); }
+    .toss-top-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; position: relative; z-index: 2; }
+
+    .vs-badge {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #071018;
+      font-weight: 950;
+      background: linear-gradient(135deg, var(--gold), #fef3c7);
+      border: 2px solid rgba(255,255,255,0.42);
+      box-shadow: 0 0 30px rgba(246,196,83,0.32), inset 0 -8px 14px rgba(0,0,0,0.18);
+      animation: vsPulse 2.4s ease-in-out infinite;
+    }
+
+    .section-label { color: var(--muted); font-size: 0.78rem; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 900; position: relative; z-index: 1; }
+    .coin-area { display: grid; place-items: center; position: relative; z-index: 1; min-height: 230px; overflow: visible; }
+    .coin-stage { position: absolute; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(246,196,83,0.12), transparent 58%), conic-gradient(from 0deg, rgba(246,196,83,0.24), transparent 22%, rgba(56,189,248,0.18), transparent 50%, rgba(34,197,94,0.16), transparent 75%, rgba(246,196,83,0.24)); opacity: 0.68; animation: stageRotate 8s linear infinite; }
+    #coinCanvas { width: 260px; height: 260px; display: block; position: relative; z-index: 5; filter: drop-shadow(0 28px 24px rgba(0,0,0,0.40)); }
+
+    .energy-ring { position: absolute; width: 190px; height: 190px; border-radius: 50%; border: 1px solid rgba(246,196,83,0.35); box-shadow: 0 0 24px rgba(246,196,83,0.15), inset 0 0 24px rgba(56,189,248,0.10); opacity: 0; transform: scale(0.65); pointer-events: none; z-index: 4; }
+    .energy-ring.ring-two { width: 226px; height: 226px; border-color: rgba(56,189,248,0.24); }
+    .coin-area.flipping .energy-ring { animation: ringBlast 1.85s ease-out; }
+    .coin-area.flipping .ring-two { animation-delay: 0.16s; }
+
+    .spark { position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 12px rgba(246,196,83,0.95); transform: translate(-50%, -50%); pointer-events: none; z-index: 10; animation: sparkFly 780ms ease-out forwards; }
+    .spark.blue { background: var(--blue); box-shadow: 0 0 12px rgba(56,189,248,0.95); }
+    .spark.green { background: var(--green); box-shadow: 0 0 12px rgba(34,197,94,0.95); }
+
+    .choice-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; position: relative; z-index: 1; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 16px;
+      padding: 11px 10px;
+      font-weight: 950;
+      letter-spacing: 0.3px;
+      color: var(--text);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--line);
+      transition: 0.18s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:hover { transform: translateY(-1px); border-color: rgba(34,197,94,0.40); background: rgba(34,197,94,0.13); }
+    button.active { background: var(--green-soft); border-color: rgba(34,197,94,0.60); color: var(--green); box-shadow: 0 0 24px rgba(34,197,94,0.18); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    .toss-btn { width: 100%; margin-top: 9px; background: linear-gradient(135deg, var(--green), #16a34a); color: #02120a; border: none; font-size: 1rem; box-shadow: 0 10px 26px rgba(34,197,94,0.18); }
+    .decision-row { display: none; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 9px; }
+    .decision-row.show { display: grid; animation: decisionDrop 420ms ease-out; }
+
+    .result-box { min-height: 94px; padding: 12px; border-radius: 18px; background: linear-gradient(90deg, rgba(246,196,83,0.08), transparent), rgba(255,255,255,0.055); border: 1px solid var(--line); position: relative; z-index: 1; }
+    .result-box.flash-result { animation: resultPop 700ms ease-out; border-color: rgba(246,196,83,0.50); box-shadow: 0 0 0 1px rgba(246,196,83,0.12), 0 0 28px rgba(246,196,83,0.18); }
+    .result-box h3 { color: var(--gold); margin-bottom: 6px; font-size: 1rem; }
+    .result-box p { color: var(--muted); font-size: 0.84rem; line-height: 1.35; }
+
+    .mini-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; position: relative; z-index: 1; }
+    .tag { font-size: 0.72rem; color: var(--text); border: 1px solid var(--line); background: rgba(255,255,255,0.055); padding: 6px 8px; border-radius: 999px; }
+    .tag.green { color: var(--green); background: var(--green-soft); border-color: rgba(34,197,94,0.22); }
+    .tag.gold { color: var(--gold); background: var(--gold-soft); border-color: rgba(246,196,83,0.22); }
+    .tag.blue { color: var(--blue); background: var(--blue-soft); border-color: rgba(56,189,248,0.22); }
+
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .info-card { padding: 14px; min-height: 132px; transition: 0.2s ease; }
+    .info-card:hover { transform: translateY(-2px); border-color: rgba(56,189,248,0.26); }
+    .info-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; position: relative; z-index: 1; }
+    .icon { width: 46px; height: 46px; border-radius: 16px; display: grid; place-items: center; background: rgba(255,255,255,0.075); border: 1px solid var(--line); font-size: 1.28rem; }
+    .info-card h2 { font-size: 1.07rem; margin-top: 10px; position: relative; z-index: 1; }
+    .info-card p { color: var(--muted); font-size: 0.82rem; line-height: 1.35; margin-top: 6px; position: relative; z-index: 1; }
+
+    @keyframes backgroundDrift { 0% { transform: translateX(0); } 100% { transform: translateX(-72px); } }
+    @keyframes beamSweep { from { opacity: 0.09; filter: blur(20px); } to { opacity: 0.22; filter: blur(13px); } }
+    @keyframes shineMove { 0%, 45% { transform: translateX(-115%); } 75%, 100% { transform: translateX(115%); } }
+    @keyframes logoPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+    @keyframes tickerSlide { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    @keyframes meterPulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.35); } }
+    @keyframes vsPulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(246,196,83,0.32); } 50% { transform: scale(1.07); box-shadow: 0 0 42px rgba(246,196,83,0.48); } }
+    @keyframes stageRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes ringBlast { 0% { opacity: 0; transform: scale(0.55) rotate(0deg); } 18% { opacity: 0.95; } 100% { opacity: 0; transform: scale(1.45) rotate(180deg); } }
+    @keyframes sparkFly { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); } 100% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(0.1); } }
+    @keyframes resultPop { 0% { transform: scale(0.96); } 45% { transform: scale(1.025); } 100% { transform: scale(1); } }
+    @keyframes decisionDrop { 0% { opacity: 0; transform: translateY(-8px); } 100% { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 930px) {
+      body { overflow-y: auto; }
+      .page { min-height: auto; }
+      .main-grid { grid-template-columns: 1fr; }
+      .toss-center { min-height: 490px; }
+      .info-grid { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .ticker { grid-template-columns: 1fr; }
+      .ticker-text { padding-left: 0; animation: none; white-space: normal; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 10px; }
+      .team-badge { width: 54px; height: 54px; font-size: 1.25rem; }
+      #coinCanvas { width: 230px; height: 230px; }
+      .coin-stage { width: 226px; height: 226px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stadium-lights">
+    <div class="beam left"></div>
+    <div class="beam center"></div>
+    <div class="beam right"></div>
+  </div>
+  <div class="field-glow"></div>
+
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🏏</div>
+        <div class="title">
+          <h1>Match Toss</h1>
+          <p>Tour match toss loaded from your selected schedule</p>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; position:relative; z-index:3;">
+        <a class="back-btn" href="index.html">← Tour Setup</a>
+        <div class="match-pill" id="matchType">T20 • Match</div>
+      </div>
+    </header>
+
+    <section class="ticker">
+      <div class="ticker-label">Match Center</div>
+      <div class="ticker-track">
+        <span class="ticker-text" id="tickerText">Bangladesh vs Zimbabwe • Toss window open • Captains at the middle • Winner decides bat or bowl</span>
+      </div>
+      <div class="ticker-status">LIVE</div>
+    </section>
+
+    <main class="main-grid">
+      <section class="card team-card">
+        <div class="team-head">
+          <div class="team-name">
+            <h2 id="teamAName">Bangladesh</h2>
+            <p id="teamASub">User Team</p>
+          </div>
+          <div class="team-badge" id="teamABadge">BAN</div>
+        </div>
+        <div class="power-meter"><div class="power-fill" id="teamAPower" style="width: 81.6667%;"></div></div>
+        <div class="team-stats">
+          <div class="stat"><b id="teamABat">84</b><span>Bat</span></div>
+          <div class="stat"><b id="teamABowl">79</b><span>Bowl</span></div>
+          <div class="stat"><b id="teamAField">82</b><span>Field</span></div>
+        </div>
+        <div class="captain-box"><small>Captain</small><strong id="teamACaptain">Captain</strong></div>
+        <div class="mini-tags"><span class="tag green">User Squad</span><span class="tag">Tour Ready</span><span class="tag gold" id="teamATag">Home</span></div>
+      </section>
+
+      <section class="card toss-center">
+        <div class="toss-top-row">
+          <div>
+            <div class="section-label">Toss Call</div>
+            <div style="font-weight: 950; margin-top: 4px;">Heads or Tails</div>
+          </div>
+          <div class="vs-badge">VS</div>
+        </div>
+
+        <div class="coin-area" id="coinArea">
+          <div class="coin-stage"></div>
+          <div class="energy-ring"></div>
+          <div class="energy-ring ring-two"></div>
+          <canvas id="coinCanvas" width="288" height="288" aria-label="Animated cricket toss coin"></canvas>
+        </div>
+
+        <div>
+          <div class="choice-row">
+            <button id="headsBtn" onclick="selectCall('Heads')" class="active">Heads</button>
+            <button id="tailsBtn" onclick="selectCall('Tails')">Tails</button>
+          </div>
+          <button class="toss-btn" id="flipBtn" onclick="doToss()">Flip Toss</button>
+          <div class="decision-row show" id="decisionRow">
+            <button onclick="chooseDecision('Bat')">Bat First</button>
+            <button onclick="chooseDecision('Bowl')">Bowl First</button>
+          </div>
+          <div class="result-box flash-result" id="resultBox" style="margin-top: 10px;">
+            <h3 id="resultTitle">Heads! Bangladesh won the toss</h3>
+            <p id="resultText">Bangladesh called Heads correctly. Choose whether to bat or bowl first.</p>
+          </div>
+          <button class="toss-btn" id="continueBtn" onclick="goToMatchCenter()" style="display:none; margin-top:9px;">Continue to Match Center</button>
+        </div>
+      </section>
+
+      <section class="card team-card">
+        <div class="team-head">
+          <div class="team-name">
+            <h2 id="teamBName">Zimbabwe</h2>
+            <p id="teamBSub">Computer Team</p>
+          </div>
+          <div class="team-badge away" id="teamBBadge">ZIM</div>
+        </div>
+        <div class="power-meter"><div class="power-fill away-fill" id="teamBPower" style="width: 76%;"></div></div>
+        <div class="team-stats">
+          <div class="stat"><b id="teamBBat">76</b><span>Bat</span></div>
+          <div class="stat"><b id="teamBBowl">74</b><span>Bowl</span></div>
+          <div class="stat"><b id="teamBField">78</b><span>Field</span></div>
+        </div>
+        <div class="captain-box"><small>Captain</small><strong id="teamBCaptain">Captain</strong></div>
+        <div class="mini-tags"><span class="tag gold">Computer Squad</span><span class="tag">AI Team</span><span class="tag blue" id="teamBTag">Away</span></div>
+      </section>
+    </main>
+
+    <section class="info-grid">
+      <section class="card info-card">
+        <div class="info-top"><div class="section-label">Weather</div><div class="icon">⛅</div></div>
+        <h2 id="weatherTitle">Partly Cloudy • 28°C</h2>
+        <p id="weatherText">Default toss conditions loaded.</p>
+        <div class="mini-tags"><span class="tag blue" id="weatherWind">Wind 12 km/h</span><span class="tag" id="weatherHumidity">Humidity 54%</span></div>
+      </section>
+      <section class="card info-card">
+        <div class="info-top"><div class="section-label">Pitch Condition</div><div class="icon">🟫</div></div>
+        <h2 id="pitchTitle">Dry Surface</h2>
+        <p id="pitchText">Good for batting first. Spin may matter later.</p>
+        <div class="mini-tags"><span class="tag gold" id="pitchBounce">Bounce: Medium</span><span class="tag green" id="pitchAssist">Assist: Spin Late</span></div>
+      </section>
+      <section class="card info-card">
+        <div class="info-top"><div class="section-label">Stadium</div><div class="icon">🏟️</div></div>
+        <h2 id="stadiumName">National Cricket Stadium</h2>
+        <p id="stadiumText">Default venue.</p>
+        <div class="mini-tags"><span class="tag" id="stadiumCapacity">Capacity 25,000</span><span class="tag green" id="stadiumCrowd">Crowd: Loud</span></div>
+      </section>
+    </section>
+  </div>
+
+  <script>
+    function getStoredTourMatch() {
+      const raw = localStorage.getItem("currentTourMatch");
+      if (!raw) return null;
+      try { return JSON.parse(raw); } catch (error) { console.error("Could not read currentTourMatch:", error); return null; }
+    }
+
+    function getTeamShortName(teamName) {
+      const special = {
+        Bangladesh: "BAN", India: "IND", Pakistan: "PAK", Australia: "AUS", England: "ENG", "New Zealand": "NZ", "South Africa": "SA", "Sri Lanka": "SL", "West Indies": "WI", Afghanistan: "AFG", Zimbabwe: "ZIM", Ireland: "IRE", Scotland: "SCO", Netherlands: "NED", Nepal: "NEP", Oman: "OMA", Canada: "CAN", Namibia: "NAM", "United Arab Emirates": "UAE", "United States of America": "USA"
+      };
+      if (special[teamName]) return special[teamName];
+      return String(teamName || "TEAM").split(/\s+/).map(word => word[0]).join("").slice(0, 3).toUpperCase();
+    }
+
+    function getPlayerName(player) { return player?.name || player?.fullName || "Captain"; }
+
+    function getPlayerOverall(player) {
+      const batting = Number(player?.attributes?.overall?.batting_overall) || 0;
+      const bowling = Number(player?.attributes?.overall?.bowling_overall) || 0;
+      const role = String(player?.role || "").toLowerCase();
+      if (role.includes("all-rounder") || role.includes("all rounder")) {
+        const high = Math.max(batting, bowling);
+        const low = Math.min(batting, bowling);
+        return (high + low * 1.3) / 2;
+      }
+      if (role.includes("bowler")) return bowling;
+      return Math.max(batting, bowling);
+    }
+
+    function getCaptain(squad) {
+      if (!Array.isArray(squad) || squad.length === 0) return "Captain";
+      const sorted = [...squad].sort((a, b) => {
+        const leadershipA = Number(a?.attributes?.mental?.leadership) || 0;
+        const leadershipB = Number(b?.attributes?.mental?.leadership) || 0;
+        if (leadershipB !== leadershipA) return leadershipB - leadershipA;
+        return getPlayerOverall(b) - getPlayerOverall(a);
+      });
+      return getPlayerName(sorted[0]);
+    }
+
+    function average(numbers) {
+      const valid = numbers.filter(number => Number.isFinite(number));
+      if (!valid.length) return 0;
+      return valid.reduce((sum, number) => sum + number, 0) / valid.length;
+    }
+
+    function getTeamRatings(squad) {
+      const players = Array.isArray(squad) ? squad : [];
+      const bat = average(players.map(player => Number(player?.attributes?.overall?.batting_overall) || 0));
+      const bowl = average(players.map(player => Number(player?.attributes?.overall?.bowling_overall) || 0));
+      const field = average(players.map(player => {
+        const f = player?.attributes?.fielding || {};
+        return average([Number(f.catching) || 0, Number(f.reflexes) || 0, Number(f.groundFielding) || 0, Number(f.throwPower) || 0, Number(f.throwAccuracy) || 0]);
+      }));
+      return { bat: Math.round(bat * 5), bowl: Math.round(bowl * 5), field: Math.round(field * 5) };
+    }
+
+    function getVenueData(match, userTeam) {
+      const venue = match?.venue || "National Cricket Stadium";
+      const format = String(match?.format || "T20");
+      if (format === "Test") {
+        return {
+          weather: { title: "Clear Skies • 27°C", text: "Good long-format conditions. The pitch may change slowly across the match.", wind: "Wind 10 km/h", humidity: "Humidity 48%" },
+          pitch: { title: "Balanced Test Surface", text: "Batting should be easier early, but bowlers may find help as the pitch wears.", bounce: "Bounce: True", assist: "Assist: Late Spin" },
+          stadium: { name: venue, text: `${userTeam} home venue. Long match conditions expected.`, capacity: "Capacity 25,000+", crowd: "Crowd: Building" }
+        };
+      }
+      if (format === "ODI") {
+        return {
+          weather: { title: "Partly Cloudy • 28°C", text: "Good one-day conditions. The ball should come onto the bat early.", wind: "Wind 12 km/h", humidity: "Humidity 54%" },
+          pitch: { title: "Dry Batting Surface", text: "Good for batting first. Spin may become stronger later in the match.", bounce: "Bounce: Medium", assist: "Assist: Spin Late" },
+          stadium: { name: venue, text: `${userTeam} home venue. Chasing may depend on dew and pitch pace.`, capacity: "Capacity 25,000+", crowd: "Crowd: Loud" }
+        };
+      }
+      return {
+        weather: { title: "Night Match • 26°C", text: "Fast-paced T20 conditions. Dew may make bowling second harder.", wind: "Wind 8 km/h", humidity: "Humidity 60%" },
+        pitch: { title: "Hard T20 Surface", text: "Good for aggressive batting. Bowlers need variations and death control.", bounce: "Bounce: Good", assist: "Assist: Dew Later" },
+        stadium: { name: venue, text: `${userTeam} home venue. Short-format energy expected from the crowd.`, capacity: "Capacity 25,000+", crowd: "Crowd: Electric" }
+      };
+    }
+
+    function buildMatchDataFromStorage() {
+      const stored = getStoredTourMatch();
+      if (!stored) {
+        return {
+          matchType: "T20 • Match",
+          teamA: { name: "Bangladesh", short: "BAN", sub: "User Team", captain: "Captain", bat: 84, bowl: 79, field: 82 },
+          teamB: { name: "Zimbabwe", short: "ZIM", sub: "Computer Team", captain: "Captain", bat: 76, bowl: 74, field: 78 },
+          weather: { title: "Partly Cloudy • 28°C", text: "Default toss conditions loaded.", wind: "Wind 12 km/h", humidity: "Humidity 54%" },
+          pitch: { title: "Dry Surface", text: "Good for batting first. Spin may matter later.", bounce: "Bounce: Medium", assist: "Assist: Spin Late" },
+          stadium: { name: "National Cricket Stadium", text: "Default venue.", capacity: "Capacity 25,000", crowd: "Crowd: Loud" }
+        };
+      }
+      const userRatings = getTeamRatings(stored.userSquad);
+      const computerRatings = getTeamRatings(stored.computerSquad);
+      const venueData = getVenueData(stored.match, stored.userTeam);
+      return {
+        matchType: `${stored.match?.format || "Match"} • ${stored.match?.title || "Tour Match"}`,
+        teamA: { name: stored.userTeam, short: getTeamShortName(stored.userTeam), sub: "User Team", captain: getCaptain(stored.userSquad), bat: userRatings.bat, bowl: userRatings.bowl, field: userRatings.field },
+        teamB: { name: stored.computerTeam, short: getTeamShortName(stored.computerTeam), sub: "Computer Team", captain: getCaptain(stored.computerSquad), bat: computerRatings.bat, bowl: computerRatings.bowl, field: computerRatings.field },
+        weather: venueData.weather,
+        pitch: venueData.pitch,
+        stadium: venueData.stadium
+      };
+    }
+
+    const currentTourMatch = getStoredTourMatch();
+    const matchData = buildMatchDataFromStorage();
+    let userCall = "Heads";
+    let tossWinner = "";
+    let isFlipping = false;
+
+    const canvas = document.getElementById("coinCanvas");
+    const ctx = canvas.getContext("2d");
+    let coinAngle = 0;
+    let currentFace = "Heads";
+
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function easeInOutSine(t) { return -(Math.cos(Math.PI * t) - 1) / 2; }
+
+    function setupCanvas() {
+      const cssSize = canvas.getBoundingClientRect().width || 260;
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      canvas.width = Math.round(cssSize * dpr);
+      canvas.height = Math.round(cssSize * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawCoin(coinAngle, 0, 0, false);
+    }
+
+    function drawEllipseCircle(x, y, radius, scaleX, fillStyle, strokeStyle, lineWidth) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scaleX, 1);
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.fillStyle = fillStyle;
+      ctx.fill();
+      if (strokeStyle) {
+        ctx.lineWidth = lineWidth / Math.max(scaleX, 0.12);
+        ctx.strokeStyle = strokeStyle;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawRidges(cx, cy, r, scaleX) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(scaleX, 1);
+      for (let i = 0; i < 72; i++) {
+        const a = (Math.PI * 2 * i) / 72;
+        const next = a + Math.PI * 2 / 110;
+        ctx.beginPath();
+        ctx.arc(0, 0, r + 4, a, next);
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = i % 2 === 0 ? "rgba(255,236,151,0.92)" : "rgba(112,77,16,0.88)";
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawFaceText(cx, cy, face, scaleX, showText) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(scaleX, 1);
+      const badge = ctx.createRadialGradient(-18, -22, 5, 0, 0, 45);
+      badge.addColorStop(0, "rgba(255,255,255,0.58)");
+      badge.addColorStop(0.35, "rgba(246,196,83,0.95)");
+      badge.addColorStop(1, "rgba(148,98,18,0.98)");
+      ctx.beginPath();
+      ctx.arc(0, 0, 43, 0, Math.PI * 2);
+      ctx.fillStyle = badge;
+      ctx.fill();
+      ctx.lineWidth = 2.5 / Math.max(scaleX, 0.18);
+      ctx.strokeStyle = "rgba(255,240,174,0.75)";
+      ctx.stroke();
+      if (showText) {
+        ctx.fillStyle = "#071018";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.shadowColor = "rgba(255,255,255,0.18)";
+        ctx.shadowBlur = 10;
+        ctx.font = "950 54px Arial";
+        ctx.fillText(face === "Heads" ? "H" : "T", 0, -4);
+        ctx.shadowBlur = 0;
+        ctx.font = "950 9px Arial";
+        ctx.fillStyle = "rgba(7,16,24,0.86)";
+        ctx.fillText(face.toUpperCase(), 0, 29);
+      }
+      ctx.restore();
+    }
+
+    function drawCoin(angle, lift, progress, spinning) {
+      const cssSize = canvas.getBoundingClientRect().width || 260;
+      ctx.clearRect(0, 0, cssSize, cssSize);
+      const cx = cssSize / 2;
+      const groundY = cssSize * 0.80;
+      const cy = cssSize * 0.50 + lift;
+      const radius = cssSize * 0.285;
+      const rawScale = Math.abs(Math.cos(angle));
+      const scaleX = Math.max(0.09, rawScale);
+      const face = Math.cos(angle) >= 0 ? "Heads" : "Tails";
+      currentFace = face;
+      const isEdgeOn = rawScale < 0.22;
+      const showText = !spinning || (progress > 0.78 && rawScale > 0.42);
+
+      const height = Math.max(0, -lift);
+      const shadowScale = Math.max(0.45, 1 - height / 180);
+      ctx.save();
+      ctx.translate(cx, groundY);
+      ctx.scale(1.05 * shadowScale, 0.18 * shadowScale);
+      const shadow = ctx.createRadialGradient(0, 0, 10, 0, 0, radius * 1.45);
+      shadow.addColorStop(0, "rgba(0,0,0,0.56)");
+      shadow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = shadow;
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * 1.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      drawRidges(cx, cy, radius, scaleX);
+      const outer = ctx.createRadialGradient(cx - radius * 0.45 * scaleX, cy - radius * 0.5, 5, cx, cy, radius * 1.25);
+      outer.addColorStop(0, "#fff3b0");
+      outer.addColorStop(0.24, "#f6d96b");
+      outer.addColorStop(0.58, "#bb8420");
+      outer.addColorStop(1, "#5b3908");
+      drawEllipseCircle(cx, cy, radius, scaleX, outer, "rgba(255,240,174,0.75)", 3);
+      const centerGrad = ctx.createRadialGradient(cx - radius * 0.25 * scaleX, cy - radius * 0.32, 4, cx, cy, radius * 0.9);
+      centerGrad.addColorStop(0, "rgba(255,255,255,0.35)");
+      centerGrad.addColorStop(0.18, "#1d3550");
+      centerGrad.addColorStop(0.62, "#071827");
+      centerGrad.addColorStop(1, "#02080d");
+      drawEllipseCircle(cx, cy, radius * 0.82, scaleX, centerGrad, "rgba(248,250,252,0.24)", 2);
+      if (!isEdgeOn) {
+        drawFaceText(cx, cy, face, scaleX, showText);
+      } else {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(scaleX, 1);
+        ctx.fillStyle = "rgba(246,196,83,0.95)";
+        ctx.fillRect(-radius * 0.55, -radius * 0.78, radius * 1.1, radius * 1.56);
+        ctx.restore();
+      }
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(scaleX, 1);
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * 0.96, 0, Math.PI * 2);
+      ctx.clip();
+      const shine = ctx.createRadialGradient(-radius * 0.35, -radius * 0.42, radius * 0.05, -radius * 0.12, -radius * 0.20, radius * 1.15);
+      shine.addColorStop(0, "rgba(255,255,255,0.46)");
+      shine.addColorStop(0.22, "rgba(255,255,255,0.22)");
+      shine.addColorStop(0.55, "rgba(255,255,255,0.06)");
+      shine.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = shine;
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * 0.96, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function setFinalFace(outcome) {
+      coinAngle = outcome === "Heads" ? 0 : Math.PI;
+      currentFace = outcome;
+      drawCoin(coinAngle, 0, 1, false);
+    }
+
+    function pctWidth(value) {
+      return `${Math.max(5, Math.min(100, Number(value) || 0))}%`;
+    }
+
+    function loadMatchData() {
+      document.getElementById("matchType").textContent = matchData.matchType;
+      document.getElementById("tickerText").textContent = `${matchData.teamA.name} vs ${matchData.teamB.name} • Toss window open • Captains at the middle • Winner decides bat or bowl`;
+      document.getElementById("teamAName").textContent = matchData.teamA.name;
+      document.getElementById("teamASub").textContent = matchData.teamA.sub;
+      document.getElementById("teamABadge").textContent = matchData.teamA.short;
+      document.getElementById("teamACaptain").textContent = matchData.teamA.captain;
+      document.getElementById("teamABat").textContent = matchData.teamA.bat;
+      document.getElementById("teamABowl").textContent = matchData.teamA.bowl;
+      document.getElementById("teamAField").textContent = matchData.teamA.field;
+      document.getElementById("teamAPower").style.width = pctWidth(average([matchData.teamA.bat, matchData.teamA.bowl, matchData.teamA.field]));
+      document.getElementById("teamBName").textContent = matchData.teamB.name;
+      document.getElementById("teamBSub").textContent = matchData.teamB.sub;
+      document.getElementById("teamBBadge").textContent = matchData.teamB.short;
+      document.getElementById("teamBCaptain").textContent = matchData.teamB.captain;
+      document.getElementById("teamBBat").textContent = matchData.teamB.bat;
+      document.getElementById("teamBBowl").textContent = matchData.teamB.bowl;
+      document.getElementById("teamBField").textContent = matchData.teamB.field;
+      document.getElementById("teamBPower").style.width = pctWidth(average([matchData.teamB.bat, matchData.teamB.bowl, matchData.teamB.field]));
+      document.getElementById("weatherTitle").textContent = matchData.weather.title;
+      document.getElementById("weatherText").textContent = matchData.weather.text;
+      document.getElementById("weatherWind").textContent = matchData.weather.wind;
+      document.getElementById("weatherHumidity").textContent = matchData.weather.humidity;
+      document.getElementById("pitchTitle").textContent = matchData.pitch.title;
+      document.getElementById("pitchText").textContent = matchData.pitch.text;
+      document.getElementById("pitchBounce").textContent = matchData.pitch.bounce;
+      document.getElementById("pitchAssist").textContent = matchData.pitch.assist;
+      document.getElementById("stadiumName").textContent = matchData.stadium.name;
+      document.getElementById("stadiumText").textContent = matchData.stadium.text;
+      document.getElementById("stadiumCapacity").textContent = matchData.stadium.capacity;
+      document.getElementById("stadiumCrowd").textContent = matchData.stadium.crowd;
+    }
+
+    function selectCall(call) {
+      if (isFlipping) return;
+      userCall = call;
+      document.getElementById("headsBtn").classList.toggle("active", call === "Heads");
+      document.getElementById("tailsBtn").classList.toggle("active", call === "Tails");
+      document.getElementById("resultTitle").textContent = `${matchData.teamA.name} calls ${call}`;
+      document.getElementById("resultText").textContent = "Now press Flip Toss. The coin will rotate physically and reveal the result when it lands.";
+      document.getElementById("continueBtn").style.display = "none";
+      flashResult();
+    }
+
+    function flashResult() {
+      const resultBox = document.getElementById("resultBox");
+      resultBox.classList.remove("flash-result");
+      void resultBox.offsetWidth;
+      resultBox.classList.add("flash-result");
+    }
+
+    function createSparkBurst() {
+      const coinArea = document.getElementById("coinArea");
+      const colors = ["gold", "blue", "green"];
+      for (let i = 0; i < 30; i++) {
+        const spark = document.createElement("span");
+        spark.className = "spark";
+        const color = colors[i % colors.length];
+        if (color !== "gold") spark.classList.add(color);
+        const angle = (Math.PI * 2 * i) / 30;
+        const distance = 76 + Math.random() * 68;
+        spark.style.setProperty("--x", `${Math.cos(angle) * distance}px`);
+        spark.style.setProperty("--y", `${Math.sin(angle) * distance}px`);
+        coinArea.appendChild(spark);
+        setTimeout(() => spark.remove(), 820);
+      }
+    }
+
+    function animateCoinTo(outcome, done) {
+      const startAngle = coinAngle;
+      const finalBase = outcome === "Heads" ? 0 : Math.PI;
+      let rotations = 7 + Math.floor(Math.random() * 2);
+      let targetAngle = finalBase + rotations * Math.PI * 2;
+      while (targetAngle <= startAngle + Math.PI * 6) targetAngle += Math.PI * 2;
+      const startTime = performance.now();
+      const duration = 1850;
+      function frame(now) {
+        const t = Math.min(1, (now - startTime) / duration);
+        const easedSpin = easeOutCubic(t);
+        const jump = -82 * Math.sin(Math.PI * easeInOutSine(t));
+        const wobble = Math.sin(t * Math.PI * 9) * (1 - t) * 0.20;
+        coinAngle = startAngle + (targetAngle - startAngle) * easedSpin + wobble;
+        drawCoin(coinAngle, jump, t, true);
+        if (t < 1) requestAnimationFrame(frame);
+        else {
+          coinAngle = finalBase;
+          drawCoin(coinAngle, 0, 1, false);
+          done();
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function doToss() {
+      if (isFlipping) return;
+      if (!userCall) {
+        document.getElementById("resultTitle").textContent = "Choose Heads or Tails first";
+        document.getElementById("resultText").textContent = "Click one toss call before flipping the coin.";
+        flashResult();
+        return;
+      }
+      isFlipping = true;
+      const coinArea = document.getElementById("coinArea");
+      const flipBtn = document.getElementById("flipBtn");
+      const headsBtn = document.getElementById("headsBtn");
+      const tailsBtn = document.getElementById("tailsBtn");
+      const decisionRow = document.getElementById("decisionRow");
+      decisionRow.classList.remove("show");
+      document.getElementById("continueBtn").style.display = "none";
+      const outcome = Math.random() < 0.5 ? "Heads" : "Tails";
+      coinArea.classList.add("flipping");
+      flipBtn.disabled = true;
+      headsBtn.disabled = true;
+      tailsBtn.disabled = true;
+      document.getElementById("resultTitle").textContent = "Coin flipping...";
+      document.getElementById("resultText").textContent = "The coin is rotating, turning edge-on, and slowing into the final result.";
+      setTimeout(createSparkBurst, 1260);
+      animateCoinTo(outcome, () => {
+        coinArea.classList.remove("flipping");
+        setFinalFace(outcome);
+        flashResult();
+        const userWon = outcome === userCall;
+        tossWinner = userWon ? matchData.teamA.name : matchData.teamB.name;
+        document.getElementById("resultTitle").textContent = `${outcome}! ${tossWinner} won the toss`;
+        if (userWon) {
+          document.getElementById("resultText").textContent = `${matchData.teamA.name} called ${userCall} correctly. Choose whether to bat or bowl first.`;
+          decisionRow.classList.add("show");
+        } else {
+          const computerDecision = getComputerDecision();
+          saveTossData(computerDecision, matchData.teamB.name);
+          document.getElementById("resultText").textContent = `${matchData.teamA.name} called ${userCall}, but it landed ${outcome}. ${matchData.teamB.name} chooses to ${computerDecision.toLowerCase()} first.`;
+          document.getElementById("continueBtn").style.display = "block";
+        }
+        flipBtn.disabled = false;
+        headsBtn.disabled = false;
+        tailsBtn.disabled = false;
+        isFlipping = false;
+      });
+    }
+
+    function getComputerDecision() {
+      const pitch = matchData.pitch.title.toLowerCase();
+      if (pitch.includes("dry") || pitch.includes("batting")) return "Bat";
+      if (pitch.includes("dew")) return "Bowl";
+      return Math.random() < 0.5 ? "Bat" : "Bowl";
+    }
+
+    function saveTossData(decision, winnerName) {
+      const tossData = {
+        matchIndex: currentTourMatch?.matchIndex ?? null,
+        winner: winnerName,
+        decision,
+        userCall,
+        savedAt: new Date().toISOString()
+      };
+      localStorage.setItem("currentTossResult", JSON.stringify(tossData));
+      if (currentTourMatch) {
+        currentTourMatch.toss = tossData;
+        localStorage.setItem("currentTourMatch", JSON.stringify(currentTourMatch));
+      }
+    }
+
+    function chooseDecision(decision) {
+      if (!tossWinner) return;
+      saveTossData(decision, tossWinner);
+      document.getElementById("resultTitle").textContent = `${tossWinner} chooses to ${decision}`;
+      document.getElementById("resultText").textContent = `${decision === "Bat" ? "Batting first selected." : "Bowling first selected."} Continue to Match Center.`;
+      document.getElementById("continueBtn").style.display = "block";
+      flashResult();
+    }
+
+    function goToMatchCenter() {
+      window.location.href = "match-center.html";
+    }
+
+    window.addEventListener("resize", setupCanvas);
+    loadMatchData();
+    setupCanvas();
+    setFinalFace("Heads");
+  </script>
+
+
+</body></html>

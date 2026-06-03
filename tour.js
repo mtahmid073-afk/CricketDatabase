@@ -1192,6 +1192,7 @@ function startTourMatch(matchIndex) {
   const match = schedule.find(item => item.matchIndex === matchIndex);
 
   if (!match) {
+    alert("Match not found.");
     return;
   }
 
