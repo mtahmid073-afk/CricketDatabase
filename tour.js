@@ -1199,12 +1199,19 @@ function startTourMatch(matchIndex) {
   tourProgress.activeMatchIndex = matchIndex;
 
   const currentMatchData = {
-    matchIndex,
-    match,
+    matchIndex: matchIndex,
+    match: match,
+
+    teamA: state.userTeam,
+    teamB: state.computerTeam,
+
     userTeam: state.userTeam,
     computerTeam: state.computerTeam,
+
     userSquad: state.userSquad,
-    computerSquad: state.computerSquad
+    computerSquad: state.computerSquad,
+
+    savedAt: new Date().toISOString()
   };
 
   localStorage.setItem("currentTourMatch", JSON.stringify(currentMatchData));
