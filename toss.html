@@ -43,18 +43,25 @@
           <div class="stat"><b id="teamAField">0</b><span>Field</span></div>
         </div>
         <div class="captain-box"><small>Captain</small><strong id="teamACaptain">Captain</strong></div>
-        <div class="team-info-box weather-inside-team">
+        <div class="team-info-box venue-inside-team">
             <div class="team-info-head">
-                <span>Weather</span>
-                <b>⛅</b>
+                <span>Pitch & Stadium</span>
+                <b>🏟️</b>
             </div>
 
-            <h3 id="weatherTitle">Partly Cloudy • 28°C</h3>
-            <p id="weatherText">Good match conditions.</p>
+            <h3 id="pitchTitle">Dry Batting Surface</h3>
+            <p id="pitchText">Good for batting first. Spin may become stronger later.</p>
+
+            <div class="venue-divider"></div>
+
+            <h3 id="stadiumName">Melbourne Cricket Ground, Melbourne</h3>
+            <p id="stadiumText">Home venue. Chasing may depend on dew and pitch pace.</p>
 
             <div class="mini-tags compact-tags">
-                <span class="tag blue" id="weatherWind">Wind 12 km/h</span>
-                <span class="tag" id="weatherHumidity">Humidity 54%</span>
+                <span class="tag gold" id="pitchBounce">Bounce: Medium</span>
+                <span class="tag green" id="pitchAssist">Assist: Spin Late</span>
+                <span class="tag" id="stadiumCapacity">Capacity 25,000+</span>
+                <span class="tag green" id="stadiumCrowd">Crowd: Loud</span>
             </div>
         </div>
       </section>
@@ -105,26 +112,20 @@
           <div class="stat"><b id="teamBField">0</b><span>Field</span></div>
         </div>
         <div class="captain-box"><small>Captain</small><strong id="teamBCaptain">Captain</strong></div>
-        <div class="team-info-box venue-inside-team">
+        <div class="team-info-box weather-inside-team">
             <div class="team-info-head">
-                <span>Pitch & Stadium</span>
-                <b>🏟️</b>
+                <span>Weather</span>
+                <b>⛅</b>
             </div>
 
-            <h3 id="pitchTitle">Dry Batting Surface</h3>
-            <p id="pitchText">Good for batting first. Spin may become stronger later.</p>
-
-            <div class="venue-divider"></div>
-
-            <h3 id="stadiumName">Melbourne Cricket Ground, Melbourne</h3>
-            <p id="stadiumText">Home venue. Chasing may depend on dew and pitch pace.</p>
+            <h3 id="weatherTitle">Partly Cloudy • 28°C</h3>
+            <p id="weatherText">Good match conditions.</p>
 
             <div class="mini-tags compact-tags">
-                <span class="tag gold" id="pitchBounce">Bounce: Medium</span>
-                <span class="tag green" id="pitchAssist">Assist: Spin Late</span>
-                <span class="tag" id="stadiumCapacity">Capacity 25,000+</span>
-                <span class="tag green" id="stadiumCrowd">Crowd: Loud</span>
+                <span class="tag blue" id="weatherWind">Wind 12 km/h</span>
+                <span class="tag" id="weatherHumidity">Humidity 54%</span>
             </div>
+        
         </div>
         
         <button class="toss-btn continue-btn" id="continueBtn" onclick="goToMatchCenter()">Continue to Match Center</button>
