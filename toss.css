@@ -660,3 +660,464 @@ body::after {
   display: block !important;
   filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
 }
+
+/* =========================================================
+   MODERN TOSS PAGE UPGRADE
+   Paste at bottom of toss.css
+========================================================= */
+
+body {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(34, 197, 94, 0.24), transparent 28%),
+    radial-gradient(circle at 82% 12%, rgba(56, 189, 248, 0.18), transparent 30%),
+    radial-gradient(circle at 50% 95%, rgba(246, 196, 83, 0.12), transparent 34%),
+    linear-gradient(135deg, #020617 0%, #061823 48%, #04110b 100%) !important;
+}
+
+body::before {
+  opacity: 0.8 !important;
+}
+
+body::after {
+  opacity: 0.18 !important;
+  animation: none !important;
+}
+
+/* Main page spacing */
+
+.page {
+  width: min(1240px, 100%) !important;
+  padding: 16px !important;
+  gap: 14px !important;
+}
+
+/* Premium top header */
+
+.topbar {
+  min-height: 82px !important;
+  border-radius: 28px !important;
+  padding: 14px 18px !important;
+  background:
+    linear-gradient(90deg, rgba(34, 197, 94, 0.15), rgba(15, 31, 44, 0.84) 42%, rgba(246, 196, 83, 0.12)),
+    rgba(5, 13, 22, 0.84) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.44),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.topbar::after {
+  display: none !important;
+}
+
+.logo {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 18px !important;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.85), transparent 18%),
+    linear-gradient(135deg, #22c55e, #38bdf8) !important;
+  box-shadow:
+    0 0 30px rgba(34, 197, 94, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.36) !important;
+}
+
+.title h1 {
+  font-size: clamp(1.45rem, 3vw, 2.15rem) !important;
+  letter-spacing: -0.045em !important;
+}
+
+.title p {
+  font-size: 0.86rem !important;
+  color: #a8c3cc !important;
+  font-weight: 750 !important;
+}
+
+/* Top right buttons */
+
+.back-btn {
+  border-radius: 16px !important;
+  padding: 10px 13px !important;
+  background: rgba(255, 255, 255, 0.075) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #eef7f3 !important;
+  box-shadow: none !important;
+}
+
+.back-btn:hover {
+  background: rgba(34, 197, 94, 0.16) !important;
+  border-color: rgba(34, 197, 94, 0.38) !important;
+}
+
+.match-pill {
+  border-radius: 999px !important;
+  padding: 11px 15px !important;
+  background:
+    linear-gradient(135deg, rgba(246, 196, 83, 0.18), rgba(255, 255, 255, 0.055)) !important;
+  border: 1px solid rgba(246, 196, 83, 0.36) !important;
+  color: #ffd66b !important;
+  box-shadow: 0 0 26px rgba(246, 196, 83, 0.14) !important;
+}
+
+/* Layout */
+
+.main-grid {
+  grid-template-columns: minmax(280px, 1fr) minmax(360px, 0.95fr) minmax(280px, 1fr) !important;
+  gap: 14px !important;
+}
+
+/* Glass cards */
+
+.card {
+  border-radius: 30px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.025)),
+    rgba(8, 20, 31, 0.82) !important;
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(16px) !important;
+}
+
+.card::before {
+  background:
+    radial-gradient(circle at 92% 6%, rgba(34, 197, 94, 0.14), transparent 30%),
+    radial-gradient(circle at 5% 95%, rgba(56, 189, 248, 0.09), transparent 34%) !important;
+}
+
+/* Team cards */
+
+.team-card {
+  padding: 18px !important;
+  gap: 14px !important;
+}
+
+.team-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(34, 197, 94, 0.34) !important;
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.48),
+    0 0 45px rgba(34, 197, 94, 0.08) !important;
+}
+
+.team-name h2 {
+  font-size: clamp(1.45rem, 3vw, 2.1rem) !important;
+  letter-spacing: -0.055em !important;
+}
+
+.team-name p {
+  color: #9db4bd !important;
+  font-weight: 850 !important;
+}
+
+/* Team logo badge */
+
+.team-badge {
+  width: 76px !important;
+  height: 76px !important;
+  border-radius: 24px !important;
+  padding: 8px !important;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.16), transparent 28%),
+    linear-gradient(135deg, rgba(15, 31, 44, 0.96), rgba(34, 48, 60, 0.92)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.17) !important;
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+  overflow: hidden !important;
+}
+
+.team-badge.away {
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.14), transparent 28%),
+    linear-gradient(135deg, rgba(58, 43, 43, 0.95), rgba(44, 31, 41, 0.92)) !important;
+}
+
+.team-badge-logo {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  filter: drop-shadow(0 7px 12px rgba(0, 0, 0, 0.36));
+}
+
+/* Power meter */
+
+.power-meter {
+  height: 11px !important;
+  background: rgba(255, 255, 255, 0.075) !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+.power-fill {
+  background: linear-gradient(90deg, #22c55e, #38bdf8, #f6c453) !important;
+  box-shadow: 0 0 24px rgba(34, 197, 94, 0.24) !important;
+}
+
+.power-fill.away-fill {
+  background: linear-gradient(90deg, #f6c453, #fb7185, #38bdf8) !important;
+}
+
+/* Stats */
+
+.team-stats {
+  gap: 10px !important;
+}
+
+.stat {
+  border-radius: 18px !important;
+  padding: 12px 9px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.stat b {
+  font-size: 1.28rem !important;
+  color: #f8fafc !important;
+}
+
+.stat span {
+  font-size: 0.74rem !important;
+  font-weight: 900 !important;
+  color: #9fb5be !important;
+}
+
+/* Captain and info boxes */
+
+.captain-box,
+.team-info-box {
+  border-radius: 22px !important;
+  background:
+    linear-gradient(180deg, rgba(34, 197, 94, 0.12), rgba(255, 255, 255, 0.035)) !important;
+  border: 1px solid rgba(34, 197, 94, 0.20) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+}
+
+.captain-box strong {
+  font-size: 1rem !important;
+}
+
+.team-info-head {
+  font-size: 0.8rem !important;
+  font-weight: 1000 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #9fb5be !important;
+}
+
+.team-info-box h3 {
+  font-size: 1rem !important;
+  margin-top: 8px !important;
+  color: #eef7f3 !important;
+}
+
+.team-info-box p {
+  color: #a8b8c0 !important;
+  font-size: 0.84rem !important;
+  line-height: 1.42 !important;
+}
+
+/* Center toss panel */
+
+.toss-center {
+  padding: 18px !important;
+  border-color: rgba(246, 196, 83, 0.28) !important;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(246, 196, 83, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02)),
+    rgba(8, 20, 31, 0.88) !important;
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.48),
+    0 0 55px rgba(246, 196, 83, 0.08) !important;
+}
+
+.toss-title-centered {
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.section-label {
+  color: #f6c453 !important;
+  font-size: 0.8rem !important;
+}
+
+.toss-call-title {
+  font-size: 1.55rem !important;
+  font-weight: 1000 !important;
+  letter-spacing: -0.045em !important;
+  color: #f8fafc !important;
+  margin-top: 4px !important;
+}
+
+/* Coin area */
+
+.coin-area {
+  min-height: 260px !important;
+}
+
+.coin-stage {
+  width: 285px !important;
+  height: 285px !important;
+  background:
+    radial-gradient(circle, rgba(246, 196, 83, 0.16), transparent 58%),
+    conic-gradient(from 0deg, rgba(246, 196, 83, 0.28), transparent 24%, rgba(56, 189, 248, 0.18), transparent 50%, rgba(34, 197, 94, 0.17), transparent 76%, rgba(246, 196, 83, 0.28)) !important;
+  opacity: 0.78 !important;
+}
+
+#coinCanvas {
+  width: 280px !important;
+  height: 280px !important;
+  filter:
+    drop-shadow(0 32px 26px rgba(0, 0, 0, 0.44))
+    drop-shadow(0 0 28px rgba(246, 196, 83, 0.18)) !important;
+}
+
+/* Buttons */
+
+.choice-row {
+  gap: 10px !important;
+}
+
+button {
+  border-radius: 18px !important;
+  font-weight: 1000 !important;
+}
+
+.choice-row button,
+.decision-row button {
+  min-height: 46px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.045)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+}
+
+.choice-row button:hover,
+.decision-row button:hover {
+  background: rgba(34, 197, 94, 0.16) !important;
+  border-color: rgba(34, 197, 94, 0.42) !important;
+}
+
+.choice-row button.active {
+  background:
+    linear-gradient(135deg, rgba(34, 197, 94, 0.32), rgba(56, 189, 248, 0.18)) !important;
+  border-color: rgba(34, 197, 94, 0.70) !important;
+  color: #7ee787 !important;
+}
+
+.toss-btn {
+  min-height: 50px !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(135deg, #22c55e, #16a34a) !important;
+  color: #02120a !important;
+  border: none !important;
+  box-shadow:
+    0 16px 34px rgba(34, 197, 94, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+
+.toss-btn:hover {
+  background: linear-gradient(135deg, #7ee787, #22c55e) !important;
+}
+
+/* Result box */
+
+.result-box {
+  border-radius: 22px !important;
+  background:
+    linear-gradient(135deg, rgba(246, 196, 83, 0.105), rgba(255, 255, 255, 0.045)) !important;
+  border: 1px solid rgba(246, 196, 83, 0.24) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+}
+
+.result-box h3 {
+  color: #ffd66b !important;
+  font-size: 1.04rem !important;
+}
+
+.result-box p {
+  color: #a8b8c0 !important;
+  font-size: 0.86rem !important;
+}
+
+/* Tags */
+
+.mini-tags {
+  gap: 8px !important;
+}
+
+.tag {
+  border-radius: 999px !important;
+  padding: 7px 10px !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  font-weight: 900 !important;
+}
+
+/* Continue button */
+
+.continue-btn {
+  margin-top: auto !important;
+  background:
+    linear-gradient(135deg, #38bdf8, #22c55e) !important;
+  color: #02120a !important;
+}
+
+/* Better responsive layout */
+
+@media (max-width: 1080px) {
+  .main-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .team-card {
+    min-height: auto !important;
+  }
+
+  .coin-area {
+    min-height: 240px !important;
+  }
+
+  #coinCanvas {
+    width: 240px !important;
+    height: 240px !important;
+  }
+
+  .coin-stage {
+    width: 245px !important;
+    height: 245px !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .topbar {
+    align-items: stretch !important;
+  }
+
+  .topbar > div:last-child {
+    width: 100% !important;
+  }
+
+  .match-pill,
+  .back-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .team-head {
+    align-items: flex-start !important;
+  }
+
+  .team-badge {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 20px !important;
+  }
+
+  .team-stats {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
