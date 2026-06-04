@@ -1465,9 +1465,68 @@ function addDays(date, days) {
   return copy;
 }
 
+
+function formatShortMonthDay(date) {
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric"
+  });
+}
+
+function formatScheduleDateRange(startDate, endDate) {
+  const sameMonth =
+    startDate.getMonth() === endDate.getMonth() &&
+    startDate.getFullYear() === endDate.getFullYear();
+
+  const startDay = startDate.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "2-digit"
+  });
+
+  const endDay = endDate.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "2-digit",
+    year: "numeric"
+  });
+
+  if (sameMonth) {
+    const month = startDate.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
+    const startNumber = String(startDate.getDate()).padStart(2, "0");
+    const endNumber = String(endDate.getDate()).padStart(2, "0");
+    const year = endDate.getFullYear();
+
+    return `${month} ${startNumber}-${endNumber}, ${year}`;
+  }
+
+  return `${startDay} - ${endDay}`.replaceAll(",", "").toUpperCase();
+}
+
+function getTestDayStatus(startDate, endDate) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+
+  if (today <= start) return "Day 1";
+  if (today >= end) return "Day 5";
+
+  const diffMs = today - start;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  return `Day ${Math.min(5, diffDays + 1)}`;
+}
+
+
 function buildTourSchedule() {
   const schedule = [];
   let scheduleMatchIndex = 0;
+
   const startDate = new Date();
   startDate.setHours(9, 30, 0, 0);
 
@@ -1478,26 +1537,31 @@ function buildTourSchedule() {
 
   state.series.forEach((match) => {
     if (match.format === "Test") {
-      for (let day = 1; day <= 5; day++) {
-        const matchDate = addDays(startDate, dayOffset);
+      const matchStartDate = addDays(startDate, dayOffset);
+      const matchEndDate = addDays(startDate, dayOffset + 4);
 
-        schedule.push({
-          matchIndex: scheduleMatchIndex++,
-          date: matchDate,
-          seriesName: `${state.computerTeam} tour of ${state.userTeam}, ${matchDate.getFullYear()}`,
-          title: `${state.userTeam} vs ${state.computerTeam}, ${getOrdinalNumber(testNumber)} Test, Day ${day}`,
-          venue: getVenueForTeam(state.userTeam),
-          format: "Test",
-          localTime: formatTime(matchDate),
-          gmtTime: formatTime(addDays(matchDate, 0)),
-          localNote: formatFullDate(matchDate)
-        });
+      schedule.push({
+        matchIndex: scheduleMatchIndex++,
 
-        dayOffset += 1;
-      }
+        date: matchStartDate,
+        endDate: matchEndDate,
+        dateLabel: formatScheduleDateRange(matchStartDate, matchEndDate),
+
+        seriesName: `${state.computerTeam} tour of ${state.userTeam}, ${matchStartDate.getFullYear()}`,
+        title: `${state.userTeam} vs ${state.computerTeam}, ${getOrdinalNumber(testNumber)} Test`,
+        venue: getVenueForTeam(state.userTeam),
+        format: "Test",
+
+        localTime: formatTime(matchStartDate),
+        gmtTime: formatTime(addDays(matchStartDate, 0)),
+
+        localNote: `${getTestDayStatus(matchStartDate, matchEndDate)} • ${formatShortMonthDay(matchStartDate)}-${matchEndDate.getDate()}`
+      });
 
       testNumber += 1;
-      dayOffset += 1;
+
+      // 5 playing days + 1 rest/travel day before next match
+      dayOffset += 6;
     }
 
     if (match.format === "ODI") {
@@ -1506,10 +1570,13 @@ function buildTourSchedule() {
       schedule.push({
         matchIndex: scheduleMatchIndex++,
         date: matchDate,
+        dateLabel: formatScheduleDate(matchDate),
+
         seriesName: `${state.computerTeam} tour of ${state.userTeam}, ${matchDate.getFullYear()}`,
         title: `${state.userTeam} vs ${state.computerTeam}, ${getOrdinalNumber(odiNumber)} ODI`,
         venue: getVenueForTeam(state.userTeam),
         format: "ODI",
+
         localTime: formatTime(matchDate),
         gmtTime: formatTime(addDays(matchDate, 0)),
         localNote: formatFullDate(matchDate)
@@ -1526,10 +1593,13 @@ function buildTourSchedule() {
       schedule.push({
         matchIndex: scheduleMatchIndex++,
         date: matchDate,
+        dateLabel: formatScheduleDate(matchDate),
+
         seriesName: `${state.computerTeam} tour of ${state.userTeam}, ${matchDate.getFullYear()}`,
         title: `${state.userTeam} vs ${state.computerTeam}, ${getOrdinalNumber(t20Number)} T20I`,
         venue: getVenueForTeam(state.userTeam),
         format: "T20",
+
         localTime: formatTime(matchDate),
         gmtTime: formatTime(addDays(matchDate, 0)),
         localNote: formatFullDate(matchDate)
@@ -1547,7 +1617,7 @@ function groupScheduleByDate(schedule) {
   const grouped = {};
 
   schedule.forEach((item) => {
-    const key = formatScheduleDate(item.date);
+    const key = item.dateLabel || formatScheduleDate(item.date);
 
     if (!grouped[key]) {
       grouped[key] = [];
