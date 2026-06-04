@@ -738,6 +738,47 @@
         return "T20";
     }
 
+
+    function buildFreshMatchTitle(oldTitle, userTeam, computerTeam, formatKey) {
+        const text = String(oldTitle || "");
+
+        let suffix = "";
+
+        if (text.includes(",")) {
+            suffix = "," + text.split(",").slice(1).join(",");
+        } else {
+            suffix = `, 1st ${formatKey === "T20" ? "T20I" : formatKey}`;
+        }
+
+        return `${userTeam} vs ${computerTeam}${suffix}`;
+    }
+
+    function syncCurrentMatchIdentity(matchData, tourSave, formatKey) {
+        if (!matchData || !tourSave) return matchData;
+
+        const freshTitle = buildFreshMatchTitle(
+            matchData.match?.title,
+            tourSave.userTeam,
+            tourSave.computerTeam,
+            formatKey
+        );
+
+        return {
+            ...matchData,
+
+            userTeam: tourSave.userTeam,
+            computerTeam: tourSave.computerTeam,
+            teamA: tourSave.userTeam,
+            teamB: tourSave.computerTeam,
+
+            match: {
+            ...(matchData.match || {}),
+            format: formatKey,
+            title: freshTitle
+            }
+        };
+    }
+
     function loadPage() {
         // Always reload fresh data from localStorage.
         currentMatch = getCurrentTourMatch();
@@ -753,6 +794,7 @@
             currentMatch.match?.format ||
             "ODI"
         );
+        currentMatch = syncCurrentMatchIdentity(currentMatch, tourSave, formatKey);
 
         const latestFormatSquad = tourSave?.formatSquads?.[formatKey];
 
@@ -785,7 +827,8 @@
 
         document.getElementById("matchType").textContent =
             `${currentMatch.match?.format || formatKey} • ${currentMatch.match?.title || "Tour Match"}`;
-
+        
+            
         saveDraftXI();
         renderXIPage();
         }
@@ -1043,14 +1086,17 @@
             selectedComputerXI: pickDefaultXI(latestComputerSquad),
 
             battingOrder: selectedXI.map((player, index) => ({
-            position: index + 1,
-            playerId: getPlayerKey(player),
-            name: getPlayerName(player)
+                position: index + 1,
+                playerId: getPlayerKey(player),
+                name: getPlayerName(player)
             })),
 
             xiConfirmed: true,
             xiConfirmedAt: new Date().toISOString()
         };
+
+        /* Important: rewrite teams and match title using the newest saved tour */
+        currentMatch = syncCurrentMatchIdentity(currentMatch, freshTourSave, activeFormat);
 
         localStorage.setItem("currentTourMatch", JSON.stringify(currentMatch));
 

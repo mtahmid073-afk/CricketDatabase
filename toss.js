@@ -52,6 +52,20 @@ function getTeamsFromMatchTitle(title) {
   };
 }
 
+function buildFreshMatchTitle(oldTitle, userTeam, computerTeam, formatKey) {
+  const text = String(oldTitle || "");
+
+  let suffix = "";
+
+  if (text.includes(",")) {
+    suffix = "," + text.split(",").slice(1).join(",");
+  } else {
+    suffix = `, 1st ${formatKey === "T20" ? "T20I" : formatKey}`;
+  }
+
+  return `${userTeam} vs ${computerTeam}${suffix}`;
+}
+
 function safeText(id, value) {
   const element = document.getElementById(id);
 
@@ -337,40 +351,56 @@ function buildMatchDataFromStorage() {
     };
   }
 
-  const titleTeams = getTeamsFromMatchTitle(stored.match?.title);
+    const titleTeams = getTeamsFromMatchTitle(stored.match?.title);
 
-  const teamAName =
-    stored.userTeam ||
-    stored.teamA ||
-    savedTour?.userTeam ||
-    titleTeams.teamA ||
-    "Team A";
+    /* Important: saved tour teams should win over stale currentTourMatch teams */
+    const teamAName =
+        savedTour?.userTeam ||
+        stored.userTeam ||
+        stored.teamA ||
+        titleTeams.teamA ||
+        "Team A";
 
-  const teamBName =
-    stored.computerTeam ||
-    stored.teamB ||
-    savedTour?.computerTeam ||
-    titleTeams.teamB ||
-    "Team B";
+    const teamBName =
+        savedTour?.computerTeam ||
+        stored.computerTeam ||
+        stored.teamB ||
+        titleTeams.teamB ||
+        "Team B";
 
-  const userSquad =
-    stored.selectedUserXI ||
-    stored.userSquad ||
-    savedTour?.userSquad ||
-    [];
+    const matchFormat = stored.match?.format || stored.format || "Match";
 
-  const computerSquad =
-    stored.selectedComputerXI ||
-    stored.computerSquad ||
-    savedTour?.computerSquad ||
-    [];
+    const freshMatchTitle = buildFreshMatchTitle(
+        stored.match?.title,
+        teamAName,
+        teamBName,
+        matchFormat
+        );
 
-  const userRatings = getTeamRatings(userSquad);
-  const computerRatings = getTeamRatings(computerSquad);
-  const venueData = getVenueData(stored.match, teamAName);
+    const freshMatch = {
+        ...(stored.match || {}),
+        format: matchFormat,
+        title: freshMatchTitle
+        };
 
-  return {
-    matchType: `${stored.match?.format || "Match"} • ${stored.match?.title || `${teamAName} vs ${teamBName}`}`,
+    const userSquad =
+        stored.selectedUserXI ||
+        stored.userSquad ||
+        savedTour?.userSquad ||
+        [];
+
+    const computerSquad =
+        stored.selectedComputerXI ||
+        stored.computerSquad ||
+        savedTour?.computerSquad ||
+        [];
+
+    const userRatings = getTeamRatings(userSquad);
+    const computerRatings = getTeamRatings(computerSquad);
+    const venueData = getVenueData(freshMatch, teamAName);
+
+    return {
+        matchType: `${matchFormat} • ${freshMatchTitle}`,
 
     teamA: {
       name: teamAName,
@@ -945,8 +975,35 @@ window.addEventListener("resize", () => {
 });
 
 function bootTossPage() {
-  // Always pull the newest match after Select XI writes currentTourMatch.
   currentTourMatch = getStoredTourMatch();
+
+  if (currentTourMatch) {
+    const savedTour = getStoredTourSave();
+    const formatKey = currentTourMatch.match?.format || currentTourMatch.format || "Match";
+
+    if (savedTour?.userTeam && savedTour?.computerTeam) {
+      const freshTitle = buildFreshMatchTitle(
+        currentTourMatch.match?.title,
+        savedTour.userTeam,
+        savedTour.computerTeam,
+        formatKey
+      );
+
+      currentTourMatch.userTeam = savedTour.userTeam;
+      currentTourMatch.computerTeam = savedTour.computerTeam;
+      currentTourMatch.teamA = savedTour.userTeam;
+      currentTourMatch.teamB = savedTour.computerTeam;
+
+      currentTourMatch.match = {
+        ...(currentTourMatch.match || {}),
+        format: formatKey,
+        title: freshTitle
+      };
+
+      localStorage.setItem("currentTourMatch", JSON.stringify(currentTourMatch));
+    }
+  }
+
   matchData = buildMatchDataFromStorage();
 
   loadMatchData();
