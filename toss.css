@@ -1121,3 +1121,114 @@ button {
     grid-template-columns: repeat(3, 1fr) !important;
   }
 }
+
+/* =========================================================
+   TOSS PAGE PERFORMANCE FIX
+   Paste at very bottom of toss.css
+========================================================= */
+
+/* Stop expensive full-screen animations */
+body::after,
+.topbar::after,
+.beam,
+.logo,
+.coin-stage,
+.power-fill,
+.power-fill.away-fill,
+.vs-badge,
+.ticker-text {
+  animation: none !important;
+}
+
+/* Hide moving stadium lights */
+.stadium-lights {
+  display: none !important;
+}
+
+/* Remove costly blur/backdrop filters */
+.topbar,
+.ticker,
+.card {
+  backdrop-filter: none !important;
+}
+
+/* Keep modern background but make it static */
+body::before {
+  opacity: 1 !important;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(34, 197, 94, 0.18), transparent 30%),
+    radial-gradient(circle at 82% 10%, rgba(56, 189, 248, 0.13), transparent 32%),
+    linear-gradient(135deg, #020617, #061823 52%, #03100b) !important;
+}
+
+/* Reduce heavy shadows */
+.topbar,
+.card,
+.team-card,
+.toss-center {
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.34) !important;
+}
+
+/* Stop hover movement lag */
+.team-card:hover,
+button:hover,
+.toss-btn:hover {
+  transform: none !important;
+}
+
+/* Reduce coin glow workload */
+#coinCanvas {
+  filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.35)) !important;
+}
+
+.coin-stage {
+  opacity: 0.35 !important;
+  background:
+    radial-gradient(circle, rgba(246, 196, 83, 0.14), transparent 58%) !important;
+}
+
+/* Reduce large glowing field effects */
+.field-glow {
+  opacity: 0.45 !important;
+  box-shadow: none !important;
+}
+
+/* Simplify badges and logos */
+.team-badge,
+.logo {
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.26) !important;
+}
+
+.team-badge-logo {
+  filter: none !important;
+}
+
+/* Simplify button and card transitions */
+button,
+.card,
+.team-card,
+.stat {
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease !important;
+}
+
+/* Keep result animation light */
+.result-box.flash-result {
+  animation: none !important;
+  box-shadow: none !important;
+}
+
+/* Mobile extra protection */
+@media (max-width: 900px) {
+  .coin-stage {
+    display: none !important;
+  }
+
+  #coinCanvas {
+    filter: none !important;
+  }
+
+  .card,
+  .topbar {
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.30) !important;
+  }
+}
