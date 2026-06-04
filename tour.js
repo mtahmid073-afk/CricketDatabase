@@ -1313,21 +1313,64 @@ function finishSquad() {
   ensureFormatSquads();
 
   const formatKey = getFormatKey(state.activeSquadFormat);
+  const matchIndex = Number(state.activeSquadMatchIndex);
 
-  state.computerSquad = autoPickComputerSquad(state.computerTeam, formatKey);
+  const schedule = buildTourSchedule();
+  const match = schedule.find(item => Number(item.matchIndex) === matchIndex);
+
+  if (!match) {
+    return showMsg("squadMsg", "Could not find this match in the tour schedule.");
+  }
+
+  const userFormatSquad = [...state.userSquad];
+  const computerFormatSquad = autoPickComputerSquad(state.computerTeam, formatKey);
+
+  state.computerSquad = [...computerFormatSquad];
 
   state.formatSquads[formatKey] = {
-    userSquad: [...state.userSquad],
-    computerSquad: [...state.computerSquad],
+    userSquad: userFormatSquad,
+    computerSquad: computerFormatSquad,
     selectedAt: new Date().toISOString()
   };
-
-  const matchIndex = state.activeSquadMatchIndex;
 
   state.activeSquadFormat = null;
   state.activeSquadMatchIndex = null;
 
+  tourProgress.activeMatchIndex = matchIndex;
+
   saveTourState("summary");
+
+  /*
+    Important:
+    Save Squad goes directly to select-xi.html,
+    so it must also write a fresh currentTourMatch.
+    Otherwise select-xi.html keeps using the old one.
+  */
+  localStorage.removeItem("currentTourMatch");
+  localStorage.removeItem("currentTossResult");
+
+  const currentMatchData = {
+    matchIndex: matchIndex,
+    match: match,
+    format: formatKey,
+
+    teamA: state.userTeam,
+    teamB: state.computerTeam,
+
+    userTeam: state.userTeam,
+    computerTeam: state.computerTeam,
+
+    userSquad: userFormatSquad,
+    computerSquad: computerFormatSquad,
+
+    selectedUserXI: [],
+    selectedComputerXI: [],
+
+    toss: null,
+    savedAt: new Date().toISOString()
+  };
+
+  localStorage.setItem("currentTourMatch", JSON.stringify(currentMatchData));
 
   window.location.href = `select-xi.html?format=${encodeURIComponent(formatKey)}&matchIndex=${encodeURIComponent(matchIndex)}&v=${Date.now()}`;
 }
