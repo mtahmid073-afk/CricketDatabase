@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cricket Tour Setup - JSON Ready</title>
-  <link rel="stylesheet" href="tour.css?v=1039" />
+  <link rel="stylesheet" href="tour.css?v=1040" />
 </head>
 <body class="app-loading main-page">
   <main class="page">
@@ -86,45 +86,64 @@
       <section class="panel series-panel">
         <h2>Series Creator</h2>
 
-        <div class="series-grid">
-          <div class="format-card">
-            <label for="tests">Test Matches</label>
-            <select id="tests">
-              <option value="0">None</option>
-              <option value="1">Only</option>
-              <option value="2">2 Tests</option>
-              <option value="3">3 Tests</option>
-              <option value="4">4 Tests</option>
-              <option value="5">5 Tests</option>
-            </select>
+        <div class="series-grid series-counter-grid">
+          <input type="hidden" id="tests" value="0">
+          <input type="hidden" id="odis" value="3">
+          <input type="hidden" id="t20s" value="1">
+
+          <div class="counter-card test-counter">
+            <div class="counter-top">
+              <span>Test</span>
+              <small>Long Format</small>
+            </div>
+
+            <div class="counter-control">
+              <button type="button" onclick="changeSeriesCount('tests', -1)">−</button>
+              <strong id="testsCount">0</strong>
+              <button type="button" onclick="changeSeriesCount('tests', 1)">+</button>
+            </div>
+
+            <div class="counter-bottom" id="testsLabel">No Tests</div>
           </div>
 
-          <div class="format-card">
-            <label for="odis">ODI Matches</label>
-            <select id="odis">
-              <option value="0">None</option>
-              <option value="1">Only</option>
-              <option value="2">2 ODIs</option>
-              <option value="3" selected>3 ODIs</option>
-              <option value="4">4 ODIs</option>
-              <option value="5">5 ODIs</option>
-            </select>
+          <div class="counter-card odi-counter">
+            <div class="counter-top">
+              <span>ODI</span>
+              <small>One-Day</small>
+            </div>
+
+            <div class="counter-control">
+              <button type="button" onclick="changeSeriesCount('odis', -1)">−</button>
+              <strong id="odisCount">3</strong>
+              <button type="button" onclick="changeSeriesCount('odis', 1)">+</button>
+            </div>
+
+            <div class="counter-bottom" id="odisLabel">3 ODIs</div>
           </div>
 
-          <div class="format-card">
-            <label for="t20s">T20 Matches</label>
-            <select id="t20s">
-              <option value="0">None</option>
-              <option value="1" selected>Only</option>
-              <option value="2">2 T20s</option>
-              <option value="3">3 T20s</option>
-              <option value="4">4 T20s</option>
-              <option value="5">5 T20s</option>
-            </select>
+          <div class="counter-card t20-counter">
+            <div class="counter-top">
+              <span>T20</span>
+              <small>Fast Format</small>
+            </div>
+
+            <div class="counter-control">
+              <button type="button" onclick="changeSeriesCount('t20s', -1)">−</button>
+              <strong id="t20sCount">1</strong>
+              <button type="button" onclick="changeSeriesCount('t20s', 1)">+</button>
+            </div>
+
+            <div class="counter-bottom" id="t20sLabel">1 T20</div>
           </div>
 
-          <div class="actions">
-            <button onclick="createSeries()">Create Series</button>
+          <div class="series-create-card">
+            <div>
+              <span class="series-preview-label">Tour Preview</span>
+              <strong id="seriesPreviewText">0 Test • 3 ODI • 1 T20</strong>
+              <small id="seriesTotalText">4 total matches</small>
+            </div>
+
+            <button type="button" onclick="createSeries()">Create Series</button>
           </div>
 
           <div id="setupMsg" class="message error"></div>
@@ -295,6 +314,6 @@
     </section>
   </main>
 
-  <script src="tour.js?v=1039"></script>
+  <script src="tour.js?v=1040"></script>
 </body>
 </html>

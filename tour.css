@@ -2093,3 +2093,178 @@ body.summary-page #summaryScreen.active {
   }
 }
 
+/* =========================================================
+   COMPACT SERIES COUNTER CREATOR
+   Option 3 without extra page scroll
+========================================================= */
+
+.series-counter-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(160px, 1fr)) minmax(230px, 1.15fr) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+  margin: 10px 0 0 !important;
+}
+
+.counter-card,
+.series-create-card {
+  min-height: 118px !important;
+  border-radius: 18px !important;
+  padding: 12px !important;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(126, 231, 135, 0.10), transparent 34%),
+    linear-gradient(180deg, rgba(34, 48, 60, 0.98), rgba(16, 24, 32, 0.96)) !important;
+  border: 1px solid rgba(126, 231, 135, 0.16) !important;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.20) !important;
+}
+
+.counter-top {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+.counter-top span {
+  color: var(--accent) !important;
+  font-size: 18px !important;
+  font-weight: 1000 !important;
+  letter-spacing: -0.04em !important;
+}
+
+.counter-top small {
+  color: var(--muted) !important;
+  font-size: 11px !important;
+  font-weight: 850 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+}
+
+.counter-control {
+  display: grid !important;
+  grid-template-columns: 42px 1fr 42px !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.counter-control button {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 14px !important;
+  padding: 0 !important;
+  font-size: 24px !important;
+  font-weight: 1000 !important;
+  line-height: 1 !important;
+  display: grid !important;
+  place-items: center !important;
+  background: #101820 !important;
+  border: 1px solid var(--border-2) !important;
+  color: var(--accent) !important;
+  box-shadow: none !important;
+}
+
+.counter-control button:hover {
+  background: var(--accent-dark) !important;
+  color: white !important;
+}
+
+.counter-control strong {
+  height: 48px !important;
+  border-radius: 16px !important;
+  display: grid !important;
+  place-items: center !important;
+  background:
+    linear-gradient(180deg, rgba(126, 231, 135, 0.14), rgba(255, 255, 255, 0.04)) !important;
+  border: 1px solid rgba(126, 231, 135, 0.22) !important;
+  color: white !important;
+  font-size: 34px !important;
+  font-weight: 1000 !important;
+  letter-spacing: -0.08em !important;
+}
+
+.counter-bottom {
+  margin-top: 8px !important;
+  color: #cbd5e1 !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+}
+
+.test-counter {
+  border-color: rgba(96, 165, 250, 0.22) !important;
+}
+
+.odi-counter {
+  border-color: rgba(126, 231, 135, 0.24) !important;
+}
+
+.t20-counter {
+  border-color: rgba(246, 196, 83, 0.24) !important;
+}
+
+.series-create-card {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+.series-preview-label {
+  display: block !important;
+  color: var(--muted) !important;
+  font-size: 11px !important;
+  font-weight: 1000 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 5px !important;
+}
+
+.series-create-card strong {
+  display: block !important;
+  color: white !important;
+  font-size: 16px !important;
+  font-weight: 1000 !important;
+  line-height: 1.2 !important;
+}
+
+.series-create-card small {
+  display: block !important;
+  color: var(--accent) !important;
+  margin-top: 4px !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+.series-create-card button {
+  width: 100% !important;
+  height: 42px !important;
+  border-radius: 14px !important;
+  padding: 0 14px !important;
+  font-size: 14px !important;
+}
+
+/* Keep setup page from growing taller */
+.series-panel {
+  padding-bottom: 12px !important;
+}
+
+@media (max-width: 1000px) {
+  .series-counter-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .series-create-card {
+    grid-column: span 2 !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .series-counter-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .series-create-card {
+    grid-column: auto !important;
+  }
+}

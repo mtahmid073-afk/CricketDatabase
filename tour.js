@@ -635,6 +635,68 @@ function makeMatches(testCount, odiCount, t20Count) {
   return matches;
 }
 
+const SERIES_LIMITS = {
+  tests: { min: 0, max: 5, label: "Test", plural: "Tests" },
+  odis: { min: 0, max: 5, label: "ODI", plural: "ODIs" },
+  t20s: { min: 0, max: 5, label: "T20", plural: "T20s" }
+};
+
+function changeSeriesCount(id, amount) {
+  const input = $(id);
+
+  if (!input) return;
+
+  const limits = SERIES_LIMITS[id];
+  const currentValue = Number(input.value) || 0;
+
+  let nextValue = currentValue + amount;
+  nextValue = Math.max(limits.min, Math.min(limits.max, nextValue));
+
+  input.value = String(nextValue);
+
+  updateSeriesCounterUI();
+  saveTourState("setup");
+}
+
+function getSeriesLabel(id, value) {
+  const limits = SERIES_LIMITS[id];
+
+  if (value === 0) {
+    return id === "tests" ? "No Tests" : `No ${limits.plural}`;
+  }
+
+  if (value === 1) {
+    return id === "tests" ? "1 Test" : `1 ${limits.label}`;
+  }
+
+  return `${value} ${limits.plural}`;
+}
+
+function updateSeriesCounterUI() {
+  const tests = Number($("tests")?.value) || 0;
+  const odis = Number($("odis")?.value) || 0;
+  const t20s = Number($("t20s")?.value) || 0;
+
+  if ($("testsCount")) $("testsCount").textContent = tests;
+  if ($("odisCount")) $("odisCount").textContent = odis;
+  if ($("t20sCount")) $("t20sCount").textContent = t20s;
+
+  if ($("testsLabel")) $("testsLabel").textContent = getSeriesLabel("tests", tests);
+  if ($("odisLabel")) $("odisLabel").textContent = getSeriesLabel("odis", odis);
+  if ($("t20sLabel")) $("t20sLabel").textContent = getSeriesLabel("t20s", t20s);
+
+  const total = tests + odis + t20s;
+
+  if ($("seriesPreviewText")) {
+    $("seriesPreviewText").textContent = `${tests} Test • ${odis} ODI • ${t20s} T20`;
+  }
+
+  if ($("seriesTotalText")) {
+    $("seriesTotalText").textContent = `${total} total match${total === 1 ? "" : "es"}`;
+  }
+}
+
+
 function createSeries() {
   hideMsg("setupMsg");
 
@@ -2104,6 +2166,19 @@ function restoreTourStateAfterDataLoad() {
 
     if (Array.isArray(saved.series)) {
       state.series = saved.series;
+    }
+
+
+    if (Array.isArray(saved.series) && saved.series.length) {
+      const savedTests = saved.series.filter(match => match.format === "Test").length;
+      const savedOdis = saved.series.filter(match => match.format === "ODI").length;
+      const savedT20s = saved.series.filter(match => match.format === "T20").length;
+
+      if ($("tests")) $("tests").value = String(savedTests);
+      if ($("odis")) $("odis").value = String(savedOdis);
+      if ($("t20s")) $("t20s").value = String(savedT20s);
+
+      updateSeriesCounterUI();
     }
 
     const savedUserSquadIds =
