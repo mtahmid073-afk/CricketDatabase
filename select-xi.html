@@ -570,6 +570,10 @@
         }
     }
 
+    function getCurrentTourMatch() {
+        return getStoredTourMatch();
+    }
+
     function getPlayerKey(player) {
         return String(player?.id || player?.playerId || player?.name || player?.fullName);
     }
@@ -713,32 +717,78 @@
         return sortBattingOrder(result.slice(0, 11));
     }
 
+    function getTourSave() {
+        const raw = localStorage.getItem("cricketTourSetupSave_v1");
+
+        if (!raw) return null;
+
+        try {
+            return JSON.parse(raw);
+        } catch (error) {
+            console.error("Could not read saved tour:", error);
+            return null;
+        }
+        }
+
+    function getFormatKey(format) {
+        const text = String(format || "").toLowerCase();
+
+        if (text.includes("test")) return "Test";
+        if (text.includes("odi")) return "ODI";
+        return "T20";
+    }
+
     function loadPage() {
-        currentMatch = getStoredTourMatch();
-
+        // Always reload fresh data from localStorage.
+        currentMatch = getCurrentTourMatch();
         if (!currentMatch) {
-        document.getElementById("matchType").textContent = "No match loaded";
-        return;
+            document.getElementById("matchType").textContent = "No match loaded";
+            return;
         }
 
-        document.getElementById("matchType").textContent =
-        `${currentMatch.match?.format || "Match"} • ${currentMatch.match?.title || "Tour Match"}`;
+        const tourSave = getTourSave();
 
-        const squad = Array.isArray(currentMatch.userSquad) ? currentMatch.userSquad : [];
+        const formatKey = getFormatKey(
+            currentMatch.format ||
+            currentMatch.match?.format ||
+            "ODI"
+        );
 
-        if (Array.isArray(currentMatch.selectedUserXI) && currentMatch.selectedUserXI.length) {
-        selectedXI = currentMatch.selectedUserXI.slice(0, 11);
-        } else {
+        const latestFormatSquad = tourSave?.formatSquads?.[formatKey];
+
+        // Important:
+        // Use the newest format squad from cricketTourSetupSave_v1.
+        // Only fall back to currentMatch.userSquad if nothing else exists.
+        const squad = Array.isArray(latestFormatSquad?.userSquad)
+            ? latestFormatSquad.userSquad
+            : Array.isArray(currentMatch.userSquad)
+            ? currentMatch.userSquad
+            : [];
+
+        const computerSquad = Array.isArray(latestFormatSquad?.computerSquad)
+            ? latestFormatSquad.computerSquad
+            : Array.isArray(currentMatch.computerSquad)
+            ? currentMatch.computerSquad
+            : [];
+
+        currentMatch.format = formatKey;
+        currentMatch.userSquad = squad;
+        currentMatch.computerSquad = computerSquad;
+
+        // Reset selected XI from the newest 18-player squad.
+        // This prevents old XI from staying after squad changes.
         selectedXI = pickDefaultXI(squad);
-        }
 
         const selectedKeys = new Set(selectedXI.map(getPlayerKey));
 
         benchPlayers = squad.filter(player => !selectedKeys.has(getPlayerKey(player)));
 
+        document.getElementById("matchType").textContent =
+            `${currentMatch.match?.format || formatKey} • ${currentMatch.match?.title || "Tour Match"}`;
+
         saveDraftXI();
         renderXIPage();
-    }
+        }
 
     function renderXIPage() {
         const selectedList = document.getElementById("selectedXiList");
@@ -928,24 +978,79 @@
 
     function startMatchFromXI() {
         if (!currentMatch) {
-        alert("No match loaded.");
-        return;
+            alert("No match loaded.");
+            return;
         }
 
         if (selectedXI.length !== 11) {
-        alert("You need exactly 11 players in the Selected XI.");
-        return;
+            alert("You need exactly 11 players in the Selected XI.");
+            return;
         }
 
-        currentMatch.selectedUserXI = selectedXI;
-        currentMatch.userBench = benchPlayers;
+        const freshTourSave = getTourSave();
+        const freshCurrentMatch = getCurrentTourMatch();
 
-        currentMatch.selectedComputerXI = Array.isArray(currentMatch.computerSquad)
-        ? pickDefaultXI(currentMatch.computerSquad)
-        : [];
+        const activeFormat = getFormatKey(
+            freshCurrentMatch?.format ||
+            freshCurrentMatch?.match?.format ||
+            currentMatch.format ||
+            currentMatch.match?.format ||
+            "ODI"
+        );
 
-        currentMatch.xiConfirmed = true;
-        currentMatch.xiConfirmedAt = new Date().toISOString();
+        const activeMatchIndex = Number(
+            freshCurrentMatch?.matchIndex ??
+            currentMatch.matchIndex ??
+            0
+        );
+
+        const freshFormatSquad = freshTourSave?.formatSquads?.[activeFormat];
+
+        if (!freshFormatSquad) {
+            alert("Could not find the latest format squad. Go back to Tour Summary and try again.");
+            return;
+        }
+
+        const latestUserSquad = Array.isArray(freshFormatSquad.userSquad)
+            ? freshFormatSquad.userSquad
+            : [];
+
+        const latestComputerSquad = Array.isArray(freshFormatSquad.computerSquad)
+            ? freshFormatSquad.computerSquad
+            : [];
+
+        const latestUserKeys = new Set(latestUserSquad.map(getPlayerKey));
+        const selectedStillValid = selectedXI.every(player => latestUserKeys.has(getPlayerKey(player)));
+
+        if (!selectedStillValid) {
+            alert("Your selected XI used an older squad. The page will reload with the newest squad.");
+            loadPage();
+            return;
+        }
+
+        currentMatch = {
+            ...(freshCurrentMatch || currentMatch),
+
+            matchIndex: activeMatchIndex,
+            format: activeFormat,
+
+            userSquad: latestUserSquad,
+            computerSquad: latestComputerSquad,
+
+            selectedUserXI: selectedXI,
+            userBench: benchPlayers,
+
+            selectedComputerXI: pickDefaultXI(latestComputerSquad),
+
+            battingOrder: selectedXI.map((player, index) => ({
+            position: index + 1,
+            playerId: getPlayerKey(player),
+            name: getPlayerName(player)
+            })),
+
+            xiConfirmed: true,
+            xiConfirmedAt: new Date().toISOString()
+        };
 
         localStorage.setItem("currentTourMatch", JSON.stringify(currentMatch));
 
@@ -956,7 +1061,19 @@
         window.location.href = "index.html";
     }
 
+    let xiPageLoadedOnce = false;
+
+    document.addEventListener("DOMContentLoaded", () => {
+    xiPageLoadedOnce = true;
     loadPage();
+    });
+
+    window.addEventListener("pageshow", (event) => {
+    if (event.persisted || xiPageLoadedOnce) {
+        loadPage();
+    }
+    });
+
     </script>
 </body>
 </html>

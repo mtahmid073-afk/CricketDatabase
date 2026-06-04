@@ -1329,7 +1329,7 @@ function finishSquad() {
 
   saveTourState("summary");
 
-  window.location.href = `select-xi.html?format=${encodeURIComponent(formatKey)}&matchIndex=${encodeURIComponent(matchIndex)}`;
+  window.location.href = `select-xi.html?format=${encodeURIComponent(formatKey)}&matchIndex=${encodeURIComponent(matchIndex)}&v=${Date.now()}`;
 }
 
 function countFormat(format) {
@@ -1774,7 +1774,7 @@ function testComputerSquadPick() {
 
 function selectXIForMatch(matchIndex) {
   const schedule = buildTourSchedule();
-  const match = schedule.find(item => item.matchIndex === matchIndex);
+  const match = schedule.find(item => Number(item.matchIndex) === Number(matchIndex));
 
   if (!match) {
     alert("Match not found.");
@@ -1784,15 +1784,18 @@ function selectXIForMatch(matchIndex) {
   const formatKey = getFormatKey(match.format);
   const formatSquad = getFormatSquad(formatKey);
 
-  if (!formatSquad) {
+  if (!formatSquad || !formatSquad.userSquad?.length || !formatSquad.computerSquad?.length) {
     openOldSquadPickerForFormat(formatKey, matchIndex);
     return;
   }
 
   tourProgress.activeMatchIndex = matchIndex;
 
+  // Important: remove stale match before writing the new one.
+  localStorage.removeItem("currentTourMatch");
+
   const currentMatchData = {
-    matchIndex: matchIndex,
+    matchIndex: Number(matchIndex),
     match: match,
     format: formatKey,
 
@@ -1802,19 +1805,22 @@ function selectXIForMatch(matchIndex) {
     userTeam: state.userTeam,
     computerTeam: state.computerTeam,
 
-    userSquad: formatSquad.userSquad,
-    computerSquad: formatSquad.computerSquad,
+    // Always use latest saved format squad
+    userSquad: [...formatSquad.userSquad],
+    computerSquad: [...formatSquad.computerSquad],
 
+    // Select XI page should start fresh every time
     selectedUserXI: [],
     selectedComputerXI: [],
 
+    toss: null,
     savedAt: new Date().toISOString()
   };
 
   localStorage.setItem("currentTourMatch", JSON.stringify(currentMatchData));
   saveTourState("summary");
 
-  window.location.href = `select-xi.html?format=${encodeURIComponent(formatKey)}&matchIndex=${encodeURIComponent(matchIndex)}`;
+  window.location.href = `select-xi.html?format=${encodeURIComponent(formatKey)}&matchIndex=${encodeURIComponent(matchIndex)}&v=${Date.now()}`;
 }
 
 function renderSummary() {
