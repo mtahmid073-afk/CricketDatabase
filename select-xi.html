@@ -754,22 +754,40 @@
     }
 
     function syncCurrentMatchIdentity(matchData, tourSave, formatKey) {
-        if (!matchData || !tourSave) return matchData;
+        if (!matchData) return matchData;
+
+        /*
+            IMPORTANT:
+            currentTourMatch is the fresh object made by tour.js.
+            tourSave may be stale until the user goes back to Tour Summary.
+            So currentMatch teams must win first.
+        */
+        const userTeam =
+            matchData.userTeam ||
+            matchData.teamA ||
+            tourSave?.userTeam ||
+            "Team A";
+
+        const computerTeam =
+            matchData.computerTeam ||
+            matchData.teamB ||
+            tourSave?.computerTeam ||
+            "Team B";
 
         const freshTitle = buildFreshMatchTitle(
             matchData.match?.title,
-            tourSave.userTeam,
-            tourSave.computerTeam,
+            userTeam,
+            computerTeam,
             formatKey
         );
 
         return {
             ...matchData,
 
-            userTeam: tourSave.userTeam,
-            computerTeam: tourSave.computerTeam,
-            teamA: tourSave.userTeam,
-            teamB: tourSave.computerTeam,
+            userTeam,
+            computerTeam,
+            teamA: userTeam,
+            teamB: computerTeam,
 
             match: {
             ...(matchData.match || {}),
@@ -778,6 +796,32 @@
             }
         };
     }
+
+    function getMatchingFormatSquad(tourSave, matchData, formatKey) {
+        if (!tourSave || !matchData) return null;
+
+        const currentUserTeam =
+            matchData.userTeam ||
+            matchData.teamA ||
+            "";
+
+        const currentComputerTeam =
+            matchData.computerTeam ||
+            matchData.teamB ||
+            "";
+
+        /*
+            Only trust tourSave.formatSquads if tourSave belongs to the same teams.
+            If not, use currentTourMatch.userSquad/currentTourMatch.computerSquad.
+        */
+        const teamsMatch =
+            (!currentUserTeam || tourSave.userTeam === currentUserTeam) &&
+            (!currentComputerTeam || tourSave.computerTeam === currentComputerTeam);
+
+        if (!teamsMatch) return null;
+
+        return tourSave.formatSquads?.[formatKey] || null;
+        }
 
     function loadPage() {
         // Always reload fresh data from localStorage.
@@ -796,8 +840,7 @@
         );
         currentMatch = syncCurrentMatchIdentity(currentMatch, tourSave, formatKey);
 
-        const latestFormatSquad = tourSave?.formatSquads?.[formatKey];
-
+        const latestFormatSquad = getMatchingFormatSquad(tourSave, currentMatch, formatKey);
         // Important:
         // Use the newest format squad from cricketTourSetupSave_v1.
         // Only fall back to currentMatch.userSquad if nothing else exists.
@@ -1047,20 +1090,39 @@
             0
         );
 
-        const freshFormatSquad = freshTourSave?.formatSquads?.[activeFormat];
+       
+       const freshFormatSquad = getMatchingFormatSquad(
+            freshTourSave,
+            freshCurrentMatch || currentMatch,
+            activeFormat
+            );
 
-        if (!freshFormatSquad) {
-            alert("Could not find the latest format squad. Go back to Tour Summary and try again.");
-            return;
-        }
-
-        const latestUserSquad = Array.isArray(freshFormatSquad.userSquad)
+            /*
+            Use matching tourSave squad only if valid.
+            Otherwise, use the squad already loaded into currentTourMatch.
+            */
+        const latestUserSquad = Array.isArray(freshFormatSquad?.userSquad)
             ? freshFormatSquad.userSquad
+            : Array.isArray(freshCurrentMatch?.userSquad)
+            ? freshCurrentMatch.userSquad
+            : Array.isArray(currentMatch?.userSquad)
+            ? currentMatch.userSquad
             : [];
 
-        const latestComputerSquad = Array.isArray(freshFormatSquad.computerSquad)
+        const latestComputerSquad = Array.isArray(freshFormatSquad?.computerSquad)
             ? freshFormatSquad.computerSquad
+            : Array.isArray(freshCurrentMatch?.computerSquad)
+            ? freshCurrentMatch.computerSquad
+            : Array.isArray(currentMatch?.computerSquad)
+            ? currentMatch.computerSquad
             : [];
+
+        if (latestUserSquad.length < 11 || latestComputerSquad.length < 11) {
+            alert("Could not find enough players for this match. Go back to Tour Summary and select the format squad again.");
+            return;
+        } 
+
+
 
         const latestUserKeys = new Set(latestUserSquad.map(getPlayerKey));
         const selectedStillValid = selectedXI.every(player => latestUserKeys.has(getPlayerKey(player)));
