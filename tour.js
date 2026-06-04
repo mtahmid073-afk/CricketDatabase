@@ -191,6 +191,15 @@ function loadPlayersFromData(rawData, sourceLabel = "JSON file") {
   state.userSquad = [];
   state.computerSquad = [];
 
+  state.formatSquads = {
+    Test: null,
+    ODI: null,
+    T20: null
+  };
+
+  state.activeSquadFormat = null;
+  state.activeSquadMatchIndex = null;
+
   fillTeamDropdowns();
 
   const restored = restoreTourStateAfterDataLoad();
@@ -337,7 +346,6 @@ function isPlayerEligibleForFormat(player, format) {
   const formatKey = String(format || "").toLowerCase();
   const nationalFormats = player.nationalFormats || player.formats || null;
 
-  // If JSON does not have nationalFormats, don't block the player.
   if (!nationalFormats) return true;
 
   if (formatKey === "test") {
@@ -365,6 +373,18 @@ function isPlayerEligibleForFormat(player, format) {
   }
 
   return true;
+}
+
+function formatTeamPlayers(team, format) {
+  const allTeamPlayers = teamPlayers(team);
+
+  if (!format) return allTeamPlayers;
+
+  const eligiblePlayers = allTeamPlayers.filter(player =>
+    isPlayerEligibleForFormat(player, format)
+  );
+
+  return eligiblePlayers.length >= 11 ? eligiblePlayers : allTeamPlayers;
 }
 
 function formatTeamPlayers(team, format) {
@@ -635,7 +655,7 @@ function createSeries() {
   state.computerTeam = computer;
   state.series = makeMatches(tests, odis, t20s);
 
-  // No squad selection here anymore
+  // No squad selection here anymore.
   state.userSquad = [];
   state.computerSquad = [];
 
@@ -1136,11 +1156,17 @@ function openOldSquadPickerForFormat(format, matchIndex) {
   state.activeSquadFormat = formatKey;
   state.activeSquadMatchIndex = matchIndex;
 
-  // Load existing selected format squad into old picker if it exists
-  state.userSquad = existingFormatSquad?.userSquad ? [...existingFormatSquad.userSquad] : [];
+  state.userSquad = existingFormatSquad?.userSquad
+    ? [...existingFormatSquad.userSquad]
+    : [];
 
-  // Computer squad gets saved only when user finishes this format squad
-  state.computerSquad = existingFormatSquad?.computerSquad ? [...existingFormatSquad.computerSquad] : [];
+  state.computerSquad = existingFormatSquad?.computerSquad
+    ? [...existingFormatSquad.computerSquad]
+    : [];
+
+  if ($("formatSquadTitle")) {
+    $("formatSquadTitle").textContent = `Select ${state.userTeam} ${formatKey} Squad`;
+  }
 
   $("searchBox").value = "";
   $("roleFilter").value = "all";
@@ -1296,12 +1322,12 @@ function finishSquad() {
     selectedAt: new Date().toISOString()
   };
 
-  saveTourState("summary");
-
   const matchIndex = state.activeSquadMatchIndex;
 
   state.activeSquadFormat = null;
   state.activeSquadMatchIndex = null;
+
+  saveTourState("summary");
 
   window.location.href = `select-xi.html?format=${encodeURIComponent(formatKey)}&matchIndex=${encodeURIComponent(matchIndex)}`;
 }
@@ -1848,6 +1874,12 @@ function getTourPayload() {
       matches: state.series
     },
     schedule: buildTourSchedule(),
+    formatSquads: state.formatSquads,
+    activeSquadFormat: state.activeSquadFormat,
+    activeSquadMatchIndex: state.activeSquadMatchIndex,
+    tourProgress,
+
+    // Temporary holders used by the old squad picker screen.
     userSquad: state.userSquad,
     computerSquad: state.computerSquad
   };
@@ -1866,6 +1898,20 @@ function resetAll() {
   state.series = [];
   state.userSquad = [];
   state.computerSquad = [];
+
+  state.formatSquads = {
+    Test: null,
+    ODI: null,
+    T20: null
+  };
+
+  state.activeSquadFormat = null;
+  state.activeSquadMatchIndex = null;
+
+  tourProgress = {
+    completedMatchIndexes: [],
+    activeMatchIndex: null
+  };
 
   currentScreenName = "setup";
 

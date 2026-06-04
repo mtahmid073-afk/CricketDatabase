@@ -354,11 +354,13 @@ function buildMatchDataFromStorage() {
     "Team B";
 
   const userSquad =
+    stored.selectedUserXI ||
     stored.userSquad ||
     savedTour?.userSquad ||
     [];
 
   const computerSquad =
+    stored.selectedComputerXI ||
     stored.computerSquad ||
     savedTour?.computerSquad ||
     [];

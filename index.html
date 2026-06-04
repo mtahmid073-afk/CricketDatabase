@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cricket Tour Setup - JSON Ready</title>
-  <link rel="stylesheet" href="tour.css?v=1033" />
+  <link rel="stylesheet" href="tour.css?v=1034" />
 </head>
 <body class="app-loading main-page">
   <main class="page">
@@ -124,7 +124,7 @@
           </div>
 
           <div class="actions">
-            <button onclick="createSeries()">Create Series & Choose Squad</button>
+            <button onclick="createSeries()">Create Series</button>
           </div>
 
           <div id="setupMsg" class="message error"></div>
@@ -140,7 +140,7 @@
       <pre id="computerSquadTestOut"></pre>
       <div class="topline">
         <div>
-          <h2>Select Tour Squad</h2>
+          <h2 id="formatSquadTitle">Select Format Squad</h2>
         </div>
 
         <button class="secondary" onclick="showScreen('setup')">Back to Setup</button>
@@ -179,7 +179,7 @@
             </div>
 
             <div class="actions">
-              <button id="summaryBtn" onclick="finishSquad()" disabled>Continue to Summary</button>
+              <button id="summaryBtn" onclick="finishSquad()" disabled>Save Squad</button>
               <button class="secondary" onclick="clearSquad()">Clear</button>
             </div>
 
@@ -263,7 +263,7 @@
         </div>
 
         <div class="schedule-actions">
-          <button class="secondary" onclick="showScreen('squad')">Back to Squad</button>
+          <button class="secondary" onclick="showScreen('setup')">Back to setup</button>
           <button onclick="copyJson()">Copy Tour JSON</button>
           <button class="secondary" onclick="resetAll()">Start Over</button>
         </div>
@@ -295,6 +295,6 @@
     </section>
   </main>
 
-  <script src="tour.js?v=1033"></script>
+  <script src="tour.js?v=1034"></script>
 </body>
 </html>
