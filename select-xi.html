@@ -1054,7 +1054,8 @@
 
         localStorage.setItem("currentTourMatch", JSON.stringify(currentMatch));
 
-        window.location.href = "toss.html";
+        localStorage.removeItem("currentTossResult");
+        window.location.href = `toss.html?v=${Date.now()}`;
     }
 
     function goBackToSummary() {

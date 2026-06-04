@@ -292,7 +292,7 @@ function getVenueData(match, userTeam) {
 }
 
 function buildMatchDataFromStorage() {
-  const stored = getStoredTourMatch();
+  const stored = currentTourMatch || getStoredTourMatch();
   const savedTour = getStoredTourSave();
 
   if (!stored) {
@@ -398,8 +398,8 @@ function buildMatchDataFromStorage() {
   };
 }
 
-let currentTourMatch = getStoredTourMatch();
-const matchData = buildMatchDataFromStorage();
+let currentTourMatch = null;
+let matchData = null;
 
 let userCall = "Heads";
 let tossWinner = "";
@@ -631,6 +631,11 @@ function pctWidth(value) {
 }
 
 function loadMatchData() {
+  if (!matchData) {
+    currentTourMatch = getStoredTourMatch();
+    matchData = buildMatchDataFromStorage();
+  }
+
   safeText("matchType", matchData.matchType);
 
   safeText("teamAName", matchData.teamA.name);
@@ -939,7 +944,17 @@ window.addEventListener("resize", () => {
   }, 150);
 });
 
-loadMatchData();
-setupCanvas();
-setFinalFace("Heads");
-resetTossUI();
+function bootTossPage() {
+  // Always pull the newest match after Select XI writes currentTourMatch.
+  currentTourMatch = getStoredTourMatch();
+  matchData = buildMatchDataFromStorage();
+
+  loadMatchData();
+  setupCanvas();
+  setFinalFace("Heads");
+  resetTossUI();
+}
+
+window.addEventListener("pageshow", () => {
+  bootTossPage();
+});
