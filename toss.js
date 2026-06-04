@@ -142,6 +142,67 @@ function getTeamShortName(teamName) {
     .toUpperCase();
 }
 
+const TEAM_LOGOS = {
+  Afghanistan: "assets/team-logos/afghanistan.png",
+  Australia: "assets/team-logos/australia.png",
+  Bangladesh: "assets/team-logos/bangladesh.png",
+  Canada: "assets/team-logos/canada.png",
+  England: "assets/team-logos/england.png",
+  India: "assets/team-logos/india.png",
+  Ireland: "assets/team-logos/ireland.png",
+  Namibia: "assets/team-logos/namibia.png",
+  Nepal: "assets/team-logos/nepal.png",
+  Netherlands: "assets/team-logos/netherlands.png",
+  "New Zealand": "assets/team-logos/new-zealand.png",
+  Oman: "assets/team-logos/oman.png",
+  Pakistan: "assets/team-logos/pakistan.png",
+  Scotland: "assets/team-logos/scotland.png",
+  "South Africa": "assets/team-logos/south-africa.png",
+  "Sri Lanka": "assets/team-logos/sri-lanka.png",
+  "United Arab Emirates": "assets/team-logos/united-arab-emirates.png",
+  "United States of America": "assets/team-logos/united-states-of-america.png",
+  "West Indies": "assets/team-logos/west-indies.png",
+  Zimbabwe: "assets/team-logos/zimbabwe.png"
+};
+
+function escapeLogoText(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function renderTeamBadge(elementId, teamName, shortName, away = false) {
+  const badge = document.getElementById(elementId);
+
+  if (!badge) return;
+
+  const logoPath = TEAM_LOGOS[teamName];
+
+  badge.classList.toggle("away", !!away);
+
+  if (!logoPath) {
+    badge.textContent = shortName || "TM";
+    return;
+  }
+
+  badge.innerHTML = `
+    <img
+      class="team-badge-logo"
+      src="${escapeLogoText(logoPath)}"
+      alt="${escapeLogoText(teamName)} logo"
+    >
+  `;
+
+  const img = badge.querySelector("img");
+
+  img.onerror = () => {
+    badge.textContent = shortName || "TM";
+  };
+}
+
 function getPlayerName(player) {
   return player?.name || player?.fullName || "Captain";
 }
@@ -670,7 +731,7 @@ function loadMatchData() {
 
   safeText("teamAName", matchData.teamA.name);
   safeText("teamASub", matchData.teamA.sub);
-  safeText("teamABadge", matchData.teamA.short);
+  renderTeamBadge("teamABadge", matchData.teamA.name, matchData.teamA.short, false);
   safeText("teamACaptain", matchData.teamA.captain);
   safeText("teamABat", matchData.teamA.bat);
   safeText("teamABowl", matchData.teamA.bowl);
@@ -683,7 +744,7 @@ function loadMatchData() {
 
   safeText("teamBName", matchData.teamB.name);
   safeText("teamBSub", matchData.teamB.sub);
-  safeText("teamBBadge", matchData.teamB.short);
+  renderTeamBadge("teamBBadge", matchData.teamB.name, matchData.teamB.short, true);
   safeText("teamBCaptain", matchData.teamB.captain);
   safeText("teamBBat", matchData.teamB.bat);
   safeText("teamBBowl", matchData.teamB.bowl);
