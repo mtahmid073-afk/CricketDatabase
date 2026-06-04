@@ -290,8 +290,20 @@ const state = {
   userTeam: "",
   computerTeam: "",
   series: [],
+
+  // Used temporarily by the old squad picker screen
   userSquad: [],
-  computerSquad: []
+  computerSquad: [],
+
+  // New format-based saved squads
+  formatSquads: {
+    Test: null,
+    ODI: null,
+    T20: null
+  },
+
+  activeSquadFormat: null,
+  activeSquadMatchIndex: null
 };
 
 let squadSort = {
@@ -319,6 +331,55 @@ const uniqueTeams = () =>
   [...new Set(PLAYER_DATA.map(p => p.nationality).filter(Boolean))].sort();
 
 const teamPlayers = team => PLAYER_DATA.filter(p => p.nationality === team);
+
+
+function isPlayerEligibleForFormat(player, format) {
+  const formatKey = String(format || "").toLowerCase();
+  const nationalFormats = player.nationalFormats || player.formats || null;
+
+  // If JSON does not have nationalFormats, don't block the player.
+  if (!nationalFormats) return true;
+
+  if (formatKey === "test") {
+    return (
+      nationalFormats.test === true ||
+      nationalFormats.Test === true ||
+      nationalFormats.TEST === true
+    );
+  }
+
+  if (formatKey === "odi") {
+    return (
+      nationalFormats.odi === true ||
+      nationalFormats.ODI === true
+    );
+  }
+
+  if (formatKey === "t20") {
+    return (
+      nationalFormats.t20 === true ||
+      nationalFormats.T20 === true ||
+      nationalFormats.t20i === true ||
+      nationalFormats.T20I === true
+    );
+  }
+
+  return true;
+}
+
+function formatTeamPlayers(team, format) {
+  const allTeamPlayers = teamPlayers(team);
+
+  if (!format) return allTeamPlayers;
+
+  const eligiblePlayers = allTeamPlayers.filter(player =>
+    isPlayerEligibleForFormat(player, format)
+  );
+
+  // If too few eligible players exist, fallback to all team players.
+  return eligiblePlayers.length >= 11 ? eligiblePlayers : allTeamPlayers;
+}
+
 
 const esc = v =>
   String(v ?? "")
@@ -573,26 +634,27 @@ function createSeries() {
   state.userTeam = user;
   state.computerTeam = computer;
   state.series = makeMatches(tests, odis, t20s);
+
+  // No squad selection here anymore
   state.userSquad = [];
-  state.computerSquad = autoPickComputerSquad(computer);
-  saveTourState("squad");
+  state.computerSquad = [];
 
-  $("searchBox").value = "";
-  $("roleFilter").value = "all";
-  $("sortBy").value = "overall";
-
-  squadSort = {
-    key: "overall",
-    direction: "desc"
+  state.formatSquads = {
+    Test: null,
+    ODI: null,
+    T20: null
   };
 
-  let tourProgress = {
+  state.activeSquadFormat = null;
+  state.activeSquadMatchIndex = null;
+
+  tourProgress = {
     completedMatchIndexes: [],
     activeMatchIndex: null
   };
 
-  renderPlayerTable();
-  showScreen("squad");
+  saveTourState("summary");
+  showScreen("summary");
 }
 
 /* =========================================================
@@ -787,8 +849,10 @@ function addBestPlayersFromPool(squad, usedKeys, pool, needed) {
   }
 }
 
-function autoPickComputerSquad(team) {
-  const selectedFormats = getSelectedNationalFormats();
+function autoPickComputerSquad(team, forcedFormat = null) {
+  const selectedFormats = forcedFormat
+    ? [String(forcedFormat).toLowerCase()]
+    : getSelectedNationalFormats();
 
   const allTeamPlayers = teamPlayers(team);
 
@@ -1065,6 +1129,32 @@ function setSquadSortFromDropdown() {
   renderPlayerTable();
 }
 
+function openOldSquadPickerForFormat(format, matchIndex) {
+  const formatKey = getFormatKey(format);
+  const existingFormatSquad = getFormatSquad(formatKey);
+
+  state.activeSquadFormat = formatKey;
+  state.activeSquadMatchIndex = matchIndex;
+
+  // Load existing selected format squad into old picker if it exists
+  state.userSquad = existingFormatSquad?.userSquad ? [...existingFormatSquad.userSquad] : [];
+
+  // Computer squad gets saved only when user finishes this format squad
+  state.computerSquad = existingFormatSquad?.computerSquad ? [...existingFormatSquad.computerSquad] : [];
+
+  $("searchBox").value = "";
+  $("roleFilter").value = "all";
+  $("sortBy").value = "overall";
+
+  squadSort = {
+    key: "overall",
+    direction: "desc"
+  };
+
+  saveTourState("squad");
+  showScreen("squad");
+}
+
 function renderPlayerTable() {
   hideMsg("squadMsg");
 
@@ -1072,7 +1162,7 @@ function renderPlayerTable() {
   const role = $("roleFilter").value;
   const ids = selectedSet();
 
-  let list = teamPlayers(state.userTeam);
+  let list = formatTeamPlayers(state.userTeam, state.activeSquadFormat);
 
   if (role !== "all") {
     list = list.filter(p => p.role === role);
@@ -1096,7 +1186,7 @@ function renderPlayerTable() {
         ? "chip bad"
         : "chip good";
 
-  $("availableChip").innerHTML = `<span>Available</span><b>${teamPlayers(state.userTeam).length}</b>`;
+  $("availableChip").innerHTML = `<span>Available</span><b>${formatTeamPlayers(state.userTeam, state.activeSquadFormat).length}</b>`;
   $("summaryBtn").disabled = state.userSquad.length < 12 || state.userSquad.length > 18;
 
   if (!list.length) {
@@ -1179,10 +1269,10 @@ function clearSquad() {
 function finishSquad() {
   hideMsg("squadMsg");
 
-  if (state.userSquad.length < 12) {
+  if (state.userSquad.length < 11) {
     return showMsg(
       "squadMsg",
-      `Pick at least 12 players. You currently have ${state.userSquad.length}.`
+      `Pick at least 11 players. You currently have ${state.userSquad.length}.`
     );
   }
 
@@ -1190,7 +1280,30 @@ function finishSquad() {
     return showMsg("squadMsg", "Maximum 18 players allowed.");
   }
 
-  showScreen("summary");
+  if (!state.activeSquadFormat) {
+    return showMsg("squadMsg", "No active format found. Go back to the tour summary and try again.");
+  }
+
+  ensureFormatSquads();
+
+  const formatKey = getFormatKey(state.activeSquadFormat);
+
+  state.computerSquad = autoPickComputerSquad(state.computerTeam, formatKey);
+
+  state.formatSquads[formatKey] = {
+    userSquad: [...state.userSquad],
+    computerSquad: [...state.computerSquad],
+    selectedAt: new Date().toISOString()
+  };
+
+  saveTourState("summary");
+
+  const matchIndex = state.activeSquadMatchIndex;
+
+  state.activeSquadFormat = null;
+  state.activeSquadMatchIndex = null;
+
+  window.location.href = `select-xi.html?format=${encodeURIComponent(formatKey)}&matchIndex=${encodeURIComponent(matchIndex)}`;
 }
 
 function countFormat(format) {
@@ -1387,32 +1500,106 @@ function getNextPlayableMatchIndex(schedule) {
   return null;
 }
 
-function renderScheduleMatch(match, nextPlayableMatchIndex) {
-  const formatClass = match.format.toLowerCase();
+function ensureFormatSquads() {
+  if (!state.formatSquads) {
+    state.formatSquads = {
+      Test: null,
+      ODI: null,
+      T20: null
+    };
+  }
+
+  ["Test", "ODI", "T20"].forEach(format => {
+    if (state.formatSquads[format] === undefined) {
+      state.formatSquads[format] = null;
+    }
+  });
+}
+
+function getFormatKey(format) {
+  const text = String(format || "").toLowerCase();
+
+  if (text.includes("test")) return "Test";
+  if (text.includes("odi")) return "ODI";
+  return "T20";
+}
+
+function getFormatSquad(format) {
+  ensureFormatSquads();
+  return state.formatSquads[getFormatKey(format)] || null;
+}
+
+function isFormatSquadReady(format) {
+  const formatSquad = getFormatSquad(format);
+
+  const userCount = formatSquad?.userSquad?.length || 0;
+  const computerCount = formatSquad?.computerSquad?.length || 0;
+
+  return userCount >= 11 && computerCount >= 11;
+}
+
+function getMatchActionLabel(match) {
+  return isFormatSquadReady(match.format) ? "Select XI" : "Select Squad";
+}
+
+function handleMatchAction(matchIndex) {
+  const schedule = buildTourSchedule();
+  const match = schedule.find(item => item.matchIndex === matchIndex);
+
+  if (!match) {
+    alert("Match not found.");
+    return;
+  }
+
+  const nextPlayableMatchIndex = getNextPlayableMatchIndex(schedule);
+
+  if (match.matchIndex !== nextPlayableMatchIndex) {
+    alert("You must finish the previous match first.");
+    return;
+  }
+
+  if (!isFormatSquadReady(match.format)) {
+    openOldSquadPickerForFormat(match.format, match.matchIndex);
+    return;
+  }
+
+  selectXIForMatch(match.matchIndex);
+}
+
+function getMatchActionButton(match, nextPlayableMatchIndex) {
   const isCompleted = tourProgress.completedMatchIndexes.includes(match.matchIndex);
   const isPlayable = match.matchIndex === nextPlayableMatchIndex && !isCompleted;
 
-  let buttonHTML = "";
-
   if (isCompleted) {
-    buttonHTML = `
+    return `
       <button class="match-action-btn completed" disabled>
         Completed
       </button>
     `;
-  } else if (isPlayable) {
-    buttonHTML = `
-      <button class="match-action-btn start" onclick="selectXIForMatch(${match.matchIndex})">
-        Select XI
-      </button>
-    `;
-  } else {
-    buttonHTML = `
+  }
+
+  if (!isPlayable) {
+    return `
       <button class="match-action-btn locked" disabled>
         Yet to Start
       </button>
     `;
   }
+
+  return `
+    <button class="match-action-btn start" onclick="handleMatchAction(${match.matchIndex})">
+      ${getMatchActionLabel(match)}
+    </button>
+  `;
+}
+
+
+function renderScheduleMatch(match, nextPlayableMatchIndex) {
+  const formatClass = match.format.toLowerCase();
+  const isCompleted = tourProgress.completedMatchIndexes.includes(match.matchIndex);
+  const isPlayable = match.matchIndex === nextPlayableMatchIndex && !isCompleted;
+
+  const buttonHTML = getMatchActionButton(match, nextPlayableMatchIndex);
 
   return `
     <div class="schedule-match-card compact-match-card">
@@ -1568,11 +1755,20 @@ function selectXIForMatch(matchIndex) {
     return;
   }
 
+  const formatKey = getFormatKey(match.format);
+  const formatSquad = getFormatSquad(formatKey);
+
+  if (!formatSquad) {
+    openOldSquadPickerForFormat(formatKey, matchIndex);
+    return;
+  }
+
   tourProgress.activeMatchIndex = matchIndex;
 
   const currentMatchData = {
     matchIndex: matchIndex,
     match: match,
+    format: formatKey,
 
     teamA: state.userTeam,
     teamB: state.computerTeam,
@@ -1580,8 +1776,8 @@ function selectXIForMatch(matchIndex) {
     userTeam: state.userTeam,
     computerTeam: state.computerTeam,
 
-    userSquad: state.userSquad,
-    computerSquad: state.computerSquad,
+    userSquad: formatSquad.userSquad,
+    computerSquad: formatSquad.computerSquad,
 
     selectedUserXI: [],
     selectedComputerXI: [],
@@ -1592,7 +1788,7 @@ function selectXIForMatch(matchIndex) {
   localStorage.setItem("currentTourMatch", JSON.stringify(currentMatchData));
   saveTourState("summary");
 
-  window.location.href = "select-xi.html";
+  window.location.href = `select-xi.html?format=${encodeURIComponent(formatKey)}&matchIndex=${encodeURIComponent(matchIndex)}`;
 }
 
 function renderSummary() {
@@ -1608,7 +1804,19 @@ function renderSummary() {
   $("scheduleSubTitle").textContent = `${state.userTeam} vs ${state.computerTeam} official tour schedule`;
   $("tourTeamSummary").textContent = `${state.userTeam} vs ${state.computerTeam}`;
   $("tourMatchSummary").textContent = `${tests} Test • ${odis} ODI • ${t20s} T20`;
-  $("tourSquadSummary").textContent = `${state.userSquad.length} user squad • ${state.computerSquad.length} computer squad`;
+
+  ensureFormatSquads();
+
+  const squadStatus = ["Test", "ODI", "T20"]
+    .filter(format => countFormat(format) > 0)
+    .map(format => {
+      const ready = isFormatSquadReady(format);
+      return `${format}: ${ready ? "Squad selected" : "No squad"}`;
+    })
+    .join(" • ");
+
+  $("tourSquadSummary").textContent = squadStatus || "No format squads selected";
+
 
   $("scheduleList").innerHTML = Object.entries(grouped).map(([dateLabel, matches]) => {
     const matchesHTML = matches.map((match) => {
@@ -1697,7 +1905,10 @@ function saveTourState(screenName = currentScreenName) {
     userSquadIds: state.userSquad.map(player => String(player.id)),
     computerSquadIds: state.computerSquad.map(player => String(player.id)),
     squadSort,
-    tourProgress
+    tourProgress,
+    formatSquads: state.formatSquads,
+    activeSquadFormat: state.activeSquadFormat,
+    activeSquadMatchIndex: state.activeSquadMatchIndex
   };
 
   localStorage.setItem(TOUR_STORAGE_KEY, JSON.stringify(saveData));
@@ -1752,12 +1963,26 @@ function restoreTourStateAfterDataLoad() {
     if (saved.tourProgress) {
       tourProgress = saved.tourProgress;
     }
+    if (saved.formatSquads) {
+      state.formatSquads = saved.formatSquads;
+    } else {
+      state.formatSquads = {
+        Test: null,
+        ODI: null,
+        T20: null
+      };
+    }
+
+    state.activeSquadFormat = saved.activeSquadFormat || null;
+    state.activeSquadMatchIndex = saved.activeSquadMatchIndex ?? null;
+
+    ensureFormatSquads();
 
     updateTeamCards();
 
     const savedScreen = saved.currentScreen || "setup";
 
-    if (savedScreen === "summary" && state.series.length && state.userSquad.length >= 12) {
+    if (savedScreen === "summary" && state.series.length) {
       showScreen("summary", false);
       return true;
     }
