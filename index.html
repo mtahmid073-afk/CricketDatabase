@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cricket Tour Setup - JSON Ready</title>
-  <link rel="stylesheet" href="tour.css?v=1046" />
+  <link rel="stylesheet" href="tour.css?v=1047" />
 </head>
 <body class="app-loading main-page">
   <main class="page">
@@ -187,14 +187,9 @@
                 <option value="wicket-keeper">Wicket-keepers</option>
               </select>
 
-              <select id="sortBy" onchange="setSquadSortFromDropdown()">
-                <option value="overall">Sort by overall</option>
-                <option value="batting">Sort by batting</option>
-                <option value="bowling">Sort by bowling</option>
-                <option value="fielding">Sort by fielding</option>
-                <option value="stamina">Sort by stamina</option>
-                <option value="name">Sort by name</option>
-              </select>
+              <button type="button" class="auto-user-squad-btn" onclick="autoPickUserSquad()">
+                Auto Pick Squad
+              </button>
             </div>
 
             <div class="actions">
@@ -314,6 +309,6 @@
     </section>
   </main>
 
-  <script src="tour.js?v=1046"></script>
+  <script src="tour.js?v=1047"></script>
 </body>
 </html>

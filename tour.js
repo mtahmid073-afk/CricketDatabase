@@ -1198,7 +1198,11 @@ function setupSquadSortButtons() {
 }
 
 function setSquadSortFromDropdown() {
-  const selectedSort = $("sortBy").value;
+  const sortDropdown = $("sortBy");
+
+  if (!sortDropdown) return;
+
+  const selectedSort = sortDropdown.value;
 
   squadSort.key = selectedSort;
 
@@ -1232,7 +1236,9 @@ function openOldSquadPickerForFormat(format, matchIndex) {
 
   $("searchBox").value = "";
   $("roleFilter").value = "all";
-  $("sortBy").value = "overall";
+  if ($("sortBy")) {
+    $("sortBy").value = "overall";
+  }
 
   squadSort = {
     key: "overall",
@@ -1242,6 +1248,42 @@ function openOldSquadPickerForFormat(format, matchIndex) {
   saveTourState("squad");
   showScreen("squad");
 }
+
+function autoPickUserSquad() {
+  hideMsg("squadMsg");
+
+  if (!state.userTeam) {
+    return showMsg("squadMsg", "Choose a user team first.");
+  }
+
+  if (!state.activeSquadFormat) {
+    return showMsg("squadMsg", "No active format found. Go back to Tour Summary and choose Select Squad.");
+  }
+
+  const formatKey = getFormatKey(state.activeSquadFormat);
+
+  /*
+    Reuses the same balanced squad picker logic:
+    7 batsmen, 2 wicketkeepers, 4 all-rounders, 5 bowlers when available.
+  */
+  const pickedSquad = autoPickComputerSquad(state.userTeam, formatKey);
+
+  if (!pickedSquad.length) {
+    return showMsg("squadMsg", `Could not auto pick players for ${state.userTeam}.`);
+  }
+
+  state.userSquad = pickedSquad.slice(0, 18);
+
+  renderPlayerTable();
+  saveTourState("squad");
+
+  showMsg(
+    "squadMsg",
+    `Auto picked ${state.userSquad.length} ${formatKey} players for ${state.userTeam}. You can still edit the squad before saving.`,
+    false
+  );
+}
+
 
 function renderPlayerTable() {
   hideMsg("squadMsg");
