@@ -763,37 +763,57 @@
     background: rgba(34, 197, 94, 0.22);
     }
 
-    /* Small captain / WK labels on cards */
+    /* Prominent C / WK badges beside player name */
 
-    .xi-role-tag-row {
+    .xi-player-name-row {
     display: flex;
-    gap: 6px;
-    margin-top: 5px;
+    align-items: center;
+    gap: 8px;
     flex-wrap: wrap;
     }
 
+    .xi-player-name-row strong {
+    line-height: 1.1;
+    }
+
     .xi-role-tag {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 28px;
-    height: 20px;
-    padding: 0 7px;
+    display: inline-grid;
+    place-items: center;
+    min-width: 36px;
+    height: 28px;
+    padding: 0 9px;
     border-radius: 999px;
-    font-size: 0.68rem;
+    font-size: 0.82rem;
     font-weight: 1000;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.30);
     }
 
     .xi-role-tag.captain {
-    background: rgba(246, 196, 83, 0.18);
-    border: 1px solid rgba(246, 196, 83, 0.45);
-    color: #f6c453;
+    background: linear-gradient(135deg, #facc15, #fb923c);
+    border: 1px solid rgba(255, 237, 213, 0.70);
+    color: #1c0a00;
     }
 
     .xi-role-tag.keeper {
-    background: rgba(56, 189, 248, 0.16);
-    border: 1px solid rgba(56, 189, 248, 0.45);
-    color: #38bdf8;
+    background: linear-gradient(135deg, #38bdf8, #2563eb);
+    border: 1px solid rgba(191, 219, 254, 0.70);
+    color: #f8fafc;
+    }
+
+    .player-option-actions button:first-child {
+        background: linear-gradient(135deg, #facc15, #fb923c) !important;
+        color: #1c0a00 !important;
+        border-color: rgba(255, 237, 213, 0.65) !important;
+    }
+
+    .player-option-actions button:nth-child(2) {
+        background: linear-gradient(135deg, #38bdf8, #2563eb) !important;
+        color: white !important;
+        border-color: rgba(191, 219, 254, 0.65) !important;
     }
   </style>
 </head>
@@ -864,7 +884,6 @@
         <div class="player-option-actions">
         <button onclick="makeSelectedPlayerCaptain()">Make Captain</button>
         <button onclick="makeSelectedPlayerWicketkeeper()">Set Wicketkeeper</button>
-        <button onclick="moveSelectedPlayerToBench()">Move to Bench</button>
         </div>
     </div>
     </div>
@@ -1261,9 +1280,7 @@
             ? `<span class="xi-role-tag keeper">WK</span>`
             : "";
 
-        const tagRow = captainTag || keeperTag
-            ? `<div class="xi-role-tag-row">${captainTag}${keeperTag}</div>`
-            : "";
+        const nameTags = `${captainTag}${keeperTag}`;
 
         return `
             <div
@@ -1280,15 +1297,17 @@
             ${rankHtml}
 
             <div class="xi-player-main">
-                <strong>${getPlayerName(player)}</strong>
+                <div class="xi-player-name-row">
+                    <strong>${getPlayerName(player)}</strong>
+                    ${nameTags}
+                </div>
+
                 <span>${role} • ${player.battingHand || "-"} hand bat • ${player.bowlingStyle || "Does Not Bowl"}</span>
-                ${tagRow}
             </div>
 
             <div class="xi-player-rating">
                 <div>Bat ${getBat(player)}</div>
                 <div>Bowl ${getBowl(player)}</div>
-                <div>Fld ${getField(player)}</div>
             </div>
             </div>
         `;
@@ -1328,6 +1347,11 @@
     function makeSelectedPlayerCaptain() {
         if (!selectedOptionPlayer) return;
 
+        if (selectedOptionListName !== "selected") {
+            alert("Captain must be in the selected XI.");
+            return;
+        }
+
         captainPlayerId = getPlayerKey(selectedOptionPlayer);
 
         saveDraftXI();
@@ -1338,37 +1362,18 @@
     function makeSelectedPlayerWicketkeeper() {
         if (!selectedOptionPlayer) return;
 
+        if (selectedOptionListName !== "selected") {
+            alert("Wicketkeeper must be in the selected XI.");
+            return;
+        }
+
         wicketkeeperPlayerId = getPlayerKey(selectedOptionPlayer);
 
         saveDraftXI();
         renderXIPage();
         closePlayerOptionModal();
-        }
-
-    function moveSelectedPlayerToBench() {
-        if (!selectedOptionPlayer || selectedOptionListName !== "selected") {
-            closePlayerOptionModal();
-            return;
-        }
-
-        if (selectedXI.length <= 11 && benchPlayers.length === 0) {
-            alert("No bench player available.");
-            return;
-        }
-
-        const [movedPlayer] = selectedXI.splice(selectedOptionIndex, 1);
-        benchPlayers.push(movedPlayer);
-
-        const movedId = getPlayerKey(movedPlayer);
-
-        if (captainPlayerId === movedId) captainPlayerId = null;
-        if (wicketkeeperPlayerId === movedId) wicketkeeperPlayerId = null;
-
-        saveDraftXI();
-        renderXIPage();
-        closePlayerOptionModal();
     }
-
+   
     function handleDragStart(event, listName, index) {
         didDragPlayer = true;
 
