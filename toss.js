@@ -244,6 +244,48 @@ function getCaptain(squad) {
   return getPlayerName(sorted[0]);
 }
 
+function getSelectedCaptainName(stored, squad, side = "user") {
+  if (!stored) {
+    return getCaptain(squad);
+  }
+
+  // User selected captain from Select XI page
+  if (side === "user") {
+    if (stored.captain) {
+      return getPlayerName(stored.captain);
+    }
+
+    if (stored.captainPlayerId) {
+      const foundCaptain = squad.find(player => {
+        return String(player.id || player.playerId || player.name || player.fullName) === String(stored.captainPlayerId);
+      });
+
+      if (foundCaptain) {
+        return getPlayerName(foundCaptain);
+      }
+    }
+  }
+
+  // Computer captain can still be auto-selected
+  if (side === "computer") {
+    if (stored.computerCaptain) {
+      return getPlayerName(stored.computerCaptain);
+    }
+
+    if (stored.computerCaptainPlayerId) {
+      const foundCaptain = squad.find(player => {
+        return String(player.id || player.playerId || player.name || player.fullName) === String(stored.computerCaptainPlayerId);
+      });
+
+      if (foundCaptain) {
+        return getPlayerName(foundCaptain);
+      }
+    }
+  }
+
+  return getCaptain(squad);
+}
+
 function average(numbers) {
   const valid = numbers.filter(number => Number.isFinite(number));
 
@@ -467,7 +509,7 @@ function buildMatchDataFromStorage() {
       name: teamAName,
       short: getTeamShortName(teamAName),
       sub: "User Team",
-      captain: getCaptain(userSquad),
+      captain: getSelectedCaptainName(stored, userSquad,"user"),
       bat: userRatings.bat,
       bowl: userRatings.bowl,
       field: userRatings.field
@@ -477,7 +519,7 @@ function buildMatchDataFromStorage() {
       name: teamBName,
       short: getTeamShortName(teamBName),
       sub: "Computer Team",
-      captain: getCaptain(computerSquad),
+      captain: getSelectedCaptainName(stored, computerSquad, "computer"),
       bat: computerRatings.bat,
       bowl: computerRatings.bowl,
       field: computerRatings.field

@@ -1730,10 +1730,16 @@
         currentMatch.captainPlayerId = captainPlayerId;
         currentMatch.wicketkeeperPlayerId = wicketkeeperPlayerId;
 
-        currentMatch.captain = selectedXI.find(player => getPlayerKey(player) === captainPlayerId) || null;
-        currentMatch.wicketkeeper = selectedXI.find(player => getPlayerKey(player) === wicketkeeperPlayerId) || null;
+        currentMatch.captain =
+            selectedXI.find(player => getPlayerKey(player) === captainPlayerId) || null;
+
+        currentMatch.wicketkeeper =
+            selectedXI.find(player => getPlayerKey(player) === wicketkeeperPlayerId) || null;
 
         localStorage.setItem("currentTourMatch", JSON.stringify(currentMatch));
+
+        localStorage.removeItem("currentTossResult");
+        window.location.href = `toss.html?v=${Date.now()}`;
     }
 
     function startMatchFromXI() {
