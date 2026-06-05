@@ -689,6 +689,112 @@
         width: 100%;
     }
     }
+
+    /* =========================================================
+   PLAYER OPTION POPUP
+    ========================================================= */
+
+    .player-option-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.62);
+    backdrop-filter: blur(6px);
+    }
+
+    .player-option-modal.hidden {
+    display: none;
+    }
+
+    .player-option-box {
+    width: min(420px, 92vw);
+    border-radius: 24px;
+    padding: 20px;
+    background:
+        radial-gradient(circle at 90% 0%, rgba(34, 197, 94, 0.16), transparent 34%),
+        linear-gradient(180deg, rgba(23, 33, 43, 0.98), rgba(9, 22, 33, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 28px 90px rgba(0, 0, 0, 0.55);
+    position: relative;
+    }
+
+    .player-option-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    }
+
+    .player-option-box h2 {
+    margin: 0;
+    color: var(--green);
+    font-size: 1.5rem;
+    letter-spacing: -0.04em;
+    }
+
+    .player-option-box p {
+    margin: 6px 0 16px;
+    color: var(--muted);
+    font-weight: 800;
+    }
+
+    .player-option-actions {
+    display: grid;
+    gap: 10px;
+    }
+
+    .player-option-actions button {
+    height: 46px;
+    border-radius: 16px;
+    border: 1px solid rgba(126, 231, 135, 0.35);
+    background: rgba(34, 197, 94, 0.12);
+    color: var(--text);
+    font-weight: 1000;
+    }
+
+    .player-option-actions button:hover {
+    background: rgba(34, 197, 94, 0.22);
+    }
+
+    /* Small captain / WK labels on cards */
+
+    .xi-role-tag-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+    }
+
+    .xi-role-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 20px;
+    padding: 0 7px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 1000;
+    }
+
+    .xi-role-tag.captain {
+    background: rgba(246, 196, 83, 0.18);
+    border: 1px solid rgba(246, 196, 83, 0.45);
+    color: #f6c453;
+    }
+
+    .xi-role-tag.keeper {
+    background: rgba(56, 189, 248, 0.16);
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    color: #38bdf8;
+    }
   </style>
 </head>
 
@@ -748,12 +854,34 @@
       </section>
     </main>
   </div>
+  <div id="playerOptionModal" class="player-option-modal hidden">
+    <div class="player-option-box">
+        <button class="player-option-close" onclick="closePlayerOptionModal()">×</button>
+
+        <h2 id="optionPlayerName">Player Name</h2>
+        <p id="optionPlayerInfo">Role info</p>
+
+        <div class="player-option-actions">
+        <button onclick="makeSelectedPlayerCaptain()">Make Captain</button>
+        <button onclick="makeSelectedPlayerWicketkeeper()">Set Wicketkeeper</button>
+        <button onclick="moveSelectedPlayerToBench()">Move to Bench</button>
+        </div>
+    </div>
+    </div>
 
     <script>
     let currentMatch = null;
     let selectedXI = [];
     let benchPlayers = [];
     let draggedInfo = null;
+
+    let selectedOptionPlayer = null;
+    let selectedOptionListName = null;
+    let selectedOptionIndex = null;
+
+    let captainPlayerId = null;
+    let wicketkeeperPlayerId = null;
+    let didDragPlayer = false;
 
     function getStoredTourMatch() {
         const raw = localStorage.getItem("currentTourMatch");
@@ -1029,6 +1157,8 @@
             return;
         }
 
+
+
         const tourSave = getTourSave();
 
         const formatKey = getFormatKey(
@@ -1038,6 +1168,15 @@
         );
         currentMatch = syncCurrentMatchIdentity(currentMatch, tourSave, formatKey);
 
+
+        captainPlayerId = 
+            currentMatch.captainPlayerId ||
+            (currentMatch.captain ? getPlayerKey(currentMatch.captain) : null);
+
+        wicketkeeperPlayerId =
+            currentMatch.wicketkeeperPlayerId ||
+            (currentMatch.wicketkeeper ? getPlayerKey(currentMatch.wicketkeeper) : null);
+        
         const latestFormatSquad = getMatchingFormatSquad(tourSave, currentMatch, formatKey);
         // Important:
         // Use the newest format squad from cricketTourSetupSave_v1.
@@ -1063,6 +1202,15 @@
         selectedXI = pickDefaultXI(squad);
 
         const selectedKeys = new Set(selectedXI.map(getPlayerKey));
+
+        if (!captainPlayerId || !selectedKeys.has(captainPlayerId)) {
+            captainPlayerId = selectedXI.length ? getPlayerKey(selectedXI[0]) : null;
+        }
+
+        if (!wicketkeeperPlayerId || !selectedKeys.has(wicketkeeperPlayerId)) {
+            const keeper = selectedXI.find(player => getRoleGroup(player) === "wicketkeeper");
+            wicketkeeperPlayerId = keeper ? getPlayerKey(keeper) : null;
+        }
 
         benchPlayers = squad.filter(player => !selectedKeys.has(getPlayerKey(player)));
 
@@ -1097,42 +1245,136 @@
     }
 
     function renderPlayerCard(player, listName, index) {
+        const playerId = getPlayerKey(player);
+
         const rankHtml = listName === "selected"
-        ? `<div class="xi-rank">${index + 1}</div>`
-        : `<div class="xi-rank">+</div>`;
+            ? `<div class="xi-rank">${index + 1}</div>`
+            : `<div class="xi-rank">+</div>`;
 
         const role = getRoleGroup(player);
 
+        const captainTag = playerId === captainPlayerId
+            ? `<span class="xi-role-tag captain">C</span>`
+            : "";
+
+        const keeperTag = playerId === wicketkeeperPlayerId
+            ? `<span class="xi-role-tag keeper">WK</span>`
+            : "";
+
+        const tagRow = captainTag || keeperTag
+            ? `<div class="xi-role-tag-row">${captainTag}${keeperTag}</div>`
+            : "";
+
         return `
-        <div
+            <div
             class="xi-player-card"
             draggable="true"
             data-list="${listName}"
             data-index="${index}"
+            onclick="handlePlayerCardClick(event, '${listName}', ${index})"
             ondragstart="handleDragStart(event, '${listName}', ${index})"
             ondragend="handleDragEnd(event)"
             ondragover="allowDrop(event)"
             ondrop="handleCardDrop(event, '${listName}', ${index})"
-        >
+            >
             ${rankHtml}
 
             <div class="xi-player-main">
-            <strong>${getPlayerName(player)}</strong>
-            <span>${role} • ${player.battingHand || "-"} hand bat • ${player.bowlingStyle || "Does Not Bowl"}</span>
+                <strong>${getPlayerName(player)}</strong>
+                <span>${role} • ${player.battingHand || "-"} hand bat • ${player.bowlingStyle || "Does Not Bowl"}</span>
+                ${tagRow}
             </div>
 
             <div class="xi-player-rating">
-            <div>Bat ${getBat(player)}</div>
-            <div>Bowl ${getBowl(player)}</div>
+                <div>Bat ${getBat(player)}</div>
+                <div>Bowl ${getBowl(player)}</div>
+                <div>Fld ${getField(player)}</div>
             </div>
-        </div>
+            </div>
         `;
     }
 
+
+
+    function handlePlayerCardClick(event, listName, index) {
+        if (didDragPlayer) return;
+
+        const list = getList(listName);
+        const player = list[index];
+
+        if (!player) return;
+
+        selectedOptionPlayer = player;
+        selectedOptionListName = listName;
+        selectedOptionIndex = index;
+
+        document.getElementById("optionPlayerName").textContent = getPlayerName(player);
+        document.getElementById("optionPlayerInfo").textContent =
+            `${getRoleGroup(player)} • Bat ${getBat(player)} • Bowl ${getBowl(player)} • Field ${getField(player)}`;
+
+        const modal = document.getElementById("playerOptionModal");
+        modal.classList.remove("hidden");
+    }
+
+    function closePlayerOptionModal() {
+        const modal = document.getElementById("playerOptionModal");
+        modal.classList.add("hidden");
+
+        selectedOptionPlayer = null;
+        selectedOptionListName = null;
+        selectedOptionIndex = null;
+    }
+
+    function makeSelectedPlayerCaptain() {
+        if (!selectedOptionPlayer) return;
+
+        captainPlayerId = getPlayerKey(selectedOptionPlayer);
+
+        saveDraftXI();
+        renderXIPage();
+        closePlayerOptionModal();
+    }
+
+    function makeSelectedPlayerWicketkeeper() {
+        if (!selectedOptionPlayer) return;
+
+        wicketkeeperPlayerId = getPlayerKey(selectedOptionPlayer);
+
+        saveDraftXI();
+        renderXIPage();
+        closePlayerOptionModal();
+        }
+
+    function moveSelectedPlayerToBench() {
+        if (!selectedOptionPlayer || selectedOptionListName !== "selected") {
+            closePlayerOptionModal();
+            return;
+        }
+
+        if (selectedXI.length <= 11 && benchPlayers.length === 0) {
+            alert("No bench player available.");
+            return;
+        }
+
+        const [movedPlayer] = selectedXI.splice(selectedOptionIndex, 1);
+        benchPlayers.push(movedPlayer);
+
+        const movedId = getPlayerKey(movedPlayer);
+
+        if (captainPlayerId === movedId) captainPlayerId = null;
+        if (wicketkeeperPlayerId === movedId) wicketkeeperPlayerId = null;
+
+        saveDraftXI();
+        renderXIPage();
+        closePlayerOptionModal();
+    }
+
     function handleDragStart(event, listName, index) {
+        didDragPlayer = true;
+
         draggedInfo = {
-        listName,
-        index
+            listName,
+            index
         };
 
         event.currentTarget.classList.add("dragging");
@@ -1141,6 +1383,10 @@
 
     function handleDragEnd(event) {
         event.currentTarget.classList.remove("dragging");
+
+        setTimeout(() => {
+            didDragPlayer = false;
+        }, 80);
     }
 
     function allowDrop(event) {
@@ -1250,11 +1496,22 @@
 
         currentMatch.selectedUserXI = selectedXI;
         currentMatch.userBench = benchPlayers;
+        currentMatch.captainPlayerId = captainPlayerId;
+        currentMatch.wicketkeeperPlayerId = wicketkeeperPlayerId;
+
+        currentMatch.captain = selectedXI.find(player => getPlayerKey(player) === captainPlayerId) || null;
+        currentMatch.wicketkeeper = selectedXI.find(player => getPlayerKey(player) === wicketkeeperPlayerId) || null;
         currentMatch.battingOrder = selectedXI.map((player, index) => ({
         position: index + 1,
         playerId: getPlayerKey(player),
         name: getPlayerName(player)
         }));
+
+        currentMatch.captainPlayerId = captainPlayerId;
+        currentMatch.wicketkeeperPlayerId = wicketkeeperPlayerId;
+
+        currentMatch.captain = selectedXI.find(player => getPlayerKey(player) === captainPlayerId) || null;
+        currentMatch.wicketkeeper = selectedXI.find(player => getPlayerKey(player) === wicketkeeperPlayerId) || null;
 
         localStorage.setItem("currentTourMatch", JSON.stringify(currentMatch));
     }
