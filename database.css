@@ -864,14 +864,28 @@ body.editor-open {
 
 /* =========================================================
    TOP DATABASE ACTION BUTTONS
-   Fixed left/right screen placement
+   Normal header layout - no fixed overlay
 ========================================================= */
 
-.back-main-btn {
-  position: fixed;
-  top: 18px;
-  left: 24px;
-  z-index: 5000;
+.database-top-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.database-top-actions h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 32px;
+  color: #7ee787;
+  white-space: nowrap;
+}
+
+.back-main-btn,
+.download-json-btn {
+  position: static !important;
 
   display: inline-flex;
   align-items: center;
@@ -882,40 +896,22 @@ body.editor-open {
   border-radius: 12px;
   border: none;
 
-  background: linear-gradient(135deg, #2d6a4f, #40916c);
   color: white;
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.back-main-btn {
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
   box-shadow: 0 10px 24px rgba(45, 106, 79, 0.25);
 }
 
 .download-json-btn {
-  position: fixed;
-  top: 18px;
-  right: 24px;
-  z-index: 5000;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  height: 42px;
-  padding: 0 16px;
-  border-radius: 12px;
-  border: none;
-
   background: linear-gradient(135deg, #1d4ed8, #2563eb);
-  color: white;
-  font-size: 14px;
-  font-weight: 900;
-  cursor: pointer;
   box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
-}
-
-.back-main-btn:hover,
-.download-json-btn:hover {
-  transform: translateY(-1px);
 }
 
 .back-main-btn:hover {
@@ -928,24 +924,39 @@ body.editor-open {
   color: #06110b;
 }
 
-/* Push content down so buttons do not cover Player Database title */
-.page {
-  padding-top: 84px;
+.top-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 18px;
 }
 
-@media (max-width: 650px) {
-  .back-main-btn,
-  .download-json-btn {
-    position: static;
-    width: 100%;
-    margin-bottom: 10px;
+/* Remove old fake spacing made for fixed buttons */
+.page {
+  padding-top: 24px !important;
+}
+
+@media (max-width: 760px) {
+  .top-bar {
+    grid-template-columns: 1fr;
   }
 
   .database-top-actions {
-    padding: 18px 24px 0;
+    grid-template-columns: 1fr;
   }
 
-  .page {
-    padding-top: 24px;
+  .database-top-actions h1 {
+    order: -1;
+    text-align: center;
+  }
+
+  .back-main-btn,
+  .download-json-btn {
+    width: 100%;
+  }
+
+  .player-count {
+    width: 100%;
+    text-align: center;
   }
 }
