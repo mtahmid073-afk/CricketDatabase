@@ -1039,6 +1039,7 @@
       <div class="xi-header-left">
         <button class="back-btn" onclick="goBackToSummary()">← Tour Summary</button>
         <button class="back-btn" onclick="autoPickBestXI()">Auto Pick XI</button>
+        <button class="back-btn" onclick="testCaptainPicker()">Test Captain</button>
       </div>
 
       <div class="xi-header-center">
@@ -1238,6 +1239,44 @@
             return getCaptainScore(b) - getCaptainScore(a);
         })[0];
     }
+
+
+    function testCaptainPicker() {
+        if (!selectedXI.length) {
+            alert("No selected XI loaded yet.");
+            return;
+        }
+
+        const rankedCaptains = [...selectedXI]
+            .sort((a, b) => getCaptainScore(b) - getCaptainScore(a))
+            .map((player, index) => {
+            return {
+                rank: index + 1,
+                name: getPlayerName(player),
+                leadership: getLeadership(player),
+                temperament: getTemperament(player),
+                judgement: getJudgement(player),
+                playerScore: Math.round(getPlayerScore(player) * 100) / 100,
+                captainScore: Math.round(getCaptainScore(player) * 100) / 100,
+                currentCaptain: getPlayerKey(player) === captainPlayerId ? "YES" : ""
+            };
+            });
+
+        console.clear();
+        console.log("CAPTAIN PICK TEST");
+        console.table(rankedCaptains);
+
+        const bestCaptain = pickDefaultCaptain(selectedXI);
+        const currentCaptain = selectedXI.find(player => getPlayerKey(player) === captainPlayerId);
+
+        alert(
+            `Captain Pick Test\n\n` +
+            `Best by formula: ${getPlayerName(bestCaptain)}\n` +
+            `Current C badge: ${currentCaptain ? getPlayerName(currentCaptain) : "None"}\n\n` +
+            `Open the browser console to see full ranking.`
+        );
+    }
+
 
     function addBest(result, used, pool, amount, scoreFunction) {
         const ranked = pool
