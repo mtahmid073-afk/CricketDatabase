@@ -1209,6 +1209,36 @@
         return bat * 5 + field;
     }
 
+    function getLeadership(player) {
+        return Number(player?.attributes?.mental?.leadership) || 0;
+    }
+
+    function getTemperament(player) {
+        return Number(player?.attributes?.mental?.temperament) || 0;
+    }
+
+    function getJudgement(player) {
+        }
+
+    function getCaptainScore(player) {
+        return (
+            getLeadership(player) * 5 +
+            getTemperament(player) * 2 +
+            getJudgement(player) * 2 +
+            getPlayerScore(player) * 0.15
+        );
+    }
+
+    function pickDefaultCaptain(players) {
+        const list = Array.isArray(players) ? players : [];
+
+        if (!list.length) return null;
+
+        return [...list].sort((a, b) => {
+            return getCaptainScore(b) - getCaptainScore(a);
+        })[0];
+    }
+
     function addBest(result, used, pool, amount, scoreFunction) {
         const ranked = pool
         .filter(player => !used.has(getPlayerKey(player)))
@@ -1438,7 +1468,8 @@
         const selectedKeys = new Set(selectedXI.map(getPlayerKey));
 
         if (!captainPlayerId || !selectedKeys.has(captainPlayerId)) {
-            captainPlayerId = selectedXI.length ? getPlayerKey(selectedXI[0]) : null;
+            const defaultCaptain = pickDefaultCaptain(selectedXI);
+            captainPlayerId = defaultCaptain ? getPlayerKey(defaultCaptain) : null;
         }
 
         if (!wicketkeeperPlayerId || !selectedKeys.has(wicketkeeperPlayerId)) {
@@ -1706,6 +1737,12 @@
 
         const selectedKeys = new Set(selectedXI.map(getPlayerKey));
         benchPlayers = currentMatch.userSquad.filter(player => !selectedKeys.has(getPlayerKey(player)));
+
+        const defaultCaptain = pickDefaultCaptain(selectedXI);
+        captainPlayerId = defaultCaptain ? getPlayerKey(defaultCaptain) : null;
+
+        const keeper = selectedXI.find(player => getRoleGroup(player) === "wicketkeeper");
+        wicketkeeperPlayerId = keeper ? getPlayerKey(keeper) : null;
 
         saveDraftXI();
         renderXIPage();
