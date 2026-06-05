@@ -53,6 +53,41 @@ const BOWLING_STYLE_CODES = {
   "Containment Spinner": "S-CTN"
 };
 
+const BOWLING_STYLE_LIBRARY = [
+  { type: "__NULL__", style: "__NULL__", abbrev: "__NULL__", label: "- / Does Not Bowl" },
+
+  // Pace
+  { type: "pace", style: "Right-arm Fast", abbrev: "RF", label: "Pace — Right-arm Fast (RF)" },
+  { type: "pace", style: "Left-arm Fast", abbrev: "LF", label: "Pace — Left-arm Fast (LF)" },
+  { type: "pace", style: "Right-arm Fast-Medium", abbrev: "RFM", label: "Pace — Right-arm Fast-Medium (RFM)" },
+  { type: "pace", style: "Left-arm Fast-Medium", abbrev: "LFM", label: "Pace — Left-arm Fast-Medium (LFM)" },
+  { type: "pace", style: "Right-arm Medium-Fast", abbrev: "RMF", label: "Pace — Right-arm Medium-Fast (RMF)" },
+  { type: "pace", style: "Left-arm Medium-Fast", abbrev: "LMF", label: "Pace — Left-arm Medium-Fast (LMF)" },
+  { type: "pace", style: "Right-arm Medium", abbrev: "RM", label: "Pace — Right-arm Medium (RM)" },
+  { type: "pace", style: "Left-arm Medium", abbrev: "LM", label: "Pace — Left-arm Medium (LM)" },
+
+  // Spin
+  { type: "spin", style: "Off Break", abbrev: "OB", label: "Spin — Off Break (OB)" },
+  { type: "spin", style: "Leg Break", abbrev: "LB", label: "Spin — Leg Break (LB)" },
+  { type: "spin", style: "Leg Break Googly", abbrev: "LBG", label: "Spin — Leg Break Googly (LBG)" },
+  { type: "spin", style: "Slow Left-arm Orthodox", abbrev: "SLA", label: "Spin — Slow Left-arm Orthodox (SLA)" },
+  { type: "spin", style: "Left-arm Wrist Spin", abbrev: "LAWS", label: "Spin — Left-arm Wrist Spin (LAWS)" }
+];
+
+function makeBowlingStyleValue(option) {
+  return `${option.type}|||${option.style}|||${option.abbrev}`;
+}
+
+function parseBowlingStyleValue(value) {
+  const [type, style, abbrev] = String(value || "").split("|||");
+
+  return {
+    type: type || "__NULL__",
+    style: style || "__NULL__",
+    abbrev: abbrev || "__NULL__"
+  };
+}
+
 const FIELD_NAMES = {
   name: ["name", "player", "playerName", "player_name", "fullName", "full_name", "displayName"],
   age: ["age"],
@@ -1216,6 +1251,96 @@ function editorField(label, path, type = "text", options = null) {
   `;
 }
 
+function editorBowlingStylePicker() {
+  const player = findEditorPlayerById(editingPlayerId);
+
+  const currentType = getNestedValue(player, "bowlingType", "__NULL__") || "__NULL__";
+  const currentStyle = getNestedValue(player, "bowlingStyle", "__NULL__") || "__NULL__";
+  const currentAbbrev = getNestedValue(player, "bowlingStyleAbbrev", "__NULL__") || "__NULL__";
+
+  const currentValue = makeBowlingStyleValue({
+    type: currentType,
+    style: currentStyle,
+    abbrev: currentAbbrev
+  });
+
+  let options = [...BOWLING_STYLE_LIBRARY];
+
+  const alreadyExists = options.some((option) => {
+    return makeBowlingStyleValue(option) === currentValue;
+  });
+
+  if (!alreadyExists && currentStyle !== "__NULL__" && currentStyle !== null && currentStyle !== "") {
+    options.unshift({
+      type: currentType,
+      style: currentStyle,
+      abbrev: currentAbbrev,
+      label: `Current — ${currentStyle} (${currentAbbrev || "-"})`
+    });
+  }
+
+  const optionHTML = options.map((option) => {
+    const value = makeBowlingStyleValue(option);
+    const selected = value === currentValue ? "selected" : "";
+
+    return `
+      <option value="${escapeHTML(value)}" ${selected}>
+        ${escapeHTML(option.label)}
+      </option>
+    `;
+  }).join("");
+
+  return `
+    <label class="editor-field editor-field-wide">
+      <span>Bowling Style / Abbrev</span>
+
+      <select id="bowlingStylePicker" data-bowling-style-picker>
+        ${optionHTML}
+      </select>
+
+      <input
+        type="hidden"
+        data-edit-path="bowlingStyle"
+        data-edit-type="text"
+        value="${escapeHTML(currentStyle)}"
+      >
+
+      <input
+        type="hidden"
+        data-edit-path="bowlingStyleAbbrev"
+        data-edit-type="text"
+        value="${escapeHTML(currentAbbrev)}"
+      >
+    </label>
+  `;
+}
+
+function syncBowlingStylePicker() {
+  const overlay = document.getElementById("playerEditorOverlay");
+  if (!overlay) return;
+
+  const picker = overlay.querySelector("[data-bowling-style-picker]");
+  if (!picker) return;
+
+  const selected = parseBowlingStyleValue(picker.value);
+
+  const bowlingTypeInput = overlay.querySelector('[data-edit-path="bowlingType"]');
+  const bowlingStyleInput = overlay.querySelector('[data-edit-path="bowlingStyle"]');
+  const bowlingAbbrevInput = overlay.querySelector('[data-edit-path="bowlingStyleAbbrev"]');
+
+  if (bowlingTypeInput) {
+    bowlingTypeInput.value = selected.type;
+  }
+
+  if (bowlingStyleInput) {
+    bowlingStyleInput.value = selected.style;
+  }
+
+  if (bowlingAbbrevInput) {
+    bowlingAbbrevInput.value = selected.abbrev;
+  }
+}
+
 function editorNumberField(label, path, min = 0, max = 20, step = 1) {
   const player = findEditorPlayerById(editingPlayerId);
   const value = getNestedValue(player, path, "");
@@ -1363,11 +1488,8 @@ function renderPlayerEditorForm(player) {
             ${editorField("Batting Hand", "battingHand", "text", handOptions)}
             ${editorField("Bowling Hand", "bowlingHand", "text", handOptions)}
             ${editorField("Bowling Type", "bowlingType", "text", bowlingTypeOptions)}
-            ${editorField("Bowling Style", "bowlingStyle")}
-            ${editorField("Bowling Abbrev", "bowlingStyleAbbrev")}
+            ${editorBowlingStylePicker()}
             ${editorField("Batting Position", "primaryBattingPosition", "number")}
-            ${editorField("Current Team", "currentTeam")}
-            ${editorField("Sold Price", "soldPrice", "number")}
           </div>
         </section>
 
@@ -1532,6 +1654,15 @@ function attachPlayerEditorLivePreview() {
     input.addEventListener("input", refreshEditorPlaystylePreview);
     input.addEventListener("change", refreshEditorPlaystylePreview);
   });
+
+  const bowlingStylePicker = overlay.querySelector("[data-bowling-style-picker]");
+
+  if (bowlingStylePicker) {
+    bowlingStylePicker.addEventListener("change", () => {
+      syncBowlingStylePicker();
+      refreshEditorPlaystylePreview();
+    });
+  }
 }
 
 function ensurePlayerEditorRoot() {

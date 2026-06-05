@@ -960,3 +960,19 @@ body.editor-open {
     text-align: center;
   }
 }
+
+.editor-field-wide {
+  grid-column: span 2;
+}
+
+@media (max-width: 900px) {
+  .editor-field-wide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .editor-field-wide {
+    grid-column: span 1;
+  }
+}
