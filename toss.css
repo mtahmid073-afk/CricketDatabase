@@ -1232,3 +1232,279 @@ button,
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.30) !important;
   }
 }
+
+/* =========================================================
+   TOSS PAGE COLOR REFRESH + FLIP TOSS EMPHASIS
+   Same scheme as Select XI
+   Paste at bottom of toss.css
+========================================================= */
+
+:root {
+  --bg: #07111c;
+  --panel: #0f1b2a;
+  --panel-2: #142235;
+  --line: rgba(255, 255, 255, 0.13);
+  --text: #eef7f3;
+  --muted: #9fb3c1;
+  --green: #22c55e;
+  --blue: #38bdf8;
+  --gold: #f6c453;
+  --orange: #fb923c;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+}
+
+/* Cooler stadium background */
+body {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(56, 189, 248, 0.16), transparent 30%),
+    radial-gradient(circle at 82% 0%, rgba(246, 196, 83, 0.12), transparent 30%),
+    linear-gradient(135deg, #030712, #071827 52%, #06111f) !important;
+}
+
+/* Header same as Select XI */
+.topbar {
+  background:
+    linear-gradient(90deg, rgba(56, 189, 248, 0.12), transparent 42%, rgba(246, 196, 83, 0.12)),
+    rgba(10, 22, 35, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38) !important;
+}
+
+.logo {
+  background:
+    linear-gradient(135deg, #38bdf8, #f6c453) !important;
+  color: #041017 !important;
+}
+
+.title h1 {
+  color: #f8fafc !important;
+}
+
+.title p {
+  color: #9fb3c1 !important;
+}
+
+/* Top buttons cooler */
+.back-btn {
+  background: rgba(15, 35, 55, 0.92) !important;
+  border: 1px solid rgba(96, 165, 250, 0.28) !important;
+  color: #cfe8ff !important;
+  box-shadow: none !important;
+}
+
+.back-btn:hover {
+  background: rgba(37, 99, 235, 0.22) !important;
+  border-color: rgba(96, 165, 250, 0.55) !important;
+  color: white !important;
+}
+
+/* Match pill gold */
+.match-pill {
+  background: rgba(246, 196, 83, 0.13) !important;
+  border-color: rgba(246, 196, 83, 0.35) !important;
+  color: #f6c453 !important;
+}
+
+/* Cards navy instead of green */
+.card,
+.team-card,
+.toss-center,
+.team-info-box,
+.captain-box,
+.result-box {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.065), transparent),
+    rgba(9, 22, 36, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.13) !important;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.34) !important;
+}
+
+/* Team card hover blue instead of green */
+.team-card:hover {
+  border-color: rgba(56, 189, 248, 0.38) !important;
+  box-shadow:
+    0 22px 52px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(56, 189, 248, 0.10) inset !important;
+}
+
+/* Team text */
+.team-name h2,
+.team-info-box h3,
+.toss-call-title {
+  color: #f8fafc !important;
+}
+
+.team-name p,
+.team-info-box p,
+.result-box p,
+.title p {
+  color: #9fb3c1 !important;
+}
+
+/* Team logos/badges blue/gold */
+.team-badge {
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.14), transparent 28%),
+    linear-gradient(135deg, rgba(15, 35, 55, 0.96), rgba(20, 34, 53, 0.94)) !important;
+  border: 1px solid rgba(96, 165, 250, 0.28) !important;
+}
+
+.team-badge.away {
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.14), transparent 28%),
+    linear-gradient(135deg, rgba(52, 35, 13, 0.95), rgba(20, 34, 53, 0.94)) !important;
+  border-color: rgba(246, 196, 83, 0.34) !important;
+}
+
+/* Stats */
+.stat {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.035)),
+    rgba(15, 32, 50, 0.84) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.stat b {
+  color: #f8fafc !important;
+}
+
+.stat span {
+  color: #9fb3c1 !important;
+}
+
+/* Power bars blue/gold */
+.power-meter {
+  background: rgba(255, 255, 255, 0.075) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.power-fill {
+  background: linear-gradient(90deg, #38bdf8, #f6c453) !important;
+  box-shadow: none !important;
+}
+
+.power-fill.away-fill {
+  background: linear-gradient(90deg, #f6c453, #fb923c) !important;
+  box-shadow: none !important;
+}
+
+/* Toss center becomes premium focus */
+.toss-center {
+  border-color: rgba(246, 196, 83, 0.32) !important;
+  background:
+    radial-gradient(circle at 50% 14%, rgba(246, 196, 83, 0.13), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.065), transparent),
+    rgba(9, 22, 36, 0.94) !important;
+}
+
+.section-label {
+  color: #f6c453 !important;
+}
+
+.toss-call-title {
+  color: #f8fafc !important;
+}
+
+/* Heads/Tails buttons cooler */
+.choice-row button,
+.decision-row button {
+  background: rgba(15, 35, 55, 0.92) !important;
+  border: 1px solid rgba(96, 165, 250, 0.28) !important;
+  color: #cfe8ff !important;
+}
+
+.choice-row button:hover,
+.decision-row button:hover {
+  background: rgba(37, 99, 235, 0.22) !important;
+  border-color: rgba(96, 165, 250, 0.55) !important;
+  color: white !important;
+}
+
+.choice-row button.active {
+  background:
+    linear-gradient(135deg, rgba(246, 196, 83, 0.24), rgba(56, 189, 248, 0.16)) !important;
+  border-color: rgba(246, 196, 83, 0.65) !important;
+  color: #f6c453 !important;
+}
+
+/* FLIP TOSS: main emphasized button */
+.toss-btn,
+#flipBtn {
+  min-height: 52px !important;
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 237, 213, 0.75) !important;
+  background:
+    linear-gradient(135deg, #facc15, #fb923c, #f97316) !important;
+  color: #1c0a00 !important;
+  font-size: 1rem !important;
+  font-weight: 1000 !important;
+  letter-spacing: 0.02em !important;
+  box-shadow:
+    0 16px 34px rgba(249, 115, 22, 0.36),
+    0 0 0 4px rgba(251, 191, 36, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+}
+
+.toss-btn:hover,
+#flipBtn:hover {
+  background:
+    linear-gradient(135deg, #fde047, #fb923c, #ea580c) !important;
+  color: #130600 !important;
+  border-color: rgba(255, 237, 213, 0.95) !important;
+  box-shadow:
+    0 18px 38px rgba(249, 115, 22, 0.48),
+    0 0 0 5px rgba(251, 191, 36, 0.16) !important;
+}
+
+.toss-btn::after,
+#flipBtn::after {
+  content: " →";
+  font-weight: 1000;
+}
+
+.toss-btn:disabled,
+#flipBtn:disabled,
+#flipBtn.locked {
+  background: rgba(100, 116, 139, 0.35) !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: none !important;
+}
+
+.toss-btn:disabled::after,
+#flipBtn:disabled::after,
+#flipBtn.locked::after {
+  content: "";
+}
+
+/* Result box gold accent */
+.result-box {
+  border-color: rgba(246, 196, 83, 0.28) !important;
+}
+
+.result-box h3 {
+  color: #f6c453 !important;
+}
+
+/* Tags */
+.tag {
+  background: rgba(15, 35, 55, 0.92) !important;
+  border: 1px solid rgba(96, 165, 250, 0.24) !important;
+  color: #cfe8ff !important;
+}
+
+/* Continue button secondary action */
+.continue-btn {
+  background:
+    linear-gradient(135deg, #38bdf8, #2563eb) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(191, 219, 254, 0.55) !important;
+  box-shadow:
+    0 12px 26px rgba(37, 99, 235, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+
+.continue-btn:hover {
+  background:
+    linear-gradient(135deg, #7dd3fc, #2563eb) !important;
+}
