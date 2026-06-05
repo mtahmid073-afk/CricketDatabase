@@ -825,6 +825,182 @@
     border: 1px solid rgba(56, 189, 248, 0.62);
     color: #38bdf8;
     }
+
+    /* =========================================================
+   SELECT XI COLOR REFRESH + START MATCH EMPHASIS
+   Paste at bottom of select-xi.html style section
+    ========================================================= */
+
+    /* Less green, more navy/gold premium tone */
+    :root {
+    --bg: #07111c;
+    --panel: #0f1b2a;
+    --panel-2: #142235;
+    --line: rgba(255, 255, 255, 0.13);
+    --text: #eef7f3;
+    --muted: #9fb3c1;
+    --green: #22c55e;
+    --blue: #38bdf8;
+    --gold: #f6c453;
+    --orange: #fb923c;
+    --shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+    }
+
+    /* Background: cooler stadium look */
+    body {
+    background:
+        radial-gradient(circle at 18% 0%, rgba(56, 189, 248, 0.16), transparent 30%),
+        radial-gradient(circle at 82% 0%, rgba(246, 196, 83, 0.12), transparent 30%),
+        linear-gradient(135deg, #030712, #071827 52%, #06111f) !important;
+    }
+
+    /* Header less green */
+    .xi-topbar-new {
+    background:
+        linear-gradient(90deg, rgba(56, 189, 248, 0.12), transparent 42%, rgba(246, 196, 83, 0.12)),
+        rgba(10, 22, 35, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    }
+
+    /* Center title */
+    .xi-header-center h1 {
+    color: #f8fafc !important;
+    }
+
+    .xi-header-center .match-pill {
+    background: rgba(246, 196, 83, 0.13) !important;
+    border-color: rgba(246, 196, 83, 0.35) !important;
+    color: #f6c453 !important;
+    }
+
+    /* Normal action buttons should be cooler blue/gray */
+    .back-btn {
+    background: rgba(15, 35, 55, 0.92) !important;
+    border: 1px solid rgba(96, 165, 250, 0.28) !important;
+    color: #cfe8ff !important;
+    box-shadow: none !important;
+    }
+
+    .back-btn:hover {
+    background: rgba(37, 99, 235, 0.22) !important;
+    border-color: rgba(96, 165, 250, 0.55) !important;
+    color: white !important;
+    }
+
+    /* Selected XI and Bench cards: more blue/navy, less green */
+    .card {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.065), transparent),
+        rgba(9, 22, 36, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.13) !important;
+    }
+
+    .xi-box-head h2 {
+    color: #f8fafc !important;
+    }
+
+    .xi-box-head p {
+    color: #9fb3c1 !important;
+    }
+
+    /* Counts use gold/blue instead of green */
+    .xi-count {
+    background: rgba(246, 196, 83, 0.12) !important;
+    border: 1px solid rgba(246, 196, 83, 0.34) !important;
+    color: #f6c453 !important;
+    }
+
+    /* Player cards cooler */
+    .xi-player-card {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.035)),
+        rgba(15, 32, 50, 0.84) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+    .xi-player-card:hover {
+    border-color: rgba(56, 189, 248, 0.38) !important;
+    background:
+        linear-gradient(180deg, rgba(56, 189, 248, 0.10), rgba(255, 255, 255, 0.035)),
+        rgba(15, 32, 50, 0.92) !important;
+    }
+
+    /* Rank boxes blue/gold instead of green */
+    .xi-rank {
+    background: rgba(56, 189, 248, 0.14) !important;
+    border: 1px solid rgba(56, 189, 248, 0.28) !important;
+    color: #38bdf8 !important;
+    }
+
+    .selected-xi-list .xi-rank {
+    background: rgba(246, 196, 83, 0.14) !important;
+    border-color: rgba(246, 196, 83, 0.34) !important;
+    color: #f6c453 !important;
+    }
+
+    /* Player name less neon green */
+    .xi-player-main strong {
+    color: #f8fafc !important;
+    }
+
+    .xi-player-main span {
+    color: #9fb3c1 !important;
+    }
+
+    /* START MATCH: make this the main button */
+    .start-btn,
+    .xi-header-right .start-btn {
+    min-width: 190px !important;
+    height: 50px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255, 237, 213, 0.70) !important;
+    background:
+        linear-gradient(135deg, #facc15, #fb923c, #f97316) !important;
+    color: #1c0a00 !important;
+    font-size: 1rem !important;
+    font-weight: 1000 !important;
+    letter-spacing: 0.02em !important;
+    box-shadow:
+        0 16px 34px rgba(249, 115, 22, 0.36),
+        0 0 0 4px rgba(251, 191, 36, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+    }
+
+    .start-btn:hover,
+    .xi-header-right .start-btn:hover {
+    background:
+        linear-gradient(135deg, #fde047, #fb923c, #ea580c) !important;
+    color: #130600 !important;
+    border-color: rgba(255, 237, 213, 0.95) !important;
+    box-shadow:
+        0 18px 38px rgba(249, 115, 22, 0.48),
+        0 0 0 5px rgba(251, 191, 36, 0.16) !important;
+    }
+
+    .start-btn::after {
+    content: " →";
+    font-weight: 1000;
+    }
+
+    .start-btn:disabled {
+    background: rgba(100, 116, 139, 0.35) !important;
+    color: rgba(255, 255, 255, 0.55) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: none !important;
+    }
+
+    .start-btn:disabled::after {
+    content: "";
+    }
+
+    /* Scrollbar now blue/gold */
+    .xi-list::-webkit-scrollbar-thumb {
+    background: rgba(56, 189, 248, 0.38) !important;
+    }
+
+    .xi-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(246, 196, 83, 0.55) !important;
+    }
     </style>
 </head>
 
