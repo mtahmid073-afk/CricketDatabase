@@ -2268,3 +2268,87 @@ body.summary-page #summaryScreen.active {
     grid-column: auto !important;
   }
 }
+
+/* =========================================================
+   REMOVE TINY SETUP PAGE SCROLL
+   Paste at very bottom of tour.css
+========================================================= */
+
+/* Only lock the main setup page, not squad or summary pages */
+body.main-page {
+  height: 100vh !important;
+  height: 100dvh !important;
+  overflow: hidden !important;
+}
+
+/* Keep the whole setup inside one screen */
+body.main-page .page {
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  gap: 8px !important;
+}
+
+/* Slightly tighten only spacing, not team card dimensions */
+body.main-page .hero {
+  margin-bottom: 0 !important;
+}
+
+body.main-page .steps {
+  margin-bottom: 0 !important;
+  gap: 6px !important;
+}
+
+body.main-page #setupScreen.active {
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+/* Keep team cards same size, just reduce outside spacing */
+body.main-page .team-grid {
+  margin-bottom: 6px !important;
+}
+
+/* Tighten Series Creator only */
+body.main-page .series-panel {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+body.main-page .series-panel h2 {
+  font-size: 22px !important;
+  margin-bottom: 0 !important;
+}
+
+body.main-page .series-counter-grid {
+  margin-top: 8px !important;
+  gap: 8px !important;
+}
+
+/* Slightly shorter counter cards only, not team cards */
+body.main-page .counter-card,
+body.main-page .series-create-card {
+  min-height: 108px !important;
+  padding: 10px !important;
+}
+
+body.main-page .counter-control strong {
+  height: 44px !important;
+  font-size: 30px !important;
+}
+
+body.main-page .counter-control button {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+body.main-page .counter-bottom {
+  margin-top: 6px !important;
+}
+
+body.main-page .series-create-card button {
+  height: 40px !important;
+}
