@@ -1716,16 +1716,6 @@
 
         currentMatch.selectedUserXI = selectedXI;
         currentMatch.userBench = benchPlayers;
-        currentMatch.captainPlayerId = captainPlayerId;
-        currentMatch.wicketkeeperPlayerId = wicketkeeperPlayerId;
-
-        currentMatch.captain = selectedXI.find(player => getPlayerKey(player) === captainPlayerId) || null;
-        currentMatch.wicketkeeper = selectedXI.find(player => getPlayerKey(player) === wicketkeeperPlayerId) || null;
-        currentMatch.battingOrder = selectedXI.map((player, index) => ({
-        position: index + 1,
-        playerId: getPlayerKey(player),
-        name: getPlayerName(player)
-        }));
 
         currentMatch.captainPlayerId = captainPlayerId;
         currentMatch.wicketkeeperPlayerId = wicketkeeperPlayerId;
@@ -1736,10 +1726,13 @@
         currentMatch.wicketkeeper =
             selectedXI.find(player => getPlayerKey(player) === wicketkeeperPlayerId) || null;
 
-        localStorage.setItem("currentTourMatch", JSON.stringify(currentMatch));
+        currentMatch.battingOrder = selectedXI.map((player, index) => ({
+            position: index + 1,
+            playerId: getPlayerKey(player),
+            name: getPlayerName(player)
+        }));
 
-        localStorage.removeItem("currentTossResult");
-        window.location.href = `toss.html?v=${Date.now()}`;
+        localStorage.setItem("currentTourMatch", JSON.stringify(currentMatch));
     }
 
     function startMatchFromXI() {
@@ -1839,6 +1832,15 @@
 
         /* Important: rewrite teams and match title using the newest saved tour */
         currentMatch = syncCurrentMatchIdentity(currentMatch, freshTourSave, activeFormat);
+
+        currentMatch.captainPlayerId = captainPlayerId;
+        currentMatch.wicketkeeperPlayerId = wicketkeeperPlayerId;
+
+        currentMatch.captain =
+            selectedXI.find(player => getPlayerKey(player) === captainPlayerId) || null;
+
+        currentMatch.wicketkeeper =
+            selectedXI.find(player => getPlayerKey(player) === wicketkeeperPlayerId) || null;
 
         localStorage.setItem("currentTourMatch", JSON.stringify(currentMatch));
 
