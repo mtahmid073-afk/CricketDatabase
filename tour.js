@@ -322,8 +322,65 @@ let squadSort = {
 
 let tourProgress = {
   completedMatchIndexes: [],
-  activeMatchIndex: null
+  activeMatchIndex: null,
+  matchResults: {}
 };
+
+function ensureTourProgressShape() {
+  if (!tourProgress || typeof tourProgress !== "object") {
+    tourProgress = {};
+  }
+
+  if (!Array.isArray(tourProgress.completedMatchIndexes)) {
+    tourProgress.completedMatchIndexes = [];
+  }
+
+  if (!tourProgress.matchResults || typeof tourProgress.matchResults !== "object") {
+    tourProgress.matchResults = {};
+  }
+
+  if (!("activeMatchIndex" in tourProgress)) {
+    tourProgress.activeMatchIndex = null;
+  }
+}
+
+function syncTourProgressFromStorage() {
+  const raw = localStorage.getItem(TOUR_STORAGE_KEY);
+
+  if (!raw) {
+    ensureTourProgressShape();
+    return;
+  }
+
+  try {
+    const saved = JSON.parse(raw);
+
+    if (saved?.tourProgress) {
+      tourProgress = {
+        completedMatchIndexes: Array.isArray(saved.tourProgress.completedMatchIndexes)
+          ? saved.tourProgress.completedMatchIndexes
+          : [],
+
+        activeMatchIndex: saved.tourProgress.activeMatchIndex ?? null,
+
+        matchResults:
+          saved.tourProgress.matchResults &&
+          typeof saved.tourProgress.matchResults === "object"
+            ? saved.tourProgress.matchResults
+            : {}
+      };
+    }
+  } catch (error) {
+    console.error("Could not sync tour progress:", error);
+  }
+
+  ensureTourProgressShape();
+}
+
+function getSavedMatchResult(matchIndex) {
+  ensureTourProgressShape();
+  return tourProgress.matchResults?.[String(matchIndex)] || null;
+}
 
 const TOUR_STORAGE_KEY = "cricketTourSetupSave_v1";
 let currentScreenName = "setup";
@@ -594,6 +651,7 @@ function showScreen(name, shouldSave = true) {
   }
 
   if (name === "summary") {
+    syncTourProgressFromStorage();
     renderSummary();
   }
 
@@ -732,7 +790,8 @@ function createSeries() {
 
   tourProgress = {
     completedMatchIndexes: [],
-    activeMatchIndex: null
+    activeMatchIndex: null,
+    matchResults: {}
   };
 
   saveTourState("summary");
@@ -1841,8 +1900,23 @@ function renderScheduleMatch(match, nextPlayableMatchIndex) {
   const formatClass = match.format.toLowerCase();
   const isCompleted = tourProgress.completedMatchIndexes.includes(match.matchIndex);
   const isPlayable = match.matchIndex === nextPlayableMatchIndex && !isCompleted;
+  const savedResult = getSavedMatchResult(match.matchIndex);
 
   const buttonHTML = getMatchActionButton(match, nextPlayableMatchIndex);
+
+  const timeOrResultHTML = savedResult
+    ? `
+      <div class="match-local-time result-text">
+        ${esc(savedResult.resultText)}
+      </div>
+      <div class="match-gmt-time">
+        Match Completed
+      </div>
+    `
+    : `
+      <div class="match-local-time">${esc(match.localTime)} <span>(${esc(match.localNote)})</span></div>
+      <div class="match-gmt-time">${esc(match.gmtTime)} GMT / LOCAL</div>
+    `;
 
   return `
     <div class="schedule-match-card compact-match-card">
@@ -1852,8 +1926,7 @@ function renderScheduleMatch(match, nextPlayableMatchIndex) {
       </div>
 
       <div class="match-time-info">
-        <div class="match-local-time">${esc(match.localTime)} <span>(${esc(match.localNote)})</span></div>
-        <div class="match-gmt-time">${esc(match.gmtTime)} GMT / LOCAL</div>
+        ${timeOrResultHTML}
       </div>
 
       <div class="match-format-pill ${esc(formatClass)}">
@@ -2133,7 +2206,8 @@ function resetAll() {
 
   tourProgress = {
     completedMatchIndexes: [],
-    activeMatchIndex: null
+    activeMatchIndex: null,
+    matchResults: {}
   };
 
   currentScreenName = "setup";

@@ -18,7 +18,7 @@ Put your real JSON file here and name it exactly:
 data/players.json
 
 Run from this folder:
-python -m http.server 8000
+python -m http.server 8001
 
 Open:
 http://localhost:8000/index.html

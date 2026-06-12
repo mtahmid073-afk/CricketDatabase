@@ -16905,9 +16905,9 @@
         },
         "mental": {
           "concentration": 16,
-          "temperament": 6,
+          "temperament": 20,
           "aggression": 4,
-          "judgement": 2,
+          "judgement": 20,
           "leadership": 20
         },
         "overall": {
@@ -52207,7 +52207,7 @@
           "temperament": 6,
           "aggression": 19,
           "judgement": 11,
-          "leadership": 15
+          "leadership": 0
         },
         "overall": {
           "batting_overall": 15,
@@ -88123,7 +88123,7 @@
           "temperament": 12,
           "aggression": 10,
           "judgement": 10,
-          "leadership": 5
+          "leadership": 20
         },
         "overall": {
           "batting_overall": 11,
